@@ -1,6 +1,6 @@
 # Kubernetes Manifests
 
-Kubernetes deployment manifests for InteriorAI production infrastructure.
+Kubernetes deployment manifests for OpenLintel production infrastructure.
 
 ## Structure
 

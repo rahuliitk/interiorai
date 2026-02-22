@@ -1,4 +1,4 @@
-# InteriorAI Mobile App
+# OpenLintel Mobile App
 
 Cross-platform mobile application for site capture and project management.
 

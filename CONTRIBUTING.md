@@ -1,6 +1,6 @@
-# Contributing to InteriorAI
+# Contributing to OpenLintel
 
-Thank you for your interest in contributing to InteriorAI! This project is ambitious and we need help from many different disciplines — software engineers, ML engineers, CAD specialists, architects, interior designers, electrical engineers, plumbers, and more.
+Thank you for your interest in contributing to OpenLintel! This project is ambitious and we need help from many different disciplines — software engineers, ML engineers, CAD specialists, architects, interior designers, electrical engineers, plumbers, and more.
 
 ## Table of Contents
 
@@ -21,7 +21,7 @@ Thank you for your interest in contributing to InteriorAI! This project is ambit
 
 ## Code of Conduct
 
-This project follows our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you agree to uphold it. Report unacceptable behavior to conduct@interiorai.dev.
+This project follows our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you agree to uphold it. Report unacceptable behavior to conduct@openlintel.dev.
 
 ## How Can I Contribute?
 
@@ -65,8 +65,8 @@ pnpm --version    # >= 9.0 (package manager)
 
 ```bash
 # Fork and clone
-git clone https://github.com/<your-username>/interiorai.git
-cd interiorai
+git clone https://github.com/<your-username>/openlintel.git
+cd openlintel
 
 # Install dependencies
 pnpm install
@@ -91,7 +91,7 @@ pnpm run dev
 pnpm test
 
 # Specific service
-pnpm test --filter=@interiorai/bom-engine
+pnpm test --filter=@openlintel/bom-engine
 
 # With coverage
 pnpm test -- --coverage
@@ -268,7 +268,7 @@ Contribute local material specs:
 
 ## Reporting Bugs
 
-Use [GitHub Issues](https://github.com/rahuliitk/interiorai/issues/new?template=bug_report.yml) with:
+Use [GitHub Issues](https://github.com/rahuliitk/openlintel/issues/new?template=bug_report.yml) with:
 
 - **Description**: What happened vs. what you expected
 - **Steps to Reproduce**: Minimal steps to trigger the bug
@@ -277,7 +277,7 @@ Use [GitHub Issues](https://github.com/rahuliitk/interiorai/issues/new?template=
 
 ## Suggesting Features
 
-Use [GitHub Discussions](https://github.com/rahuliitk/interiorai/discussions/categories/ideas) for feature ideas. Describe:
+Use [GitHub Discussions](https://github.com/rahuliitk/openlintel/discussions/categories/ideas) for feature ideas. Describe:
 
 - The problem you're trying to solve
 - Your proposed solution

@@ -6,25 +6,25 @@ services:
   # ---------------------------------------------------------------------------
   postgres:
     image: postgres:16-alpine
-    container_name: interiorai-postgres
+    container_name: openlintel-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-interiorai}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-interiorai_dev}
-      POSTGRES_DB: ${POSTGRES_DB:-interiorai}
+      POSTGRES_USER: ${POSTGRES_USER:-openlintel}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-openlintel_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-openlintel}
     ports:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U interiorai']
+      test: ['CMD-SHELL', 'pg_isready -U openlintel']
       interval: 10s
       timeout: 5s
       retries: 5
 
   redis:
     image: redis:7-alpine
-    container_name: interiorai-redis
+    container_name: openlintel-redis
     restart: unless-stopped
     ports:
       - '6379:6379'
@@ -38,7 +38,7 @@ services:
 
   minio:
     image: minio/minio:latest
-    container_name: interiorai-minio
+    container_name: openlintel-minio
     restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
@@ -55,7 +55,7 @@ services:
   # ---------------------------------------------------------------------------
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
-    container_name: interiorai-elasticsearch
+    container_name: openlintel-elasticsearch
     restart: unless-stopped
     environment:
       - discovery.type=single-node
@@ -74,12 +74,12 @@ services:
   #   build:
   #     context: .
   #     dockerfile: infra/docker/web.Dockerfile
-  #   container_name: interiorai-web
+  #   container_name: openlintel-web
   #   restart: unless-stopped
   #   ports:
   #     - '3000:3000'
   #   environment:
-  #     - DATABASE_URL=postgresql://interiorai:interiorai_dev@postgres:5432/interiorai
+  #     - DATABASE_URL=postgresql://openlintel:openlintel_dev@postgres:5432/openlintel
   #     - REDIS_URL=redis://redis:6379
   #   depends_on:
   #     postgres:
@@ -91,7 +91,7 @@ services:
   #   build:
   #     context: .
   #     dockerfile: infra/docker/design-engine.Dockerfile
-  #   container_name: interiorai-design-engine
+  #   container_name: openlintel-design-engine
   #   restart: unless-stopped
   #   ports:
   #     - '8000:8000'

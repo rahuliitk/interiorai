@@ -8,11 +8,11 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in InteriorAI, please report it responsibly.
+If you discover a security vulnerability in OpenLintel, please report it responsibly.
 
 **Do NOT open a public GitHub issue for security vulnerabilities.**
 
-Instead, please email: **security@interiorai.dev**
+Instead, please email: **security@openlintel.dev**
 
 Include the following in your report:
 

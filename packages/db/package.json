@@ -1,5 +1,5 @@
 {
-  "name": "@interiorai/db",
+  "name": "@openlintel/db",
   "version": "0.1.0",
   "private": true,
   "main": "./src/index.ts",
@@ -14,7 +14,7 @@
     "reset": "echo 'TODO: reset database'"
   },
   "dependencies": {
-    "@interiorai/core": "workspace:*"
+    "@openlintel/core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.6.0",

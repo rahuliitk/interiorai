@@ -1,13 +1,13 @@
 {
-  "name": "interiorai",
+  "name": "openlintel",
   "version": "0.1.0",
   "private": true,
   "description": "End-to-end home design automation platform",
-  "author": "InteriorAI Contributors",
+  "author": "OpenLintel Contributors",
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/interiorai/interiorai.git"
+    "url": "https://github.com/openlintel/openlintel.git"
   },
   "engines": {
     "node": ">=20.0.0",
@@ -15,7 +15,7 @@
   },
   "packageManager": "pnpm@9.15.4",
   "scripts": {
-    "dev": "pnpm --filter @interiorai/web dev",
+    "dev": "pnpm --filter @openlintel/web dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "lint:fix": "pnpm -r lint --fix",
@@ -23,9 +23,9 @@
     "format:check": "prettier --check .",
     "test": "pnpm -r test",
     "test:coverage": "pnpm -r test -- --coverage",
-    "db:migrate": "pnpm --filter @interiorai/db migrate",
-    "db:seed": "pnpm --filter @interiorai/db seed",
-    "db:reset": "pnpm --filter @interiorai/db reset",
+    "db:migrate": "pnpm --filter @openlintel/db migrate",
+    "db:seed": "pnpm --filter @openlintel/db seed",
+    "db:reset": "pnpm --filter @openlintel/db reset",
     "clean": "pnpm -r exec rm -rf node_modules dist .next out .turbo",
     "typecheck": "pnpm -r typecheck",
     "prepare": "husky"

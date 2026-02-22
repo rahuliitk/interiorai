@@ -1,6 +1,6 @@
 # Terraform Infrastructure
 
-Infrastructure as Code for InteriorAI cloud deployment.
+Infrastructure as Code for OpenLintel cloud deployment.
 
 ## Planned Resources
 

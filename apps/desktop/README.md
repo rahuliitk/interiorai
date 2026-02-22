@@ -1,4 +1,4 @@
-# InteriorAI Desktop App
+# OpenLintel Desktop App
 
 Desktop application for heavy 3D design work and CAD integration.
 

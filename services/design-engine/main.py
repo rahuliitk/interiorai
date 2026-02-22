@@ -1,10 +1,10 @@
-"""Design Engine — AI design generation service for InteriorAI."""
+"""Design Engine — AI design generation service for OpenLintel."""
 
 from fastapi import FastAPI
 from pydantic import BaseModel
 
 app = FastAPI(
-    title="InteriorAI Design Engine",
+    title="OpenLintel Design Engine",
     description="AI-powered room design generation",
     version="0.1.0",
 )

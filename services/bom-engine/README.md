@@ -1,6 +1,6 @@
 # BOM Engine
 
-Bill of Materials calculation service for InteriorAI.
+Bill of Materials calculation service for OpenLintel.
 
 ## Responsibilities
 
@@ -9,6 +9,13 @@ Bill of Materials calculation service for InteriorAI.
 - Generate room-by-room and category-wise BOMs
 - Produce tile/stone cut lists with layout optimization
 - Generate electrical and plumbing material schedules
+
+## Open-Source Tools
+
+| Tool | License | Role |
+|------|---------|------|
+| [Google OR-Tools](https://github.com/google/or-tools) | Apache-2.0 | Material quantity optimization and waste minimization |
+| [PuLP](https://github.com/coin-or/pulp) | MIT | Linear programming for budget-constrained material selection |
 
 ## Tech Stack
 

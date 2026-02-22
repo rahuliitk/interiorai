@@ -44,9 +44,9 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_USER: interiorai
-          POSTGRES_PASSWORD: interiorai_test
-          POSTGRES_DB: interiorai_test
+          POSTGRES_USER: openlintel
+          POSTGRES_PASSWORD: openlintel_test
+          POSTGRES_DB: openlintel_test
         ports:
           - 5432:5432
         options: >-
@@ -80,7 +80,7 @@ jobs:
       - name: Run tests
         run: pnpm test
         env:
-          DATABASE_URL: postgresql://interiorai:interiorai_test@localhost:5432/interiorai_test
+          DATABASE_URL: postgresql://openlintel:openlintel_test@localhost:5432/openlintel_test
           REDIS_URL: redis://localhost:6379
           NODE_ENV: test
 

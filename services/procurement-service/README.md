@@ -1,6 +1,6 @@
 # Procurement Service
 
-Order management and supply chain coordination for InteriorAI.
+Order management and supply chain coordination for OpenLintel.
 
 ## Responsibilities
 
@@ -9,6 +9,12 @@ Order management and supply chain coordination for InteriorAI.
 - Multi-vendor order splitting optimization
 - Delivery tracking and site coordination
 - Returns and defect management
+
+## Open-Source Tools
+
+| Tool | License | Role |
+|------|---------|------|
+| [Google OR-Tools](https://github.com/google/or-tools) | Apache-2.0 | Route optimization, delivery scheduling, vendor selection |
 
 ## Status
 

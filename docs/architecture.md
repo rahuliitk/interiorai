@@ -2,7 +2,7 @@
 
 ## System Architecture
 
-InteriorAI follows a **microservices architecture** with an API gateway pattern.
+OpenLintel follows a **microservices architecture** with an API gateway pattern.
 
 ```
 Client Apps (Web, Mobile, Desktop)
@@ -30,21 +30,55 @@ Engine  Engine         Engine
 
 ## Tech Stack
 
-| Layer | Technology | Rationale |
-|-------|-----------|-----------|
-| Web Frontend | Next.js 15 + React 19 | Server components, great DX |
-| 3D Editor | Three.js + React Three Fiber | WebGL-based, React integration |
-| Mobile | React Native or Flutter | Cross-platform, native performance |
-| API Layer | Node.js (TypeScript) | Type-safe, fast, large ecosystem |
-| ML Services | Python (FastAPI) | ML ecosystem, PyTorch compatibility |
-| Database | PostgreSQL 16 | Reliable, PostGIS for spatial data |
-| Cache | Redis 7 | Session, real-time, job queues |
-| Search | Elasticsearch | Full-text product search |
-| File Storage | S3 / GCS / MinIO | Scalable binary storage |
-| Message Queue | Redis Streams or RabbitMQ | Async service communication |
-| CI/CD | GitHub Actions | Built-in, free for open source |
-| Infrastructure | Docker + Kubernetes | Container orchestration |
-| IaC | Terraform | Multi-cloud infrastructure |
+| Layer | Technology | Key Open-Source Tools | Rationale |
+|-------|-----------|----------------------|-----------|
+| Web Frontend | Next.js 15 + React 19 | — | Server components, great DX |
+| 3D Editor | Three.js + React Three Fiber | GaussianSplats3D, A-Frame, Model Viewer | WebGL-based, React integration, AR support |
+| Mobile | React Native or Flutter | — | Cross-platform, native performance |
+| API Layer | Node.js (TypeScript) | — | Type-safe, fast, large ecosystem |
+| ML Services | Python (FastAPI) | SAM 2, Depth Anything V2, Diffusers, ControlNet | ML ecosystem, PyTorch compatibility |
+| LLM/Agents | Python | Ollama, vLLM, LangGraph, CrewAI, Outlines | Local-first LLM inference, structured output |
+| CAD/Drawing | Python | ezdxf, IfcOpenShell, CadQuery | DXF/IFC generation, parametric modeling |
+| Optimization | Python | OR-Tools, DeepNest, rectpack | Nesting, scheduling, resource allocation |
+| MEP Engineering | Python | EnergyPlus, EPpy, Ladybug Tools | Energy modeling, HVAC calculations |
+| Database | PostgreSQL 16 + pgvector | pgvector | Reliable, PostGIS for spatial, vector search |
+| Cache | Redis 7 | — | Session, real-time, job queues |
+| Search | Meilisearch | Meilisearch | Fast, typo-tolerant product search |
+| File Storage | S3 / GCS / MinIO | MinIO | Scalable binary storage, self-hostable |
+| Real-time | WebSocket | Y.js, Socket.IO | Collaborative editing, live updates |
+| Message Queue | NATS | NATS | High-performance event streaming |
+| Task Queue | Celery / Temporal | Celery, Temporal | Async jobs, durable workflows |
+| CI/CD | GitHub Actions | — | Built-in, free for open source |
+| Infrastructure | Docker + Kubernetes | — | Container orchestration |
+| IaC | Terraform | — | Multi-cloud infrastructure |
+
+### Open-Source Integration Map
+
+The following diagram shows how open-source tools connect in the primary data pipeline:
+
+```
+Photo Upload → OpenCV (validation) → COLMAP (SfM) → Open3D (mesh processing)
+                                                          ↓
+                                              SAM 2 + Grounding DINO (segmentation)
+                                                          ↓
+                                              Depth Anything V2 (depth estimation)
+                                                          ↓
+                                              CubiCasa5k / RoomFormer (floor plan parsing)
+                                                          ↓
+                                              ezdxf (DXF generation)
+                                                          ↓
+Design Engine: Diffusers + SDXL/FLUX → ControlNet (spatial control) → IP-Adapter (style)
+                                                          ↓
+                                              IC-Light (relighting) → Blender (photorealistic render)
+                                                          ↓
+BOM Engine → OR-Tools (optimization) → DeepNest/rectpack (nesting) → ezdxf (CNC output)
+                                                          ↓
+MEP Calculator: EnergyPlus + EPpy (energy) → Ladybug Tools (environmental analysis)
+                                                          ↓
+LLM Agents: Ollama/vLLM → LangGraph (orchestration) → Outlines (structured output)
+```
+
+> See `TECH_STACK.md` for the complete technology map with GitHub links, licenses, and detailed descriptions.
 
 ## Data Flow: Photo to Design
 

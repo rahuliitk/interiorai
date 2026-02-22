@@ -1,10 +1,10 @@
 /**
- * @interiorai/config
+ * @openlintel/config
  *
  * Shared configuration: ESLint configs, TypeScript configs, constants.
  */
 
-export const APP_NAME = 'InteriorAI';
+export const APP_NAME = 'OpenLintel';
 export const DEFAULT_UNIT_SYSTEM = 'metric' as const;
 export const DEFAULT_CURRENCY = 'USD';
 

@@ -1,6 +1,6 @@
 # Collaboration Service
 
-Real-time collaboration and communication hub for InteriorAI.
+Real-time collaboration and communication hub for OpenLintel.
 
 ## Responsibilities
 
@@ -10,6 +10,13 @@ Real-time collaboration and communication hub for InteriorAI.
 - Digital approval workflows
 - Notification dispatch (email, push, SMS, WhatsApp)
 - Design version history and diff
+
+## Open-Source Tools
+
+| Tool | License | Role |
+|------|---------|------|
+| [Y.js](https://github.com/yjs/yjs) | MIT | CRDT-based real-time collaborative editing — conflict-free sync |
+| [Socket.IO](https://github.com/socketio/socket.io) | MIT | WebSocket transport for real-time events and notifications |
 
 ## Status
 

@@ -1,4 +1,4 @@
-# InteriorAI
+# OpenLintel
 
 **End-to-end home design automation** — from room photos to finished living spaces, with every cut list, wire run, and pipe fitting accounted for.
 
@@ -11,7 +11,7 @@
 
 Designing and renovating a home today involves juggling 10-15 different professionals, WhatsApp-based "version control," opaque pricing with 30-60% markup stacking, and zero coordination between trades. Interior designers produce pretty renders but not manufacturing instructions. Carpenters eyeball measurements. Electricians and plumbers discover conflicts after walls are sealed. Material waste averages 10-15%.
 
-**InteriorAI exists to fix all of that.**
+**OpenLintel exists to fix all of that.**
 
 ## What This Project Does
 
@@ -123,8 +123,8 @@ Photos/Floor Plans
 
 ```bash
 # Clone the repository
-git clone https://github.com/rahuliitk/interiorai.git
-cd interiorai
+git clone https://github.com/rahuliitk/openlintel.git
+cd openlintel
 
 # Copy environment template
 cp .env.example .env
@@ -153,7 +153,7 @@ See [docs/development.md](docs/development.md) for detailed development environm
 ## Project Structure
 
 ```
-interiorai/
+openlintel/
 ├── apps/
 │   ├── web/                  # Next.js web application
 │   ├── mobile/               # React Native / Flutter mobile app
@@ -253,8 +253,8 @@ We welcome contributions from developers, designers, architects, engineers, and 
 
 ## Community
 
-- [Discussions](https://github.com/rahuliitk/interiorai/discussions) — Questions, ideas, show & tell
-- [Issues](https://github.com/rahuliitk/interiorai/issues) — Bug reports and feature requests
+- [Discussions](https://github.com/rahuliitk/openlintel/discussions) — Questions, ideas, show & tell
+- [Issues](https://github.com/rahuliitk/openlintel/issues) — Bug reports and feature requests
 - [Discord](#) — Real-time chat *(coming soon)*
 
 ## License

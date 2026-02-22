@@ -15,8 +15,8 @@
 The fastest way to get started:
 
 ```bash
-git clone https://github.com/interiorai/interiorai.git
-cd interiorai
+git clone https://github.com/openlintel/openlintel.git
+cd openlintel
 cp .env.example .env
 docker compose up -d
 pnpm install
@@ -70,7 +70,7 @@ CPU fallback is supported for development — models will run slower but functio
 pnpm test
 
 # Specific package
-pnpm test --filter=@interiorai/core
+pnpm test --filter=@openlintel/core
 
 # Python tests
 cd services/design-engine

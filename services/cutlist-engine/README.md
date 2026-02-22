@@ -1,6 +1,6 @@
 # Cut List Engine
 
-CNC-ready cut list generation and nesting optimization for InteriorAI.
+CNC-ready cut list generation and nesting optimization for OpenLintel.
 
 ## Responsibilities
 
@@ -10,6 +10,16 @@ CNC-ready cut list generation and nesting optimization for InteriorAI.
 - DXF output for CNC router integration
 - Track reusable offcuts
 - Hardware schedule generation per furniture unit
+
+## Open-Source Tools
+
+| Tool | License | Role |
+|------|---------|------|
+| [DeepNest](https://github.com/Jack000/DeepNest) | MIT | 2D nesting optimizer for irregular tile/stone shapes |
+| [rectpack](https://github.com/secnot/rectpack) | Apache-2.0 | Fast rectangular bin-packing for panel cut lists |
+| [libnest2d](https://github.com/tamasmeszaros/libnest2d) | LGPL-3.0 | High-performance 2D irregular nesting backend |
+| [Google OR-Tools](https://github.com/google/or-tools) | Apache-2.0 | Optimization for offcut tracking and material purchasing |
+| [ezdxf](https://github.com/mozman/ezdxf) | MIT | DXF output for CNC router integration |
 
 ## Tech Stack
 

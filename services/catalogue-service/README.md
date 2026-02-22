@@ -1,6 +1,6 @@
 # Catalogue Service
 
-Product catalogue management for InteriorAI.
+Product catalogue management for OpenLintel.
 
 ## Responsibilities
 
@@ -11,11 +11,18 @@ Product catalogue management for InteriorAI.
 - Product recommendation engine
 - Compatibility checking between products
 
+## Open-Source Tools
+
+| Tool | License | Role |
+|------|---------|------|
+| [Meilisearch](https://github.com/meilisearch/meilisearch) | MIT | Lightning-fast full-text product search with typo tolerance |
+| [pgvector](https://github.com/pgvector/pgvector) | PostgreSQL License | Vector similarity search for visual product matching |
+
 ## Tech Stack
 
 - Node.js / TypeScript
 - Fastify or Express
-- PostgreSQL + Elasticsearch
+- PostgreSQL + Meilisearch
 - Redis (caching)
 
 ## Status

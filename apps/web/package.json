@@ -1,5 +1,5 @@
 {
-  "name": "@interiorai/web",
+  "name": "@openlintel/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,8 +11,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@interiorai/core": "workspace:*",
-    "@interiorai/ui": "workspace:*",
+    "@openlintel/core": "workspace:*",
+    "@openlintel/ui": "workspace:*",
     "next": "^15.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

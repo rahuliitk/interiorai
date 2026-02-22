@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'InteriorAI',
+  title: 'OpenLintel',
   description: 'End-to-end home design automation platform',
 };
 

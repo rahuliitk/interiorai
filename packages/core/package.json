@@ -1,5 +1,5 @@
 {
-  "name": "@interiorai/core",
+  "name": "@openlintel/core",
   "version": "0.1.0",
   "private": true,
   "main": "./src/index.ts",

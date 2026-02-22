@@ -1,5 +1,5 @@
 [project]
-name = "interiorai"
+name = "openlintel"
 version = "0.1.0"
 description = "End-to-end home design automation platform"
 requires-python = ">=3.11"

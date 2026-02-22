@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['@interiorai/core', '@interiorai/ui'],
+  transpilePackages: ['@openlintel/core', '@openlintel/ui'],
 };
 
 export default nextConfig;

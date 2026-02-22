@@ -10,11 +10,20 @@ Computer vision model for identifying room elements from photos.
 - Damage detection (cracks, dampness, mold)
 - Monocular depth estimation for dimension inference
 
+## Open-Source Tools
+
+| Tool | License | Role |
+|------|---------|------|
+| [SAM 2](https://github.com/facebookresearch/sam2) | Apache-2.0 | Promptable segmentation for room elements (walls, floors, ceilings) |
+| [Grounding DINO](https://github.com/IDEA-Research/GroundingDINO) | Apache-2.0 | Open-set detection of furniture, fixtures, and architectural elements |
+| [Depth Anything V2](https://github.com/DepthAnything/Depth-Anything-V2) | Apache-2.0 | Monocular depth estimation for dimension inference |
+
 ## Architecture
 
-- Backbone: SegFormer or Mask2Former
+- Backbone: SAM 2 + Grounding DINO for zero-shot segmentation and detection
+- Depth: Depth Anything V2 for monocular depth estimation
 - Training data: ADE20K + custom interior dataset
-- Output: Per-pixel semantic segmentation masks
+- Output: Per-pixel semantic segmentation masks + depth maps
 
 ## Getting Started
 

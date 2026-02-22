@@ -22,7 +22,7 @@ ignore = [
 ]
 
 [lint.isort]
-known-first-party = ["interiorai"]
+known-first-party = ["openlintel"]
 
 [format]
 quote-style = "double"

@@ -17,10 +17,10 @@
     "declarationMap": true,
     "sourceMap": true,
     "paths": {
-      "@interiorai/core/*": ["./packages/core/src/*"],
-      "@interiorai/db/*": ["./packages/db/src/*"],
-      "@interiorai/ui/*": ["./packages/ui/src/*"],
-      "@interiorai/config/*": ["./packages/config/src/*"]
+      "@openlintel/core/*": ["./packages/core/src/*"],
+      "@openlintel/db/*": ["./packages/db/src/*"],
+      "@openlintel/ui/*": ["./packages/ui/src/*"],
+      "@openlintel/config/*": ["./packages/config/src/*"]
     }
   },
   "include": [],

@@ -1,4 +1,4 @@
-# InteriorAI — Comprehensive Product Requirements Document
+# OpenLintel — Comprehensive Product Requirements Document
 
 > **Vision**: An end-to-end platform that transforms how homes are designed, documented, procured, and built — from a photo of an empty room to a fully finished living space, with every cut list, wire run, and pipe fitting accounted for.
 
@@ -1024,5 +1024,69 @@
 | Platform-managed project completion rate | > 95% |
 
 ---
+
+---
+
+## 22. Open-Source Technology Foundation
+
+OpenLintel is built on a curated stack of best-in-class open-source tools. Each requirement area maps to specific libraries and models that provide the foundation.
+
+### 22.1 Computer Vision & 3D Reconstruction (Sections 2, 15)
+- **Room Segmentation:** SAM 2 (Apache-2.0), Grounding DINO (Apache-2.0)
+- **Depth Estimation:** Depth Anything V2 (Apache-2.0)
+- **Photogrammetry:** COLMAP (BSD-3), Meshroom (MPL-2.0)
+- **3D Processing:** Open3D (MIT), 3D Gaussian Splatting
+- **SLAM:** ORB-SLAM3 (GPL-3.0)
+- **Floor Plan Parsing:** CubiCasa5k, RoomFormer (MIT)
+
+### 22.2 AI Design Generation (Section 3)
+- **Diffusion Framework:** Hugging Face Diffusers (Apache-2.0)
+- **Base Models:** SDXL, FLUX.1-schnell (Apache-2.0)
+- **Spatial Control:** ControlNet (Apache-2.0)
+- **Style Transfer:** IP-Adapter (Apache-2.0)
+- **Relighting:** IC-Light (Apache-2.0)
+- **Workflow Builder:** ComfyUI (GPL-3.0)
+
+### 22.3 CAD & Technical Drawing (Section 4)
+- **DXF I/O:** ezdxf (MIT)
+- **BIM/IFC:** IfcOpenShell (LGPL-3.0)
+- **Parametric CAD:** CadQuery / Build123d (Apache-2.0)
+- **Geometry Kernel:** OpenCASCADE via pythonOCC (LGPL-3.0)
+
+### 22.4 3D Graphics & Rendering (Sections 3, 18)
+- **Web 3D Engine:** Three.js (MIT) + React Three Fiber (MIT)
+- **AR/VR:** A-Frame (MIT), Google Model Viewer (Apache-2.0)
+- **PBR Rendering:** Google Filament (Apache-2.0)
+- **Offline Rendering:** Blender Python API (GPL-3.0 / Cycles Apache-2.0)
+- **Gaussian Splat Viewer:** GaussianSplats3D (MIT)
+
+### 22.5 LLM & AI Agents (Sections 3, 15)
+- **Local Serving:** Ollama (MIT), vLLM (Apache-2.0)
+- **Open Models:** Qwen 2.5/3 (Apache-2.0), Mistral (Apache-2.0)
+- **Agent Framework:** LangGraph (MIT)
+- **Multi-Agent:** CrewAI (MIT)
+- **RAG:** LlamaIndex (MIT)
+- **Structured Output:** Outlines (Apache-2.0)
+
+### 22.6 Optimization (Sections 5, 7, 15)
+- **General Optimization:** Google OR-Tools (Apache-2.0)
+- **Sheet Nesting:** DeepNest (MIT), libnest2d (LGPL-3.0)
+- **Rectangle Packing:** rectpack (Apache-2.0)
+- **Linear Programming:** PuLP (MIT), SciPy (BSD-3)
+
+### 22.7 MEP Engineering (Section 8)
+- **Energy Modeling:** EnergyPlus (BSD-3), OpenStudio (BSD-3)
+- **Python EnergyPlus:** EPpy (MIT)
+- **HVAC/Environmental:** Ladybug Tools (AGPL-3.0), python-hvac
+
+### 22.8 Infrastructure (Section 14)
+- **Task Queue:** Celery (BSD-3) / Temporal (MIT)
+- **Search:** Meilisearch (MIT)
+- **Vector Search:** pgvector (PostgreSQL License)
+- **Object Storage:** MinIO (AGPL-3.0)
+- **Real-time Collaboration:** Y.js (MIT) + Socket.IO (MIT)
+- **Event Streaming:** NATS (Apache-2.0)
+
+> See `TECH_STACK.md` for the complete technology map with GitHub links and detailed descriptions.
 
 *This document is a living specification. Each section should be expanded into detailed user stories, wireframes, and technical specifications during sprint planning.*

@@ -16,7 +16,7 @@ FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY . .
-RUN pnpm --filter @interiorai/web build
+RUN pnpm --filter @openlintel/web build
 
 # Production
 FROM base AS runner
