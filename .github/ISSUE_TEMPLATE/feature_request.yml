@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Have a feature idea? We'd love to hear it! Please check [existing discussions](https://github.com/openlintel/openlintel/discussions/categories/ideas) first.
+        Have a feature idea? We'd love to hear it! Please check [existing discussions](https://github.com/rahuliitk/openlintel/discussions/categories/ideas) first.
 
   - type: textarea
     id: problem

@@ -15,7 +15,7 @@
 The fastest way to get started:
 
 ```bash
-git clone https://github.com/openlintel/openlintel.git
+git clone https://github.com/rahuliitk/openlintel.git
 cd openlintel
 cp .env.example .env
 docker compose up -d

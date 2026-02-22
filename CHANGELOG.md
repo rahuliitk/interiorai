@@ -25,4 +25,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-*This changelog will be updated with each release. For the full commit history, see the [git log](https://github.com/openlintel/openlintel/commits/main).*
+*This changelog will be updated with each release. For the full commit history, see the [git log](https://github.com/rahuliitk/openlintel/commits/main).*

@@ -7,7 +7,7 @@
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openlintel/openlintel.git"
+    "url": "https://github.com/rahuliitk/openlintel.git"
   },
   "engines": {
     "node": ">=20.0.0",
