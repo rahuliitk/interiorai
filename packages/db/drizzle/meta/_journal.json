@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1771756205356,
+      "tag": "0000_pink_squadron_supreme",
+      "breakpoints": true
+    }
+  ]
+}
