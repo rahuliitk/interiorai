@@ -123,7 +123,7 @@ Photos/Floor Plans
 
 ```bash
 # Clone the repository
-git clone https://github.com/interiorai/interiorai.git
+git clone https://github.com/rahuliitk/interiorai.git
 cd interiorai
 
 # Copy environment template
@@ -189,7 +189,7 @@ interiorai/
 ├── CONTRIBUTING.md           # Contribution guide
 ├── CODE_OF_CONDUCT.md        # Community code of conduct
 ├── CHANGELOG.md              # Version changelog
-├── LICENSE                   # AGPL-3.0
+├── LICENSE.md                # AGPL-3.0
 └── docker-compose.yml        # Local development orchestration
 ```
 
@@ -253,13 +253,13 @@ We welcome contributions from developers, designers, architects, engineers, and 
 
 ## Community
 
-- [Discussions](https://github.com/interiorai/interiorai/discussions) — Questions, ideas, show & tell
-- [Issues](https://github.com/interiorai/interiorai/issues) — Bug reports and feature requests
+- [Discussions](https://github.com/rahuliitk/interiorai/discussions) — Questions, ideas, show & tell
+- [Issues](https://github.com/rahuliitk/interiorai/issues) — Bug reports and feature requests
 - [Discord](#) — Real-time chat *(coming soon)*
 
 ## License
 
-This project is licensed under the **GNU Affero General Public License v3.0** — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **GNU Affero General Public License v3.0** — see the [LICENSE.md](LICENSE.md) file for details.
 
 **What this means:**
 - You can use, modify, and distribute this software freely

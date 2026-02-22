@@ -268,7 +268,7 @@ Contribute local material specs:
 
 ## Reporting Bugs
 
-Use [GitHub Issues](https://github.com/interiorai/interiorai/issues/new?template=bug_report.yml) with:
+Use [GitHub Issues](https://github.com/rahuliitk/interiorai/issues/new?template=bug_report.yml) with:
 
 - **Description**: What happened vs. what you expected
 - **Steps to Reproduce**: Minimal steps to trigger the bug
@@ -277,7 +277,7 @@ Use [GitHub Issues](https://github.com/interiorai/interiorai/issues/new?template
 
 ## Suggesting Features
 
-Use [GitHub Discussions](https://github.com/interiorai/interiorai/discussions/categories/ideas) for feature ideas. Describe:
+Use [GitHub Discussions](https://github.com/rahuliitk/interiorai/discussions/categories/ideas) for feature ideas. Describe:
 
 - The problem you're trying to solve
 - Your proposed solution
