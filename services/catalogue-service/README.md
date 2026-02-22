@@ -11,18 +11,31 @@ Product catalogue management for OpenLintel.
 - Product recommendation engine
 - Compatibility checking between products
 
-## Open-Source Tools
+## Architecture: Search Infrastructure + LLM Agent
+
+1. **Meilisearch** handles full-text product search with typo tolerance
+2. **pgvector** stores CLIP/DINOv2 embeddings for visual similarity search
+3. **LLM agent** handles recommendations, compatibility checking, and natural language queries
+
+### Specialized Tools
 
 | Tool | License | Role |
 |------|---------|------|
-| [Meilisearch](https://github.com/meilisearch/meilisearch) | MIT | Lightning-fast full-text product search with typo tolerance |
+| [Meilisearch](https://github.com/meilisearch/meilisearch) | MIT | Full-text product search with instant results |
 | [pgvector](https://github.com/pgvector/pgvector) | PostgreSQL License | Vector similarity search for visual product matching |
+
+### LLM Agent handles
+
+- Product recommendations based on design context
+- Compatibility checking between products
+- Natural language search queries
+- Price comparison and value analysis
 
 ## Tech Stack
 
 - Node.js / TypeScript
 - Fastify or Express
-- PostgreSQL + Meilisearch
+- PostgreSQL + Meilisearch + pgvector
 - Redis (caching)
 
 ## Status

@@ -1,6 +1,6 @@
 # Design Generation Model
 
-AI model for generating interior design concepts from constraints.
+AI model pipeline for generating interior design concepts from constraints.
 
 ## Capabilities
 
@@ -9,20 +9,28 @@ AI model for generating interior design concepts from constraints.
 - Material palette generation (cohesive color/texture combinations)
 - Style transfer and adaptation
 
-## Open-Source Tools
+## Architecture: LLM Agent + Diffusion Models
+
+1. **LLM agent** interprets design brief — style, budget, room function, user preferences
+2. **Agent** crafts optimal diffusion prompts and selects conditioning inputs
+3. **Diffusers + SDXL/FLUX** generates design images
+4. **ControlNet** constrains output to room geometry (floor plan outline, depth map)
+5. **Agent** evaluates results, iterates if quality/style criteria aren't met
+
+### Specialized Tools
 
 | Tool | License | Role |
 |------|---------|------|
-| [HF Diffusers](https://github.com/huggingface/diffusers) | Apache-2.0 | Core diffusion model framework |
-| [SDXL](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0) | Apache-2.0 | Base model for interior design image generation |
-| [ControlNet](https://github.com/lllyasviel/ControlNet) | Apache-2.0 | Spatial conditioning from floor plan + depth map |
-| [ComfyUI](https://github.com/comfyanonymous/ComfyUI) | GPL-3.0 | Workflow builder for chaining generation steps |
+| [HF Diffusers](https://github.com/huggingface/diffusers) | Apache-2.0 | Core diffusion framework |
+| [SDXL](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0) | Apache-2.0 | Base model for design image generation |
+| [ControlNet](https://github.com/lllyasviel/ControlNet) | Apache-2.0 | Spatial conditioning from floor plan + depth |
 
-## Architecture
+### LLM Agent handles (replaces ComfyUI)
 
-- Based on Stable Diffusion XL fine-tuned on interior design dataset
-- ControlNet for spatial constraints (floor plan outline, depth map)
-- Custom conditioning on style embeddings and budget parameters
+- Pipeline orchestration and prompt engineering
+- Style consistency enforcement across rooms
+- Quality control and iterative re-generation
+- Design brief interpretation
 
 ## Status
 

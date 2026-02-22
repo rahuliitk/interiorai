@@ -10,14 +10,32 @@ Convert raster floor plans (scans, photos, PDFs) to vector CAD representations.
 - Wall thickness detection
 - Output: structured JSON + DXF
 
-## Open-Source Tools
+## Architecture: Multimodal LLM-Driven
+
+The floor plan digitizer is **primarily driven by a multimodal LLM** — it reads floor plan images directly and extracts structured data.
+
+### How it works:
+
+1. **Multimodal LLM** analyzes the floor plan image
+2. **LLM** extracts room boundaries, dimensions, doors, windows, and labels
+3. **LLM** outputs structured JSON conforming to the room schema (via Outlines)
+4. **ezdxf** generates DXF from the structured data
+5. **OpenCV** handles image preprocessing (enhancement, deskewing) if needed
+
+### Specialized Tools (image processing + binary output)
 
 | Tool | License | Role |
 |------|---------|------|
-| [CubiCasa5k](https://github.com/CubiCasa/CubiCasa5k) | Custom | Baseline model for floor plan image parsing |
-| [RoomFormer](https://github.com/ywyue/RoomFormer) | MIT | Transformer-based room polygon reconstruction |
-| [OpenCV](https://github.com/opencv/opencv) | Apache-2.0 | Image preprocessing, contour detection, line detection |
-| [ezdxf](https://github.com/mozman/ezdxf) | MIT | DXF output generation from detected room geometry |
+| [OpenCV](https://github.com/opencv/opencv) | Apache-2.0 | Image preprocessing — deskew, enhance, threshold |
+| [ezdxf](https://github.com/mozman/ezdxf) | MIT | DXF output from extracted room geometry |
+
+### LLM Agent handles (replaces CubiCasa5k, RoomFormer)
+
+- Floor plan image understanding
+- Room boundary extraction
+- Dimension and label reading (better than traditional OCR)
+- Door/window detection with opening direction
+- Structured JSON output with room polygons
 
 ## Status
 

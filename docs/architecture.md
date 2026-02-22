@@ -30,55 +30,55 @@ Engine  Engine         Engine
 
 ## Tech Stack
 
-| Layer | Technology | Key Open-Source Tools | Rationale |
-|-------|-----------|----------------------|-----------|
+| Layer | Technology | Specialized Tools | Rationale |
+|-------|-----------|------------------|-----------|
 | Web Frontend | Next.js 15 + React 19 | — | Server components, great DX |
-| 3D Editor | Three.js + React Three Fiber | GaussianSplats3D, A-Frame, Model Viewer | WebGL-based, React integration, AR support |
-| Mobile | React Native or Flutter | — | Cross-platform, native performance |
+| 3D Editor | Three.js + React Three Fiber | GaussianSplats3D, Model Viewer | WebGL-based, handles AR/VR/PBR natively |
+| Mobile | React Native or Flutter | ARKit/ARCore | Cross-platform, native SLAM |
 | API Layer | Node.js (TypeScript) | — | Type-safe, fast, large ecosystem |
-| ML Services | Python (FastAPI) | SAM 2, Depth Anything V2, Diffusers, ControlNet | ML ecosystem, PyTorch compatibility |
-| LLM/Agents | Python | Ollama, vLLM, LangGraph, CrewAI, Outlines | Local-first LLM inference, structured output |
-| CAD/Drawing | Python | ezdxf, IfcOpenShell, CadQuery | DXF/IFC generation, parametric modeling |
-| Optimization | Python | OR-Tools, DeepNest, rectpack | Nesting, scheduling, resource allocation |
-| MEP Engineering | Python | EnergyPlus, EPpy, Ladybug Tools | Energy modeling, HVAC calculations |
-| Database | PostgreSQL 16 + pgvector | pgvector | Reliable, PostGIS for spatial, vector search |
+| ML Services | Python (FastAPI) | SAM 2, Depth Anything V2, Diffusers | ML ecosystem, PyTorch compatibility |
+| LLM Agents | Python (LangGraph) | Ollama, vLLM, Outlines | Central reasoning layer for all services |
+| CAD/Drawing | Python | ezdxf, IfcOpenShell | LLM agent generates code; tools write files |
+| Optimization | Python | OR-Tools, DeepNest, rectpack | NP-hard problems require solvers |
+| MEP Engineering | Python (LangGraph) | — | Fully LLM agent-driven |
+| Database | PostgreSQL 16 + pgvector | pgvector | Reliable, spatial data, vector search |
 | Cache | Redis 7 | — | Session, real-time, job queues |
 | Search | Meilisearch | Meilisearch | Fast, typo-tolerant product search |
 | File Storage | S3 / GCS / MinIO | MinIO | Scalable binary storage, self-hostable |
 | Real-time | WebSocket | Y.js, Socket.IO | Collaborative editing, live updates |
-| Message Queue | NATS | NATS | High-performance event streaming |
-| Task Queue | Celery / Temporal | Celery, Temporal | Async jobs, durable workflows |
+| Event Streaming | NATS | NATS | High-performance pub/sub messaging |
+| Workflow Engine | Temporal | Temporal | Durable long-running workflows |
 | CI/CD | GitHub Actions | — | Built-in, free for open source |
 | Infrastructure | Docker + Kubernetes | — | Container orchestration |
 | IaC | Terraform | — | Multi-cloud infrastructure |
 
-### Open-Source Integration Map
+### LLM Agent Integration Map
 
-The following diagram shows how open-source tools connect in the primary data pipeline:
+The following shows how LLM agents orchestrate specialized tools in the primary data pipeline:
 
 ```
 Photo Upload → OpenCV (validation) → COLMAP (SfM) → Open3D (mesh processing)
                                                           ↓
-                                              SAM 2 + Grounding DINO (segmentation)
+                                              Multimodal LLM (object identification)
+                                                          ↓
+                                              SAM 2 (pixel segmentation, prompted by LLM)
                                                           ↓
                                               Depth Anything V2 (depth estimation)
                                                           ↓
-                                              CubiCasa5k / RoomFormer (floor plan parsing)
+                                              Multimodal LLM (floor plan parsing → structured JSON)
                                                           ↓
-                                              ezdxf (DXF generation)
+                                              ezdxf (DXF generation, code written by LLM agent)
                                                           ↓
-Design Engine: Diffusers + SDXL/FLUX → ControlNet (spatial control) → IP-Adapter (style)
+LLM Agent orchestrates: Diffusers + SDXL/FLUX → ControlNet → IP-Adapter → IC-Light
                                                           ↓
-                                              IC-Light (relighting) → Blender (photorealistic render)
+LLM Agent: BOM calculation → OR-Tools (optimization) → rectpack/DeepNest → ezdxf (CNC)
                                                           ↓
-BOM Engine → OR-Tools (optimization) → DeepNest/rectpack (nesting) → ezdxf (CNC output)
+LLM Agent: MEP calculations (NEC/IPC/ASHRAE formulas → Outlines structured output)
                                                           ↓
-MEP Calculator: EnergyPlus + EPpy (energy) → Ladybug Tools (environmental analysis)
-                                                          ↓
-LLM Agents: Ollama/vLLM → LangGraph (orchestration) → Outlines (structured output)
+LLM Agent: Schedule generation → Temporal (workflow) → OR-Tools (critical path)
 ```
 
-> See `TECH_STACK.md` for the complete technology map with GitHub links, licenses, and detailed descriptions.
+> LLM agents are the orchestration layer. They decide what to do; specialized tools execute what agents cannot. See `TECH_STACK.md` for the complete map.
 
 ## Data Flow: Photo to Design
 

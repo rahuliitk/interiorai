@@ -21,26 +21,38 @@ Mechanical, Electrical, and Plumbing engineering calculations for OpenLintel.
 - Equipment tonnage/BTU recommendation
 - Duct sizing for centralized systems
 
-## Open-Source Tools
+## Architecture: Fully LLM Agent-Driven
 
-| Tool | License | Role |
-|------|---------|------|
-| [EnergyPlus](https://github.com/NREL/EnergyPlus) | BSD-3 | Whole-building energy simulation for HVAC load calculations |
-| [EPpy](https://github.com/santoshphilip/eppy) | MIT | Python scripting for EnergyPlus model creation |
-| [Ladybug Tools](https://github.com/ladybug-tools) | AGPL-3.0 | Solar analysis, daylight simulation, thermal comfort evaluation |
-| python-hvac | — | Psychrometric calculations, duct sizing formulas |
-| [OpenStudio](https://github.com/NREL/OpenStudio) | BSD-3 | Building energy model creation and parametric analysis |
+The MEP calculator is **entirely driven by LLM agents** — no specialized engineering tools.
 
-## Tech Stack
+### How it works:
 
-- Python 3.11+
-- FastAPI
-- NumPy
+1. **Agent** receives room specifications, design selections, and fixture schedules
+2. **Agent** applies formulas from NEC (electrical), IPC/UPC (plumbing), ASHRAE (HVAC)
+3. **Outlines** guarantees structured output (panel schedules, pipe sizing tables, load calculations)
+4. **Agent** shows its work — every calculation cites the source standard and clause number
+5. Results are validated against known textbook values in unit tests
+
+### Why no specialized tools:
+
+EnergyPlus, Ladybug Tools, and similar are designed for whole-building simulation of commercial structures — overkill for residential room-scale MEP. LLM agents with engineering formulas are more flexible, faster to set up, and produce human-readable calculation sheets.
+
+### What the agent computes:
+
+- **Electrical:** Load (W per circuit), wire gauge (NEC Table 310.16), voltage drop, panel schedule, conduit fill
+- **Plumbing:** Fixture units (IPC Table 604.4), pipe sizing, drainage slope, hot water sizing
+- **HVAC:** Cooling/heating load (ASHRAE Manual J simplified), equipment sizing (BTU/tonnage), duct sizing
+- **Fire safety:** Smoke detector placement (NFPA 72), extinguisher locations
 
 ## Important
 
-All engineering calculations must cite their source standard (NEC, IEC, IS, IPC, UPC, etc.)
-and include unit tests with known textbook values.
+All calculations must cite their source standard (NEC, IEC, IS, IPC, UPC, etc.) and include unit tests with known textbook values.
+
+## Tech Stack
+
+- Python 3.11+ / FastAPI
+- LangGraph (agent orchestration)
+- Outlines (structured output)
 
 ## Status
 

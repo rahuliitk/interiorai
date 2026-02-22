@@ -11,12 +11,14 @@ Real-time collaboration and communication hub for OpenLintel.
 - Notification dispatch (email, push, SMS, WhatsApp)
 - Design version history and diff
 
-## Open-Source Tools
+## Specialized Tools
 
 | Tool | License | Role |
 |------|---------|------|
-| [Y.js](https://github.com/yjs/yjs) | MIT | CRDT-based real-time collaborative editing — conflict-free sync |
-| [Socket.IO](https://github.com/socketio/socket.io) | MIT | WebSocket transport for real-time events and notifications |
+| [Y.js](https://github.com/yjs/yjs) | MIT | CRDT-based real-time collaborative editing |
+| [Socket.IO](https://github.com/socketio/socket.io) | MIT | WebSocket transport for real-time events |
+
+*No LLM agent role — this is infrastructure-level real-time sync.*
 
 ## Status
 

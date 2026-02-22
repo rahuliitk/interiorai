@@ -20,5 +20,4 @@ ezdxf>=1.3.0
 # LLM & Agents
 langchain-core>=0.3.0
 langgraph>=0.2.0
-crewai>=0.80.0
 outlines>=0.1.0

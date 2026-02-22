@@ -10,18 +10,25 @@ Bill of Materials calculation service for OpenLintel.
 - Produce tile/stone cut lists with layout optimization
 - Generate electrical and plumbing material schedules
 
-## Open-Source Tools
+## Architecture: LLM Agent + OR-Tools
+
+1. **Agent** analyzes design variant and calculates material quantities with waste factors
+2. **Agent** handles material substitutions and alternates based on budget/availability
+3. **OR-Tools** solves budget allocation and vendor selection optimization
+4. **Outlines** ensures structured BOM output matching typed schemas
+
+### Specialized Tools
 
 | Tool | License | Role |
 |------|---------|------|
-| [Google OR-Tools](https://github.com/google/or-tools) | Apache-2.0 | Material quantity optimization and waste minimization |
-| [PuLP](https://github.com/coin-or/pulp) | MIT | Linear programming for budget-constrained material selection |
+| [Google OR-Tools](https://github.com/google/or-tools) | Apache-2.0 | Budget allocation and material purchasing optimization |
 
-## Tech Stack
+### LLM Agent handles
 
-- Python 3.11+
-- FastAPI
-- NumPy (for quantity calculations)
+- Quantity calculation with waste factors (replaces hand-coded rules)
+- Material substitution reasoning
+- Cross-category dependency detection
+- Electrical and plumbing material schedules
 
 ## Status
 

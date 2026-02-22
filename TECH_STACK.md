@@ -1,433 +1,367 @@
 # OpenLintel Technology Stack
 
-> Every open-source tool, library, and model that powers the OpenLintel platform — organized by capability area.
+> An opinionated, LLM-agent-first approach: use AI agents for reasoning, orchestration, and business logic — use specialized tools only where LLMs fundamentally cannot operate (pixel-level vision, 3D geometry, binary file formats, GPU rendering, combinatorial optimization).
+
+---
+
+## Architecture Philosophy
+
+OpenLintel follows the **"LLM Agent + Specialized Tool"** pattern:
+
+- **LLM agents** handle: reasoning, orchestration, business logic, engineering calculations, natural language understanding, floor plan interpretation, code generation, and decision-making
+- **Specialized tools** handle: pixel-level segmentation, depth estimation, 3D reconstruction, image generation, binary file I/O, GPU rendering, and NP-hard optimization
+
+The agent decides *what* to do. The tool executes *what the agent cannot*.
+
+### What we removed and why
+
+| Removed | Reason | Replaced by |
+|---------|--------|-------------|
+| CubiCasa5k, RoomFormer | Fragile academic models, limited generalization | Multimodal LLM reads floor plans directly |
+| Grounding DINO, YOLO | LLM vision identifies objects with natural language | Multimodal LLM (+ ARKit/ARCore on-device) |
+| ComfyUI | Visual UI, not production code | LLM agent orchestrates Diffusers pipeline |
+| CrewAI | Redundant agent framework | LangGraph handles multi-agent |
+| LlamaIndex | Unnecessary abstraction | LangGraph + pgvector directly |
+| EnergyPlus, EPpy, OpenStudio | Building-scale overkill for residential | LLM agent with NEC/IPC/ASHRAE formulas |
+| Ladybug Tools, python-hvac | LLM computes with cited formulas | LLM agent + Outlines structured output |
+| PuLP | Redundant — OR-Tools covers LP/MILP | OR-Tools |
+| libnest2d | Redundant with DeepNest + rectpack | DeepNest (irregular) + rectpack (rectangular) |
+| CadQuery, Build123d, pythonOCC | Parametric scripting is what LLMs excel at | LLM agent generates ezdxf code directly |
+| A-Frame, Google Filament | Redundant with Three.js + R3F | Three.js handles WebXR and PBR |
+| Meshroom | Redundant — COLMAP sufficient | COLMAP |
+| ORB-SLAM3 | Complex C++ dep; phones have native SLAM | ARKit / ARCore |
+| Celery | Temporal is strictly superior | Temporal |
+| Mistral (as a named dep) | Stay model-agnostic | Ollama/vLLM serve any model |
 
 ---
 
 ## Computer Vision & 3D Reconstruction
 
-### Segmentation — SAM 2
+> LLM agents handle object identification, scene understanding, and floor plan parsing. Specialized models handle pixel-level output that LLMs cannot produce.
+
+### Segmentation — SAM 2 (Apache-2.0)
 
 - **GitHub:** https://github.com/facebookresearch/sam2
-- **License:** Apache-2.0
-- **Description:** Segment Anything Model 2 — state-of-the-art promptable segmentation for images and video.
-- **Role in OpenLintel:** Room element segmentation (walls, floors, ceilings, doors, windows) from uploaded photos. Powers the room-segmentation ML pipeline.
+- **Why it stays:** LLMs output text, not pixel masks. SAM 2 produces precise segmentation maps.
+- **Role:** Room element segmentation (walls, floors, ceilings, doors, windows) from photos. Prompted by LLM agent identifying what to segment.
 
-### Object Detection — Grounding DINO
-
-- **GitHub:** https://github.com/IDEA-Research/GroundingDINO
-- **License:** Apache-2.0
-- **Description:** Open-set object detection with text prompts — detect anything by describing it.
-- **Role in OpenLintel:** Identify furniture, fixtures, appliances, and architectural elements in room photos without needing per-category training.
-
-### Object Detection — YOLO (Ultralytics)
-
-- **GitHub:** https://github.com/ultralytics/ultralytics
-- **License:** AGPL-3.0
-- **Description:** Real-time object detection, segmentation, and classification.
-- **Role in OpenLintel:** Fast on-device detection for mobile AR measurement and real-time room scanning.
-
-### Depth Estimation — Depth Anything V2
+### Depth Estimation — Depth Anything V2 (Apache-2.0)
 
 - **GitHub:** https://github.com/DepthAnything/Depth-Anything-V2
-- **License:** Apache-2.0
-- **Description:** State-of-the-art monocular depth estimation — infer 3D depth from a single photo.
-- **Role in OpenLintel:** Estimate room dimensions from photos, generate depth maps for ControlNet-guided design generation, and support AR measurement calibration.
+- **Why it stays:** Dense per-pixel depth maps require a specialized neural network.
+- **Role:** Estimate room dimensions from photos, generate depth maps for ControlNet conditioning, support AR measurement.
 
-### Photogrammetry — COLMAP
+### Photogrammetry — COLMAP (BSD-3)
 
 - **GitHub:** https://github.com/colmap/colmap
-- **License:** BSD-3-Clause
-- **Description:** Structure-from-Motion and Multi-View Stereo photogrammetry pipeline.
-- **Role in OpenLintel:** Reconstruct 3D room geometry from multiple photos. Core of the media-service photogrammetry pipeline.
+- **Why it stays:** 3D reconstruction from photos is a geometric computation pipeline.
+- **Role:** Structure-from-Motion reconstruction of room geometry from multiple photos.
 
-### Photogrammetry — Meshroom (AliceVision)
-
-- **GitHub:** https://github.com/alicevision/Meshroom
-- **License:** MPL-2.0
-- **Description:** Open-source 3D reconstruction pipeline with a node-based UI.
-- **Role in OpenLintel:** Alternative photogrammetry backend for high-quality mesh reconstruction from photo sets.
-
-### 3D Processing — Open3D
+### 3D Processing — Open3D (MIT)
 
 - **GitHub:** https://github.com/isl-org/Open3D
-- **License:** MIT
-- **Description:** Modern library for 3D data processing — point clouds, meshes, and scene reconstruction.
-- **Role in OpenLintel:** Point cloud processing, mesh cleaning, and 3D model manipulation in the media-service pipeline.
+- **Why it stays:** Point cloud and mesh manipulation requires specialized geometry code.
+- **Role:** Point cloud processing, mesh cleaning, model manipulation in the media-service pipeline.
 
-### 3D Gaussian Splatting
+### 3D Gaussian Splatting (Custom)
 
 - **GitHub:** https://github.com/graphdeco-inria/gaussian-splatting
-- **License:** Custom (research, see repo)
-- **Description:** Real-time radiance field rendering using 3D Gaussians.
-- **Role in OpenLintel:** Generate photorealistic navigable 3D captures of rooms for immersive visualization and digital twins.
+- **Why it stays:** Novel view synthesis via GPU rendering — no LLM equivalent.
+- **Role:** Photorealistic navigable 3D room captures for immersive visualization and digital twins.
 
-### SLAM — ORB-SLAM3
+### Visual Embeddings — CLIP / DINOv2 (MIT / Apache-2.0)
 
-- **GitHub:** https://github.com/UZ-SLAMLab/ORB_SLAM3
-- **License:** GPL-3.0
-- **Description:** Visual-Inertial SLAM system for monocular, stereo, and RGB-D cameras.
-- **Role in OpenLintel:** Real-time spatial mapping during mobile video walkthroughs for room capture.
+- **GitHub:** https://github.com/openai/CLIP / https://github.com/facebookresearch/dinov2
+- **Why it stays:** Efficient vector embeddings for similarity search at scale — LLMs are too slow for 10M+ product comparisons.
+- **Role:** Generate visual embeddings for product catalogue similarity search via pgvector.
 
-### Floor Plan Parsing — CubiCasa5k
+### LLM Agent replaces:
 
-- **GitHub:** https://github.com/CubiCasa/CubiCasa5k
-- **License:** Custom (research)
-- **Description:** Large-scale floor plan image dataset and parsing model.
-- **Role in OpenLintel:** Baseline model for the floor-plan-digitizer ML pipeline — convert raster floor plan images to structured room layouts.
-
-### Floor Plan Parsing — RoomFormer
-
-- **GitHub:** https://github.com/ywyue/RoomFormer
-- **License:** MIT
-- **Description:** Transformer-based floor plan reconstruction from point clouds.
-- **Role in OpenLintel:** Convert 3D point cloud scans into structured floor plans with room polygons.
+- **Object detection:** Multimodal LLM identifies furniture, fixtures, architectural elements via natural language prompts (replaces Grounding DINO, YOLO)
+- **Floor plan parsing:** Multimodal LLM extracts room boundaries, dimensions, doors, windows from floor plan images (replaces CubiCasa5k, RoomFormer)
+- **Scene understanding:** LLM agent interprets room photos for style, condition, and spatial layout
+- **On-device detection:** ARKit (iOS) / ARCore (Android) handle real-time spatial mapping (replaces ORB-SLAM3)
 
 ---
 
 ## CAD & Technical Drawing
 
-### DXF I/O — ezdxf
+> LLM agents generate drawing specifications, calculate coordinates, and produce parametric designs. Specialized tools handle binary file format I/O.
+
+### DXF I/O — ezdxf (MIT)
 
 - **GitHub:** https://github.com/mozman/ezdxf
-- **License:** MIT
-- **Description:** Python library for reading, writing, and modifying DXF files.
-- **Role in OpenLintel:** Core library for the drawing-generator service — produces DXF floor plans, elevations, sections, and cut list layouts.
+- **Why it stays:** DXF is a precise structured format — must be written byte-correct.
+- **Role:** Core DXF generation for floor plans, elevations, sections, cut list layouts, and CNC output. LLM agent generates the drawing logic; ezdxf writes the file.
 
-### BIM/IFC — IfcOpenShell
+### BIM/IFC — IfcOpenShell (LGPL-3.0)
 
 - **GitHub:** https://github.com/IfcOpenShell/IfcOpenShell
-- **License:** LGPL-3.0
-- **Description:** Open-source IFC (Industry Foundation Classes) library for BIM data.
-- **Role in OpenLintel:** Import/export IFC files for interoperability with BIM tools (Revit, ArchiCAD). Structural and MEP data exchange.
+- **Why it stays:** IFC is a complex industry standard format for BIM interoperability.
+- **Role:** Import/export IFC files for interoperability with Revit, ArchiCAD. LLM agent orchestrates the model; IfcOpenShell serializes it.
 
-### Parametric CAD — CadQuery / Build123d
+### LLM Agent replaces:
 
-- **GitHub:** https://github.com/CadQuery/cadquery / https://github.com/gumyr/build123d
-- **License:** Apache-2.0
-- **Description:** Python-based parametric CAD scripting built on OpenCASCADE.
-- **Role in OpenLintel:** Generate parametric furniture models, joinery details, and custom millwork from design specifications.
-
-### Geometry Kernel — OpenCASCADE (via pythonOCC)
-
-- **GitHub:** https://github.com/tpaviot/pythonocc-core
-- **License:** LGPL-3.0
-- **Description:** Python wrapper for the OpenCASCADE geometry kernel — industrial-strength B-Rep modeling.
-- **Role in OpenLintel:** Geometric operations for intersection detection, boolean operations on room geometry, and STEP/IGES file handling.
+- **Parametric CAD scripting:** LLM agent generates ezdxf drawing code directly — parametric relationships, dimensions, layers (replaces CadQuery, Build123d, pythonOCC)
+- **Drawing specifications:** LLM agent reasons about what to draw, which views, dimensions, annotations
+- **SVG generation:** LLM agent writes SVG markup directly for web-embeddable drawings
 
 ---
 
 ## 3D Graphics & Rendering
 
-### Web 3D Engine — Three.js + React Three Fiber
+> Rendering is inherently GPU-bound. LLM agents orchestrate scene setup and camera placement.
+
+### Web 3D Engine — Three.js + React Three Fiber (MIT)
 
 - **GitHub:** https://github.com/mrdoob/three.js / https://github.com/pmndrs/react-three-fiber
-- **License:** MIT
-- **Description:** The most widely used WebGL library, with a React renderer for declarative 3D scenes.
-- **Role in OpenLintel:** Core 3D engine for the web application — room visualization, design variant preview, interactive 3D editor, and AR viewer.
+- **Why it stays:** WebGL rendering requires a GPU pipeline.
+- **Role:** Core 3D engine — room visualization, design preview, interactive editor, AR/VR via WebXR, PBR material rendering.
 
-### AR/VR — A-Frame
-
-- **GitHub:** https://github.com/aframevr/aframe
-- **License:** MIT
-- **Description:** Web framework for building VR/AR experiences using HTML-like components.
-- **Role in OpenLintel:** WebXR-based AR preview of designs overlaid on real rooms via mobile browser.
-
-### AR/VR — Google Model Viewer
+### AR Preview — Google Model Viewer (Apache-2.0)
 
 - **GitHub:** https://github.com/google/model-viewer
-- **License:** Apache-2.0
-- **Description:** Web component for rendering 3D models with AR support.
-- **Role in OpenLintel:** Quick AR preview of individual furniture and fixture items from the catalogue.
+- **Why it stays:** Lightweight web component for instant AR preview.
+- **Role:** Quick AR preview of individual furniture/fixture items from catalogue.
 
-### PBR Rendering — Google Filament
+### Photorealistic Rendering — Blender Python API (GPL-3.0 / Cycles Apache-2.0)
 
-- **GitHub:** https://github.com/google/filament
-- **License:** Apache-2.0
-- **Description:** Real-time physically-based rendering engine for mobile, web, and desktop.
-- **Role in OpenLintel:** High-quality material preview rendering — accurate representation of tiles, wood grains, fabrics, and metal finishes.
+- **GitHub:** https://github.com/blender/blender
+- **Why it stays:** Production-quality path tracing requires a rendering engine.
+- **Role:** Headless photorealistic batch rendering of design variants. LLM agent sets up scene and materials; Blender renders.
 
-### Offline Rendering — Blender Python API
-
-- **GitHub:** https://github.com/blender/blender (via bpy module)
-- **License:** GPL-3.0 (Cycles renderer: Apache-2.0)
-- **Description:** Full 3D creation suite with Python scripting and production-quality Cycles renderer.
-- **Role in OpenLintel:** Headless photorealistic rendering of design variants. Batch-render marketing images and client presentation renders.
-
-### Gaussian Splat Viewer — GaussianSplats3D
+### Gaussian Splat Viewer — GaussianSplats3D (MIT)
 
 - **GitHub:** https://github.com/mkkellogg/GaussianSplats3D
-- **License:** MIT
-- **Description:** Three.js-based viewer for 3D Gaussian Splat scenes.
-- **Role in OpenLintel:** Web-based interactive viewer for Gaussian Splat room captures — navigable photorealistic room walkthroughs.
+- **Why it stays:** Specialized Three.js-based viewer for Gaussian Splat data.
+- **Role:** Web-based interactive viewer for photorealistic room walkthroughs.
+
+### LLM Agent replaces:
+
+- **Scene composition:** LLM agent generates Three.js/R3F scene descriptions, camera positions, lighting setups
+- **AR/VR frameworks:** Three.js + R3F handles WebXR natively (replaces A-Frame)
+- **PBR material setup:** Three.js handles physically-based materials (replaces Google Filament)
 
 ---
 
 ## AI Design Generation
 
-### Diffusion Framework — Hugging Face Diffusers
+> LLM agents orchestrate the multi-step generation pipeline. Diffusion models generate the actual pixels.
+
+### Diffusion Framework — Hugging Face Diffusers (Apache-2.0)
 
 - **GitHub:** https://github.com/huggingface/diffusers
-- **License:** Apache-2.0
-- **Description:** State-of-the-art diffusion model library — inference and training for image, video, and audio generation.
-- **Role in OpenLintel:** Core framework for the design-engine service. Loads and runs all diffusion-based design generation models.
+- **Why it stays:** Image generation requires diffusion neural networks — LLMs generate text, not pixels.
+- **Role:** Core inference framework for all image generation models.
 
-### Base Models — SDXL / FLUX.1-schnell
+### Base Models — SDXL / FLUX.1-schnell (Apache-2.0)
 
 - **GitHub:** https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0 / https://huggingface.co/black-forest-labs/FLUX.1-schnell
-- **License:** Apache-2.0
-- **Description:** High-quality text-to-image foundation models.
-- **Role in OpenLintel:** Generate interior design concept images from text descriptions of style, materials, and spatial layout.
+- **Why they stay:** Foundation text-to-image models.
+- **Role:** Generate interior design concept images from text + spatial conditioning.
 
-### Architectural Control — ControlNet
+### Spatial Control — ControlNet (Apache-2.0)
 
 - **GitHub:** https://github.com/lllyasviel/ControlNet
-- **License:** Apache-2.0
-- **Description:** Add spatial conditioning controls (edges, depth, segmentation) to diffusion models.
-- **Role in OpenLintel:** Constrain design generation to match actual room geometry — floor plan outlines, depth maps, and segmentation masks guide the output.
+- **Why it stays:** Specialized conditioning adapters for diffusion models.
+- **Role:** Constrain design generation to match room geometry — floor plan outlines, depth maps, segmentation masks.
 
-### Style Transfer — IP-Adapter
+### Style Transfer — IP-Adapter (Apache-2.0)
 
 - **GitHub:** https://github.com/tencent-ailab/IP-Adapter
-- **License:** Apache-2.0
-- **Description:** Image Prompt Adapter for text-to-image diffusion models — transfer style from reference images.
-- **Role in OpenLintel:** Allow users to upload mood board images or reference photos and generate designs that match the style/aesthetic.
+- **Why it stays:** Image-prompt conditioning for diffusion models.
+- **Role:** Transfer style from mood board / reference images to generated designs.
 
-### Relighting — IC-Light
+### Relighting — IC-Light (Apache-2.0)
 
 - **GitHub:** https://github.com/lllyasviel/IC-Light
-- **License:** Apache-2.0
-- **Description:** Controllable image relighting with diffusion models.
-- **Role in OpenLintel:** Adjust lighting in design renders to match time-of-day, window orientation, and artificial lighting design.
+- **Why it stays:** Specialized relighting model.
+- **Role:** Adjust lighting in design renders to match time-of-day, window orientation, and lighting design.
 
-### Workflow Builder — ComfyUI
+### LLM Agent replaces:
 
-- **GitHub:** https://github.com/comfyanonymous/ComfyUI
-- **License:** GPL-3.0
-- **Description:** Node-based UI for building complex diffusion model workflows.
-- **Role in OpenLintel:** Prototyping and chaining multi-step generation pipelines (e.g., segment → depth → generate → relight → upscale).
+- **Pipeline orchestration:** LLM agent chains segment → depth → generate → style → relight → upscale steps in code (replaces ComfyUI)
+- **Prompt engineering:** LLM agent crafts optimal diffusion prompts from user preferences, style quiz, and spatial context
+- **Quality control:** LLM agent evaluates generated designs and re-prompts if quality/style criteria aren't met
 
 ---
 
 ## LLM & AI Agents
 
-### Local Model Serving — Ollama
+> The central nervous system of OpenLintel. LLM agents handle reasoning, planning, calculation, and orchestration across all services.
+
+### Local Model Serving — Ollama (MIT)
 
 - **GitHub:** https://github.com/ollama/ollama
-- **License:** MIT
-- **Description:** Run large language models locally with a simple API.
-- **Role in OpenLintel:** Local LLM inference for development and self-hosted deployments — no cloud API dependency.
+- **Role:** Local LLM inference for development and self-hosted deployments. Model-agnostic — run Qwen, LLaMA, Mistral, or any open model.
 
-### Local Model Serving — vLLM
+### Production Serving — vLLM (Apache-2.0)
 
 - **GitHub:** https://github.com/vllm-project/vllm
-- **License:** Apache-2.0
-- **Description:** High-throughput LLM serving engine with PagedAttention.
-- **Role in OpenLintel:** Production-grade LLM serving for multi-user inference with optimal GPU utilization.
+- **Role:** High-throughput production LLM serving with PagedAttention for optimal GPU utilization.
 
-### Open Models — Qwen 2.5/3
-
-- **GitHub:** https://github.com/QwenLM/Qwen2.5
-- **License:** Apache-2.0
-- **Description:** State-of-the-art open-weight LLM family from Alibaba.
-- **Role in OpenLintel:** Primary open LLM for design copilot, material recommendations, building code Q&A, and project planning assistance.
-
-### Open Models — Mistral
-
-- **GitHub:** https://github.com/mistralai/mistral-inference
-- **License:** Apache-2.0
-- **Description:** Efficient open-weight LLMs.
-- **Role in OpenLintel:** Alternative LLM backend for cost/performance trade-offs and multi-model routing.
-
-### Agent Framework — LangGraph
+### Agent Orchestration — LangGraph (MIT)
 
 - **GitHub:** https://github.com/langchain-ai/langgraph
-- **License:** MIT
-- **Description:** Framework for building stateful, multi-step LLM agent workflows as graphs.
-- **Role in OpenLintel:** Orchestrate complex design-to-delivery workflows — multi-step reasoning chains for design generation, BOM calculation, and procurement planning.
+- **Role:** THE agent framework for OpenLintel. Handles:
+  - Multi-step design-to-delivery workflows
+  - Multi-agent coordination (designer, engineer, estimator, procurement)
+  - Tool calling (ezdxf, OR-Tools, Diffusers, etc.)
+  - RAG over building codes, material specs, product catalogues (via pgvector)
+  - State management across long-running project lifecycles
 
-### Multi-Agent — CrewAI
-
-- **GitHub:** https://github.com/crewAIInc/crewAI
-- **License:** MIT
-- **Description:** Framework for orchestrating role-playing AI agents working together.
-- **Role in OpenLintel:** Coordinate specialized agents (designer, engineer, estimator, procurement) for end-to-end project automation.
-
-### RAG — LlamaIndex
-
-- **GitHub:** https://github.com/run-llama/llama_index
-- **License:** MIT
-- **Description:** Data framework for connecting LLMs to external data sources.
-- **Role in OpenLintel:** Retrieval-Augmented Generation over building codes, material specifications, product catalogues, and design guidelines.
-
-### Structured Output — Outlines
+### Structured Output — Outlines (Apache-2.0)
 
 - **GitHub:** https://github.com/dottxt-ai/outlines
-- **License:** Apache-2.0
-- **Description:** Guaranteed structured generation from LLMs — JSON, regex, grammars.
-- **Role in OpenLintel:** Ensure LLM outputs conform to typed schemas (BOM items, room specifications, design parameters) for reliable downstream processing.
+- **Role:** Guarantee LLM outputs conform to typed schemas — BOM items, room specs, design parameters, engineering calculations. Critical for reliable downstream processing.
+
+### What LLM agents handle across OpenLintel:
+
+| Service | LLM Agent Responsibilities |
+|---------|---------------------------|
+| **design-engine** | Orchestrate Diffusers pipeline, craft prompts, evaluate quality |
+| **drawing-generator** | Generate drawing specs, calculate coordinates, produce ezdxf code |
+| **cutlist-engine** | Break furniture into panels, generate cut lists, call nesting solvers |
+| **mep-calculator** | All engineering calculations with NEC/IPC/ASHRAE formulas, structured output |
+| **bom-engine** | Calculate quantities, waste factors, material substitutions |
+| **catalogue-service** | Product recommendations, compatibility checking, natural language search |
+| **procurement-service** | Vendor evaluation, order optimization, negotiation logic |
+| **project-service** | Schedule generation, dependency analysis, change impact assessment |
+| **floor-plan-digitizer** | Read floor plan images, extract rooms/dimensions/doors/windows |
+| **room-segmentation** | Identify objects, prompt SAM 2, interpret scene context |
+| **measurement** | Reference object detection, calibration, dimension inference |
+| **product-matching** | Understand user intent, interpret visual queries, rank results |
 
 ---
 
 ## Optimization
 
-### General Optimization — Google OR-Tools
+> LLM agents handle business logic and problem formulation. Specialized solvers handle NP-hard combinatorial problems.
+
+### General Optimization — Google OR-Tools (Apache-2.0)
 
 - **GitHub:** https://github.com/google/or-tools
-- **License:** Apache-2.0
-- **Description:** Operations research suite — constraint programming, linear/integer programming, routing, scheduling.
-- **Role in OpenLintel:** Furniture layout optimization, procurement route planning, construction schedule optimization, and resource allocation.
+- **Why it stays:** LLMs are terrible at combinatorial optimization. OR-Tools solves constraint programming, LP/MILP, routing, and scheduling problems.
+- **Role:** Furniture layout optimization, procurement route planning, construction schedule optimization, budget allocation. LLM agent formulates the problem; OR-Tools solves it.
 
-### Sheet Nesting — DeepNest
+### Irregular Shape Nesting — DeepNest (MIT)
 
 - **GitHub:** https://github.com/Jack000/DeepNest
-- **License:** MIT
-- **Description:** Open-source 2D nesting / bin-packing optimizer for irregular shapes.
-- **Role in OpenLintel:** Optimize tile and stone cutting layouts — minimize waste on irregularly shaped pieces.
+- **Why it stays:** NP-hard 2D nesting — algorithmic solver required.
+- **Role:** Optimize tile and stone cutting layouts — minimize waste on irregular shapes.
 
-### Sheet Nesting — libnest2d
-
-- **GitHub:** https://github.com/tamasmeszaros/libnest2d
-- **License:** LGPL-3.0
-- **Description:** 2D irregular bin-packing library (C++ with Python bindings).
-- **Role in OpenLintel:** High-performance nesting backend for the cutlist-engine — pack panel parts onto standard sheet sizes.
-
-### Rectangle Packing — rectpack
+### Rectangle Packing — rectpack (Apache-2.0)
 
 - **GitHub:** https://github.com/secnot/rectpack
-- **License:** Apache-2.0
-- **Description:** Fast 2D rectangle bin-packing algorithms in Python.
-- **Role in OpenLintel:** Rectangular panel nesting for CNC cut lists — fast optimization for standard rectangular parts.
+- **Why it stays:** Fast bin-packing algorithms — LLMs can't solve this efficiently.
+- **Role:** Panel nesting for CNC cut lists — pack rectangular parts onto standard sheets.
 
-### Linear Programming — PuLP
-
-- **GitHub:** https://github.com/coin-or/pulp
-- **License:** MIT (BSD-2)
-- **Description:** LP/MILP modeler in Python.
-- **Role in OpenLintel:** Formulate and solve material purchasing optimization, vendor selection, and budget allocation problems.
-
-### Scientific Computing — SciPy
+### Scientific Computing — SciPy (BSD-3)
 
 - **GitHub:** https://github.com/scipy/scipy
-- **License:** BSD-3-Clause
-- **Description:** Fundamental algorithms for scientific computing in Python.
-- **Role in OpenLintel:** Optimization algorithms, spatial calculations, and engineering computations across all Python services.
+- **Role:** Foundational algorithms for spatial calculations and engineering computations.
+
+### LLM Agent replaces:
+
+- **Problem formulation:** LLM agent translates business requirements into optimization problem definitions (replaces hand-coded formulation)
+- **LP/MILP modeling:** OR-Tools handles this natively (replaces PuLP)
+- **Irregular nesting orchestration:** LLM agent decides which parts need nesting, sets constraints (replaces libnest2d)
 
 ---
 
 ## MEP Engineering
 
-### Energy Modeling — EnergyPlus
+> **Fully LLM-agent-driven** for residential scale. LLM agents perform all calculations using standard engineering formulas with proper citations.
 
-- **GitHub:** https://github.com/NREL/EnergyPlus
-- **License:** BSD-3-Clause
-- **Description:** DOE's whole-building energy simulation engine.
-- **Role in OpenLintel:** HVAC load calculations, energy performance modeling, and sustainability scoring for design variants.
+### How it works:
 
-### Energy Modeling — OpenStudio
+1. LLM agent receives room specifications, design selections, and fixture schedules
+2. Agent applies formulas from NEC (electrical), IPC/UPC (plumbing), and ASHRAE (HVAC) standards
+3. Outlines guarantees structured output (panel schedules, pipe sizing tables, load calculations)
+4. Agent shows its work — every calculation cites the source standard and clause number
+5. Results are validated against known textbook values in unit tests
 
-- **GitHub:** https://github.com/NREL/OpenStudio
-- **License:** BSD-3-Clause
-- **Description:** Cross-platform collection of tools for building energy modeling using EnergyPlus.
-- **Role in OpenLintel:** Building energy model creation and parametric analysis for comparing design variant energy performance.
+### Why specialized tools were removed:
 
-### Python EnergyPlus — EPpy
+- **EnergyPlus / OpenStudio** — designed for whole-building simulation of commercial structures. Overkill for residential room-scale MEP. Complex setup, slow execution, brittle configuration.
+- **Ladybug Tools** — AGPL-3.0 license concern, plus LLM agents handle solar/thermal calculations from first principles.
+- **EPpy / python-hvac** — thin wrappers around formulas that LLMs know natively.
 
-- **GitHub:** https://github.com/santoshphilip/eppy
-- **License:** MIT
-- **Description:** Python scripting for EnergyPlus input/output files.
-- **Role in OpenLintel:** Programmatically create and modify EnergyPlus models from design specifications in the mep-calculator service.
+### What the LLM agent computes:
 
-### HVAC Calculations — Ladybug Tools
-
-- **GitHub:** https://github.com/ladybug-tools
-- **License:** AGPL-3.0
-- **Description:** Collection of tools for environmental design analysis — solar, daylight, thermal comfort, energy.
-- **Role in OpenLintel:** Solar analysis, daylight simulation, thermal comfort evaluation, and environmental performance scoring.
-
-### Python HVAC — python-hvac
-
-- **Description:** Python utilities for HVAC engineering calculations.
-- **Role in OpenLintel:** Psychrometric calculations, duct sizing, and equipment selection formulas in the mep-calculator service.
+- **Electrical:** Load calculation (W per circuit), wire gauge (NEC Table 310.16), voltage drop, panel schedule, conduit fill
+- **Plumbing:** Fixture unit totals (IPC Table 604.4), pipe sizing, drainage slope, hot water system sizing
+- **HVAC:** Cooling/heating load (ASHRAE Manual J simplified), equipment sizing (BTU/tonnage), duct sizing
+- **Fire safety:** Smoke detector placement (NFPA 72), extinguisher locations
+- **Validation:** Every calculation includes unit tests against textbook examples
 
 ---
 
 ## Infrastructure & Platform
 
-### Task Queue — Celery
-
-- **GitHub:** https://github.com/celery/celery
-- **License:** BSD-3-Clause
-- **Description:** Distributed task queue for Python.
-- **Role in OpenLintel:** Async job processing for ML inference, render generation, BOM calculation, and report generation.
-
-### Workflow Engine — Temporal
+### Workflow Engine — Temporal (MIT)
 
 - **GitHub:** https://github.com/temporalio/temporal
-- **License:** MIT
-- **Description:** Durable workflow execution platform.
-- **Role in OpenLintel:** Orchestrate long-running project workflows (design → approval → procurement → construction) with reliable state management and retry logic.
+- **Role:** Durable workflow orchestration for long-running project lifecycles (design → approval → procurement → construction). Handles retries, timeouts, and state persistence. Single choice — replaces Celery.
 
-### Search — Meilisearch
+### Search — Meilisearch (MIT)
 
 - **GitHub:** https://github.com/meilisearch/meilisearch
-- **License:** MIT
-- **Description:** Lightning-fast, typo-tolerant search engine.
-- **Role in OpenLintel:** Product catalogue full-text search with instant results, faceted filtering, and typo tolerance.
+- **Role:** Product catalogue full-text search with instant results, faceted filtering, and typo tolerance.
 
-### Vector Search — pgvector
+### Vector Search — pgvector (PostgreSQL License)
 
 - **GitHub:** https://github.com/pgvector/pgvector
-- **License:** PostgreSQL License
-- **Description:** Open-source vector similarity search for PostgreSQL.
-- **Role in OpenLintel:** Store and query CLIP/DINOv2 embeddings for visual product search, design similarity, and RAG retrieval — all within the existing PostgreSQL database.
+- **Role:** Store and query CLIP/DINOv2 embeddings for visual product search, plus RAG retrieval for building codes and material specs — all within PostgreSQL.
 
-### Object Storage — MinIO
+### Object Storage — MinIO (AGPL-3.0)
 
 - **GitHub:** https://github.com/minio/minio
-- **License:** AGPL-3.0
-- **Description:** High-performance S3-compatible object storage.
-- **Role in OpenLintel:** Self-hosted file storage for photos, 3D models, renders, drawings, and documents. S3-compatible API for cloud migration.
+- **Role:** Self-hosted S3-compatible file storage for photos, 3D models, renders, drawings, and documents.
 
-### Real-time Collaboration — Y.js
+### Real-time Collaboration — Y.js (MIT) + Socket.IO (MIT)
 
-- **GitHub:** https://github.com/yjs/yjs
-- **License:** MIT
-- **Description:** CRDT-based framework for building collaborative applications.
-- **Role in OpenLintel:** Real-time collaborative design editing — multiple users can modify the same design simultaneously with conflict-free merging.
+- **GitHub:** https://github.com/yjs/yjs / https://github.com/socketio/socket.io
+- **Role:** CRDT-based collaborative design editing with WebSocket transport. Multiple users edit simultaneously with conflict-free merging.
 
-### Real-time Communication — Socket.IO
-
-- **GitHub:** https://github.com/socketio/socket.io
-- **License:** MIT
-- **Description:** Bidirectional event-based real-time communication.
-- **Role in OpenLintel:** WebSocket transport for the collaboration service — real-time updates, notifications, and live cursor tracking.
-
-### Event Streaming — NATS
+### Event Streaming — NATS (Apache-2.0)
 
 - **GitHub:** https://github.com/nats-io/nats-server
-- **License:** Apache-2.0
-- **Description:** High-performance cloud-native messaging system.
-- **Role in OpenLintel:** Inter-service event streaming — decouple microservices with publish/subscribe messaging for design events, status updates, and workflow triggers.
+- **Role:** Inter-service event streaming — decouple microservices with publish/subscribe messaging.
 
 ---
 
-## License Compatibility Notes
+## License Compatibility
 
-| License | Commercial Use | Modification | Distribution | Patent Grant | Copyleft |
-|---------|---------------|-------------|-------------|-------------|----------|
-| MIT | Yes | Yes | Yes | No | No |
-| Apache-2.0 | Yes | Yes | Yes | Yes | No |
-| BSD-3 | Yes | Yes | Yes | No | No |
-| LGPL-3.0 | Yes | Yes | Yes | No | Weak (library) |
-| GPL-3.0 | Yes | Yes | Yes | No | Strong |
-| AGPL-3.0 | Yes | Yes | Yes | No | Strong (network) |
+| License | Commercial | Copyleft | Notes |
+|---------|-----------|----------|-------|
+| MIT | Yes | No | Most permissive |
+| Apache-2.0 | Yes | No | Includes patent grant |
+| BSD-3 | Yes | No | Permissive |
+| LGPL-3.0 | Yes | Weak | Library use via dynamic linking OK |
+| GPL-3.0 | Yes | Strong | Blender used as standalone service |
+| AGPL-3.0 | Yes | Strong (network) | MinIO used as standalone infrastructure |
 
-**OpenLintel's approach:**
-- Core platform code is **AGPL-3.0** — compatible with all licenses above
-- GPL/AGPL tools (ComfyUI, YOLO, Blender, MinIO, Ladybug) are used as **standalone services** or **development tools**, not linked into permissively-licensed code
-- LGPL libraries (IfcOpenShell, pythonOCC, libnest2d) are used via **dynamic linking** as permitted by LGPL
+**OpenLintel is AGPL-3.0** — compatible with all licenses above. GPL/AGPL tools (Blender, MinIO) run as standalone services, not linked into application code.
 
 ---
 
-*This document is maintained alongside the codebase. When adding a new open-source dependency, update this file with the tool's details and role in OpenLintel.*
+## Tool Count
+
+| Category | Specialized Tools | LLM Agent Handles |
+|----------|------------------|-------------------|
+| Computer Vision & 3D | 6 (SAM 2, Depth Anything, COLMAP, Open3D, GS, CLIP/DINOv2) | Object detection, floor plan parsing, scene understanding |
+| CAD & Drawing | 2 (ezdxf, IfcOpenShell) | Parametric design, drawing specs, SVG generation |
+| 3D Graphics | 4 (Three.js/R3F, Model Viewer, Blender, GaussianSplats3D) | Scene composition, camera placement |
+| AI Generation | 5 (Diffusers, SDXL/FLUX, ControlNet, IP-Adapter, IC-Light) | Pipeline orchestration, prompt crafting, quality control |
+| LLM & Agents | 4 (Ollama, vLLM, LangGraph, Outlines) | Everything listed above |
+| Optimization | 4 (OR-Tools, DeepNest, rectpack, SciPy) | Problem formulation |
+| MEP Engineering | 0 | All calculations via LLM agent |
+| Infrastructure | 6 (Temporal, Meilisearch, pgvector, MinIO, Y.js/Socket.IO, NATS) | — |
+| **Total** | **31 tools** | **12 service areas** |
+
+*Previously 47 tools → now 31. The 16 removed tools are replaced by LLM agents that are more flexible, more maintainable, and better at reasoning.*
+
+---
+
+*This document is maintained alongside the codebase. When adding a new dependency, first ask: "Can an LLM agent do this?" If yes, use an agent. If no, add the specialized tool here.*

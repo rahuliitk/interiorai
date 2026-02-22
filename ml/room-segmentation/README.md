@@ -1,6 +1,6 @@
-# Room Segmentation Model
+# Room Segmentation
 
-Computer vision model for identifying room elements from photos.
+Computer vision pipeline for identifying room elements from photos.
 
 ## Capabilities
 
@@ -10,20 +10,26 @@ Computer vision model for identifying room elements from photos.
 - Damage detection (cracks, dampness, mold)
 - Monocular depth estimation for dimension inference
 
-## Open-Source Tools
+## Architecture: LLM Agent + Specialized Vision Models
+
+1. **Multimodal LLM** identifies objects in the scene via natural language (replaces Grounding DINO, YOLO)
+2. **SAM 2** produces pixel-level segmentation masks from LLM-identified regions
+3. **Depth Anything V2** generates dense depth maps for dimension estimation
+4. **LLM agent** interprets results — room type, condition, spatial layout
+
+### Specialized Tools (pixel-level output)
 
 | Tool | License | Role |
 |------|---------|------|
-| [SAM 2](https://github.com/facebookresearch/sam2) | Apache-2.0 | Promptable segmentation for room elements (walls, floors, ceilings) |
-| [Grounding DINO](https://github.com/IDEA-Research/GroundingDINO) | Apache-2.0 | Open-set detection of furniture, fixtures, and architectural elements |
-| [Depth Anything V2](https://github.com/DepthAnything/Depth-Anything-V2) | Apache-2.0 | Monocular depth estimation for dimension inference |
+| [SAM 2](https://github.com/facebookresearch/sam2) | Apache-2.0 | Pixel-level segmentation — LLMs output text, not masks |
+| [Depth Anything V2](https://github.com/DepthAnything/Depth-Anything-V2) | Apache-2.0 | Dense depth maps from single photos |
 
-## Architecture
+### LLM Agent handles (replaces Grounding DINO, YOLO)
 
-- Backbone: SAM 2 + Grounding DINO for zero-shot segmentation and detection
-- Depth: Depth Anything V2 for monocular depth estimation
-- Training data: ADE20K + custom interior dataset
-- Output: Per-pixel semantic segmentation masks + depth maps
+- Object identification via natural language prompts
+- Scene understanding and room type classification
+- Damage assessment and condition reporting
+- Prompting SAM 2 with identified regions
 
 ## Getting Started
 
@@ -32,7 +38,6 @@ cd ml/room-segmentation
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python train.py --config configs/default.yaml
 ```
 
 ## Status
