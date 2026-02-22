@@ -2,13 +2,33 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "jsx": "preserve",
-    "plugins": [{ "name": "next" }],
+    "declaration": false,
+    "declarationMap": false,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@openlintel/core/*": ["../../packages/core/src/*"],
-      "@openlintel/ui/*": ["../../packages/ui/src/*"]
-    }
+      "@/*": [
+        "./src/*"
+      ],
+      "@openlintel/core/*": [
+        "../../packages/core/src/*"
+      ],
+      "@openlintel/ui/*": [
+        "../../packages/ui/src/*"
+      ]
+    },
+    "incremental": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

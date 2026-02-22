@@ -53,18 +53,22 @@ services:
   # ---------------------------------------------------------------------------
   # Search
   # ---------------------------------------------------------------------------
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
-    container_name: openlintel-elasticsearch
+  meilisearch:
+    image: getmeili/meilisearch:v1.12
+    container_name: openlintel-meilisearch
     restart: unless-stopped
     environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-openlintel_dev_key}
+      MEILI_ENV: development
     ports:
-      - '9200:9200'
+      - '7700:7700'
     volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
+      - meilisearch_data:/meili_data
+    healthcheck:
+      test: ['CMD', 'wget', '--no-verbose', '--spider', 'http://localhost:7700/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # ---------------------------------------------------------------------------
   # Application Services (uncomment as you build them)
@@ -107,4 +111,4 @@ volumes:
   postgres_data:
   redis_data:
   minio_data:
-  elasticsearch_data:
+  meilisearch_data:
