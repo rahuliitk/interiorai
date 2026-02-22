@@ -189,7 +189,7 @@ interiorai/
 ├── CONTRIBUTING.md           # Contribution guide
 ├── CODE_OF_CONDUCT.md        # Community code of conduct
 ├── CHANGELOG.md              # Version changelog
-├── LICENSE.md                # AGPL-3.0
+├── LICENSE                   # AGPL-3.0
 └── docker-compose.yml        # Local development orchestration
 ```
 
@@ -259,7 +259,7 @@ We welcome contributions from developers, designers, architects, engineers, and 
 
 ## License
 
-This project is licensed under the **GNU Affero General Public License v3.0** — see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the **GNU Affero General Public License v3.0** — see the [LICENSE](LICENSE) file for details.
 
 **What this means:**
 - You can use, modify, and distribute this software freely
