@@ -26,8 +26,13 @@ The floor plan digitizer is **primarily driven by a multimodal LLM** — it read
 
 | Tool | License | Role |
 |------|---------|------|
+| [LibreDWG](https://github.com/LibreDWG/libredwg) | GPL-3.0 | DWG reading — convert uploaded DWG floor plans to DXF |
 | [OpenCV](https://github.com/opencv/opencv) | Apache-2.0 | Image preprocessing — deskew, enhance, threshold |
 | [ezdxf](https://github.com/mozman/ezdxf) | MIT | DXF output from extracted room geometry |
+
+### DWG Input Support
+
+Floor plans often arrive as DWG files. LibreDWG converts DWG → DXF on ingest, then ezdxf processes the geometry. For raster floor plans (scans, photos, PDFs), the multimodal VLM reads them directly.
 
 ### LLM Agent handles (replaces CubiCasa5k, RoomFormer)
 

@@ -11,34 +11,39 @@ Auto-generated technical drawing service for OpenLintel.
 - Flooring layout plans
 - Joinery/millwork detail drawings
 
-## Architecture: LLM Agent + ezdxf
+## Architecture: LLM Agent + File Format Tools
 
-The drawing generator uses an **LLM agent** to produce all drawing logic:
+### DWG Support
 
-1. **Agent** receives room model, design variant, and drawing requirements
-2. **Agent** calculates coordinates, dimensions, layers, and annotations
-3. **Agent** generates ezdxf Python code for each drawing
-4. **ezdxf** writes the actual DXF file
-5. **Agent** generates SVG markup directly for web-embeddable views
+Most real-world CAD files arrive as DWG (Autodesk's proprietary format). OpenLintel handles this:
+
+```
+User uploads DWG → LibreDWG (dwg2dxf) → ezdxf reads DXF → process geometry
+                                                                    ↓
+LLM agent generates new drawings → ezdxf writes DXF → user opens in any CAD
+                                                                    ↓
+                                            IfcOpenShell writes IFC → BIM tools
+```
 
 ### Specialized Tools (binary format I/O)
 
 | Tool | License | Role |
 |------|---------|------|
-| [ezdxf](https://github.com/mozman/ezdxf) | MIT | DXF file generation — precise binary format |
+| [LibreDWG](https://github.com/LibreDWG/libredwg) | GPL-3.0 | DWG reading — converts industry-standard DWG to DXF |
+| [ezdxf](https://github.com/mozman/ezdxf) | MIT | DXF read/write — all drawing generation and processing |
 | [IfcOpenShell](https://github.com/IfcOpenShell/IfcOpenShell) | LGPL-3.0 | IFC/BIM export for Revit/ArchiCAD interop |
 
-### LLM Agent handles (replaces CadQuery, Build123d, pythonOCC)
+### LLM Agent handles
 
 - Drawing specifications — which views, scales, title blocks
 - Coordinate calculations — wall positions, furniture placement, dimensions
 - Parametric joinery details — generates ezdxf code for custom millwork
 - SVG generation — writes SVG markup directly for web embedding
-- Annotation and dimensioning — proper architectural drawing conventions
+- Annotation and dimensioning — architectural drawing conventions
 
 ## Output Formats
 
-- DXF (via ezdxf)
+- DXF (via ezdxf) — readable by all CAD software including AutoCAD
 - PDF drawing sets (scaled, title-blocked)
 - SVG for web embedding
 - IFC/BIM (via IfcOpenShell)

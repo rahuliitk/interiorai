@@ -1,36 +1,33 @@
-# Design Generation Model
+# Design Generation
 
-AI model pipeline for generating interior design concepts from constraints.
+VLM-powered interior design concept generation.
 
 ## Capabilities
 
-- Generate multiple design variants from room dimensions + style + budget
-- Furniture layout optimization (traffic flow, ergonomics, lighting)
+- Generate multiple design variants from room photos + style + budget
+- Preserve specified elements ("keep the floors," "don't move the windows")
 - Material palette generation (cohesive color/texture combinations)
-- Style transfer and adaptation
+- Style transfer from mood board / reference images
 
-## Architecture: LLM Agent + Diffusion Models
+## Architecture: VLM API Direct
 
-1. **LLM agent** interprets design brief — style, budget, room function, user preferences
-2. **Agent** crafts optimal diffusion prompts and selects conditioning inputs
-3. **Diffusers + SDXL/FLUX** generates design images
-4. **ControlNet** constrains output to room geometry (floor plan outline, depth map)
-5. **Agent** evaluates results, iterates if quality/style criteria aren't met
+Design generation uses **VLM APIs directly** — no local diffusion models.
 
-### Specialized Tools
+### How it works:
 
-| Tool | License | Role |
-|------|---------|------|
-| [HF Diffusers](https://github.com/huggingface/diffusers) | Apache-2.0 | Core diffusion framework |
-| [SDXL](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0) | Apache-2.0 | Base model for design image generation |
-| [ControlNet](https://github.com/lllyasviel/ControlNet) | Apache-2.0 | Spatial conditioning from floor plan + depth |
+1. **LangGraph agent** interprets design brief — style, budget, room function, constraints
+2. **Agent** crafts optimal VLM prompt with photo + context
+3. **VLM API** (via LiteLLM) generates redesigned room image
+4. **Agent** evaluates results against constraints and quality criteria
+5. **Agent** iterates with refined prompts if needed
 
-### LLM Agent handles (replaces ComfyUI)
+### Why VLM APIs replace the diffusion pipeline:
 
-- Pipeline orchestration and prompt engineering
-- Style consistency enforcement across rooms
-- Quality control and iterative re-generation
-- Design brief interpretation
+Modern VLMs can take a room photo and accurately redesign it while respecting natural language constraints. This replaces the entire Diffusers + SDXL + ControlNet + IP-Adapter + IC-Light pipeline with a single API call — simpler, more flexible, and no GPU infrastructure required.
+
+### No specialized tools
+
+Pure API orchestration via LangGraph + LiteLLM. Users configure their preferred VLM provider.
 
 ## Status
 

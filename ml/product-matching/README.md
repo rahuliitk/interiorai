@@ -13,8 +13,8 @@ Match photos of materials and products to catalogue items.
 
 1. **CLIP/DINOv2** generates visual embeddings for uploaded photo
 2. **pgvector** performs nearest-neighbor search across product catalogue embeddings
-3. **Multimodal LLM** interprets the photo — material type, color, texture, style
-4. **LLM agent** re-ranks results considering budget, availability, and design context
+3. **Multimodal VLM** interprets the photo — material type, color, texture, style
+4. **VLM/LLM agent** re-ranks results considering budget, availability, and design context
 
 ### Specialized Tools
 
@@ -24,9 +24,9 @@ Match photos of materials and products to catalogue items.
 | [pgvector](https://github.com/pgvector/pgvector) | PostgreSQL License | Vector similarity search in PostgreSQL |
 | [Meilisearch](https://github.com/meilisearch/meilisearch) | MIT | Full-text product search fallback |
 
-### LLM Agent handles
+### VLM/LLM Agent handles
 
-- Photo interpretation — material type, color, pattern, style
+- Photo interpretation via VLM — material type, color, texture, style
 - Intent understanding — "something like this but cheaper"
 - Result re-ranking with design context and budget
 - Natural language product queries

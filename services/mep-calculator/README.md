@@ -29,7 +29,7 @@ The MEP calculator is **entirely driven by LLM agents** — no specialized engin
 
 1. **Agent** receives room specifications, design selections, and fixture schedules
 2. **Agent** applies formulas from NEC (electrical), IPC/UPC (plumbing), ASHRAE (HVAC)
-3. **Outlines** guarantees structured output (panel schedules, pipe sizing tables, load calculations)
+3. **Pydantic** validates structured output (panel schedules, pipe sizing tables, load calculations)
 4. **Agent** shows its work — every calculation cites the source standard and clause number
 5. Results are validated against known textbook values in unit tests
 
@@ -52,7 +52,8 @@ All calculations must cite their source standard (NEC, IEC, IS, IPC, UPC, etc.) 
 
 - Python 3.11+ / FastAPI
 - LangGraph (agent orchestration)
-- Outlines (structured output)
+- LiteLLM (multi-provider API access)
+- Pydantic (structured output validation)
 
 ## Status
 

@@ -12,10 +12,10 @@ Computer vision pipeline for identifying room elements from photos.
 
 ## Architecture: LLM Agent + Specialized Vision Models
 
-1. **Multimodal LLM** identifies objects in the scene via natural language (replaces Grounding DINO, YOLO)
+1. **Multimodal VLM** identifies objects in the scene via natural language (replaces Grounding DINO, YOLO)
 2. **SAM 2** produces pixel-level segmentation masks from LLM-identified regions
 3. **Depth Anything V2** generates dense depth maps for dimension estimation
-4. **LLM agent** interprets results — room type, condition, spatial layout
+4. **VLM/LLM agent** interprets results — room type, condition, spatial layout
 
 ### Specialized Tools (pixel-level output)
 
@@ -24,9 +24,9 @@ Computer vision pipeline for identifying room elements from photos.
 | [SAM 2](https://github.com/facebookresearch/sam2) | Apache-2.0 | Pixel-level segmentation — LLMs output text, not masks |
 | [Depth Anything V2](https://github.com/DepthAnything/Depth-Anything-V2) | Apache-2.0 | Dense depth maps from single photos |
 
-### LLM Agent handles (replaces Grounding DINO, YOLO)
+### VLM handles (replaces Grounding DINO, YOLO)
 
-- Object identification via natural language prompts
+- Object identification via natural language prompts (VLM API)
 - Scene understanding and room type classification
 - Damage assessment and condition reporting
 - Prompting SAM 2 with identified regions

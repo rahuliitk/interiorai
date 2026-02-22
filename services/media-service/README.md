@@ -27,9 +27,9 @@ The media service is the most tool-heavy service — 3D reconstruction and proce
 | [Depth Anything V2](https://github.com/DepthAnything/Depth-Anything-V2) | Apache-2.0 | Monocular depth estimation |
 | [OpenCV](https://github.com/opencv/opencv) | Apache-2.0 | Image processing, validation, feature extraction |
 
-### LLM Agent handles
+### VLM/LLM Agent handles
 
-- Object identification in room photos (replaces Grounding DINO)
+- Object identification in room photos via VLM (replaces Grounding DINO)
 - Scene understanding and metadata extraction
 - Quality assessment of uploaded media
 

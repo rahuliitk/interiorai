@@ -1031,35 +1031,32 @@
 
 OpenLintel follows an **LLM-agent-first** approach: use AI agents for reasoning, orchestration, and business logic — use specialized tools only where LLMs fundamentally cannot operate.
 
-### 22.1 LLM Agents — Central Nervous System
-- **Serving:** Ollama (MIT) for local dev, vLLM (Apache-2.0) for production
-- **Agent Framework:** LangGraph (MIT) — single framework for all agent workflows
-- **Structured Output:** Outlines (Apache-2.0) — guaranteed schema-conformant LLM output
-- **Scope:** Agents handle design orchestration, engineering calculations, drawing specifications, BOM generation, floor plan parsing, product recommendations, schedule generation, and procurement logic
+### 22.1 VLM/LLM API Layer — Central Nervous System
+- **Unified API:** LiteLLM (MIT) — single interface to 100+ providers (OpenAI, Gemini, Anthropic, etc.)
+- **Agent Framework:** LangGraph (MIT) — orchestration for all multi-step workflows
+- **No local model serving** — users configure their preferred provider's API key
+- **Scope:** VLM/LLM APIs handle design generation, engineering calculations, drawing specifications, BOM generation, floor plan parsing, product recommendations, schedule generation, and procurement logic
 
 ### 22.2 Computer Vision & 3D Reconstruction (Sections 2, 15)
 - **Segmentation:** SAM 2 (Apache-2.0) — pixel-level masks
 - **Depth Estimation:** Depth Anything V2 (Apache-2.0)
 - **Photogrammetry:** COLMAP (BSD-3)
 - **3D Processing:** Open3D (MIT), 3D Gaussian Splatting
-- **Visual Embeddings:** CLIP / DINOv2 for product search
-- **Object Detection:** Multimodal LLM replaces Grounding DINO, YOLO
-- **Floor Plan Parsing:** Multimodal LLM replaces CubiCasa5k, RoomFormer
+- **Visual Embeddings:** CLIP / DINOv2 for product search at scale
+- **Object Detection:** Multimodal VLM replaces Grounding DINO, YOLO
+- **Floor Plan Parsing:** Multimodal VLM replaces CubiCasa5k, RoomFormer
 - **On-device SLAM:** ARKit / ARCore (native device APIs)
 
 ### 22.3 AI Design Generation (Section 3)
-- **Diffusion Framework:** Hugging Face Diffusers (Apache-2.0)
-- **Base Models:** SDXL, FLUX.1-schnell (Apache-2.0)
-- **Spatial Control:** ControlNet (Apache-2.0)
-- **Style Transfer:** IP-Adapter (Apache-2.0)
-- **Relighting:** IC-Light (Apache-2.0)
-- **Pipeline Orchestration:** LLM agent replaces ComfyUI
+- **VLM APIs** handle design generation directly — take room photo + natural language constraints, output redesigned image
+- **No local diffusion models** — replaces Diffusers, SDXL, ControlNet, IP-Adapter, IC-Light
+- **LangGraph agent** orchestrates prompt crafting, quality evaluation, and iterative re-generation
 
 ### 22.4 CAD & Technical Drawing (Section 4)
-- **DXF I/O:** ezdxf (MIT)
+- **DWG Reading:** LibreDWG (GPL-3.0) — read industry-standard DWG files, convert to DXF
+- **DXF I/O:** ezdxf (MIT) — all drawing generation and processing
 - **BIM/IFC:** IfcOpenShell (LGPL-3.0)
-- **Parametric Design:** LLM agent generates ezdxf code (replaces CadQuery, Build123d)
-- **SVG Generation:** LLM agent writes SVG directly
+- **Parametric Design:** LLM agent generates ezdxf code directly
 
 ### 22.5 3D Graphics & Rendering (Sections 3, 18)
 - **Web 3D Engine:** Three.js (MIT) + React Three Fiber (MIT) — includes WebXR, PBR

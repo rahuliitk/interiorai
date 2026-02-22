@@ -15,7 +15,7 @@ Bill of Materials calculation service for OpenLintel.
 1. **Agent** analyzes design variant and calculates material quantities with waste factors
 2. **Agent** handles material substitutions and alternates based on budget/availability
 3. **OR-Tools** solves budget allocation and vendor selection optimization
-4. **Outlines** ensures structured BOM output matching typed schemas
+4. **Pydantic** validates structured BOM output against typed schemas
 
 ### Specialized Tools
 

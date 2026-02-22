@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 app = FastAPI(
     title="OpenLintel Design Engine",
-    description="AI-powered room design generation",
+    description="VLM-powered room design generation — users bring their own API keys",
     version="0.1.0",
 )
 

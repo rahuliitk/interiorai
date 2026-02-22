@@ -36,9 +36,9 @@ Engine  Engine         Engine
 | 3D Editor | Three.js + React Three Fiber | GaussianSplats3D, Model Viewer | WebGL-based, handles AR/VR/PBR natively |
 | Mobile | React Native or Flutter | ARKit/ARCore | Cross-platform, native SLAM |
 | API Layer | Node.js (TypeScript) | — | Type-safe, fast, large ecosystem |
-| ML Services | Python (FastAPI) | SAM 2, Depth Anything V2, Diffusers | ML ecosystem, PyTorch compatibility |
-| LLM Agents | Python (LangGraph) | Ollama, vLLM, Outlines | Central reasoning layer for all services |
-| CAD/Drawing | Python | ezdxf, IfcOpenShell | LLM agent generates code; tools write files |
+| ML Services | Python (FastAPI) | SAM 2, Depth Anything V2 | CV models for pixel-level output |
+| VLM/LLM APIs | Python (LangGraph) | LiteLLM | Users bring API keys — no local serving |
+| CAD/Drawing | Python | LibreDWG, ezdxf, IfcOpenShell | DWG reading + DXF generation + BIM export |
 | Optimization | Python | OR-Tools, DeepNest, rectpack | NP-hard problems require solvers |
 | MEP Engineering | Python (LangGraph) | — | Fully LLM agent-driven |
 | Database | PostgreSQL 16 + pgvector | pgvector | Reliable, spatial data, vector search |
@@ -59,17 +59,17 @@ The following shows how LLM agents orchestrate specialized tools in the primary 
 ```
 Photo Upload → OpenCV (validation) → COLMAP (SfM) → Open3D (mesh processing)
                                                           ↓
-                                              Multimodal LLM (object identification)
+                                              Multimodal VLM (object identification)
                                                           ↓
                                               SAM 2 (pixel segmentation, prompted by LLM)
                                                           ↓
                                               Depth Anything V2 (depth estimation)
                                                           ↓
-                                              Multimodal LLM (floor plan parsing → structured JSON)
+                                              Multimodal VLM (floor plan parsing → structured JSON)
                                                           ↓
                                               ezdxf (DXF generation, code written by LLM agent)
                                                           ↓
-LLM Agent orchestrates: Diffusers + SDXL/FLUX → ControlNet → IP-Adapter → IC-Light
+VLM API (via LiteLLM): room photo + style instructions → redesigned design image
                                                           ↓
 LLM Agent: BOM calculation → OR-Tools (optimization) → rectpack/DeepNest → ezdxf (CNC)
                                                           ↓

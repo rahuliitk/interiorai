@@ -4,45 +4,41 @@ AI-powered design generation service for OpenLintel.
 
 ## Responsibilities
 
-- Accept room dimensions, style preferences, and budget constraints
+- Accept room photos, style preferences, and budget constraints
 - Generate multiple design variants per room
-- Produce 2D concepts, 3D viewport renders, and photorealistic renders
-- Spatial planning and furniture layout optimization
+- Preserve specified elements (e.g., "don't change the floors")
+- Produce concept images, mood boards, and design recommendations
 
-## Architecture: LLM Agent + Diffusion Models
+## Architecture: VLM API + LangGraph Agent
 
-The design engine uses an **LLM agent** (via LangGraph) to orchestrate the generation pipeline:
+Design generation uses **VLM APIs directly** — no local diffusion models, no GPU inference.
 
-1. **Agent** interprets user preferences, selects style parameters, crafts optimal prompts
-2. **Diffusers + SDXL/FLUX** generates design images from text + spatial conditioning
-3. **ControlNet** constrains output to match room geometry (floor plan, depth map)
-4. **IP-Adapter** transfers style from mood board / reference images
-5. **IC-Light** adjusts lighting to match time-of-day and lighting design
-6. **Agent** evaluates output quality and re-prompts if needed
+### How it works:
 
-### Specialized Tools (things LLMs can't do)
+1. User uploads room photo + preferences (style, budget, constraints like "keep the floors")
+2. **LangGraph agent** crafts the optimal VLM prompt with spatial context
+3. **VLM API** (via LiteLLM — OpenAI, Gemini, Anthropic, etc.) generates redesigned room image
+4. **Agent** evaluates quality, checks constraint compliance, iterates if needed
+5. Multiple variants generated with different style/budget parameters
 
-| Tool | License | Role |
-|------|---------|------|
-| [HF Diffusers](https://github.com/huggingface/diffusers) | Apache-2.0 | Core diffusion framework — generates pixels |
-| [SDXL](https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0) / [FLUX.1-schnell](https://huggingface.co/black-forest-labs/FLUX.1-schnell) | Apache-2.0 | Base text-to-image models |
-| [ControlNet](https://github.com/lllyasviel/ControlNet) | Apache-2.0 | Spatial conditioning from room geometry |
-| [IP-Adapter](https://github.com/tencent-ailab/IP-Adapter) | Apache-2.0 | Style transfer from reference images |
-| [IC-Light](https://github.com/lllyasviel/IC-Light) | Apache-2.0 | Controllable relighting |
+### Why VLM APIs instead of local diffusion models:
 
-### LLM Agent handles (replaces ComfyUI)
+VLMs (GPT-4o, Gemini, etc.) can now take a room photo and redesign it accurately while respecting constraints ("don't change the floors," "make it modern," "keep the window treatments"). This replaces the entire Diffusers + SDXL + ControlNet + IP-Adapter + IC-Light pipeline with a single API call.
 
-- Pipeline orchestration — chains segment → depth → generate → style → relight
-- Prompt engineering from user preferences and spatial context
-- Quality evaluation and iterative re-generation
-- Style consistency across rooms
+### No specialized tools needed
+
+The design engine is pure orchestration:
+- **LiteLLM** — unified API for any VLM provider
+- **LangGraph** — agent workflow orchestration
+- **Pydantic** — structured output validation
+
+Users configure their API key for their preferred provider.
 
 ## Tech Stack
 
 - Python 3.11+ / FastAPI
 - LangGraph (agent orchestration)
-- PyTorch / Diffusers (model inference)
-- Outlines (structured output)
+- LiteLLM (multi-provider VLM API)
 
 ## Getting Started
 
