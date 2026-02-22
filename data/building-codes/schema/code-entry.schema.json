@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BuildingCodeEntry",
+  "description": "Schema for regional building code rule entries",
+  "type": "object",
+  "required": ["code_id", "jurisdiction", "category", "rule", "source"],
+  "properties": {
+    "code_id": {
+      "type": "string",
+      "description": "Unique identifier for this code entry"
+    },
+    "jurisdiction": {
+      "type": "object",
+      "required": ["country"],
+      "properties": {
+        "country": { "type": "string", "description": "ISO 3166-1 alpha-2 country code" },
+        "state": { "type": "string" },
+        "city": { "type": "string" }
+      }
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "room_dimensions",
+        "ventilation",
+        "fire_safety",
+        "electrical",
+        "plumbing",
+        "structural",
+        "accessibility",
+        "setback",
+        "far",
+        "parking",
+        "environmental"
+      ]
+    },
+    "rule": {
+      "type": "object",
+      "required": ["description", "requirement"],
+      "properties": {
+        "description": { "type": "string" },
+        "requirement": { "type": "string" },
+        "min_value": { "type": "number" },
+        "max_value": { "type": "number" },
+        "unit": { "type": "string" },
+        "applies_to": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Room types or building types this applies to"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["document", "clause"],
+      "properties": {
+        "document": { "type": "string", "description": "Name of the code/standard document" },
+        "edition": { "type": "string" },
+        "clause": { "type": "string", "description": "Specific clause reference" },
+        "url": { "type": "string", "format": "uri" }
+      }
+    },
+    "effective_date": { "type": "string", "format": "date" },
+    "notes": { "type": "string" }
+  }
+}

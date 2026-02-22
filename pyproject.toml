@@ -1,0 +1,18 @@
+[project]
+name = "interiorai"
+version = "0.1.0"
+description = "End-to-end home design automation platform"
+requires-python = ">=3.11"
+license = "AGPL-3.0"
+
+[tool.pytest.ini_options]
+testpaths = ["services", "ml"]
+python_files = ["test_*.py", "*_test.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true

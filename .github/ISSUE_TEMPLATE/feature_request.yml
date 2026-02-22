@@ -1,0 +1,73 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a feature idea? We'd love to hear it! Please check [existing discussions](https://github.com/interiorai/interiorai/discussions/categories/ideas) first.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or motivation
+      description: What problem does this feature solve? Who benefits?
+      placeholder: "As a [homeowner/designer/contractor], I need..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the feature you'd like.
+      placeholder: Describe how this would work from a user's perspective.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any alternative solutions or workarounds you've considered?
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Related area
+      description: Which part of the system would this affect?
+      multiple: true
+      options:
+        - Design Engine
+        - Drawing Generation
+        - BOM / Cut Lists
+        - MEP Engineering
+        - Product Catalogue
+        - Procurement
+        - Project Management
+        - Collaboration
+        - Mobile App
+        - AR / VR
+        - AI / ML
+        - Infrastructure
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: phase
+    attributes:
+      label: Roadmap phase
+      description: Which phase does this align with?
+      options:
+        - "Phase 1: Foundation"
+        - "Phase 2: Depth"
+        - "Phase 3: Execution"
+        - "Phase 4: Intelligence"
+        - "Phase 5: Ecosystem"
+        - "Not sure"
+    validations:
+      required: false

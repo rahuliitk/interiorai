@@ -1,0 +1,122 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+__pypackages__/
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# Environment
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# IDE
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build outputs
+.next/
+out/
+.nuxt/
+.output/
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.so
+.Python
+pip-log.txt
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ML models and data (large binary files)
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.onnx
+*.safetensors
+ml/*/data/
+ml/*/checkpoints/
+ml/*/wandb/
+*.tfrecords
+
+# Docker
+.docker/
+
+# Terraform
+infra/terraform/.terraform/
+infra/terraform/*.tfstate
+infra/terraform/*.tfstate.*
+infra/terraform/*.tfvars
+!infra/terraform/*.tfvars.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Temp files
+tmp/
+temp/
+*.tmp
+*.bak
+
+# Large media (should use Git LFS)
+*.psd
+*.ai
+*.sketch
+*.fig
+
+# Secrets (never commit these)
+*.pem
+*.key
+*.cert
+*.p12
+credentials.json
+service-account.json

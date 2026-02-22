@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "charliermarsh.ruff",
+    "ms-python.python",
+    "bradlc.vscode-tailwindcss",
+    "editorconfig.editorconfig",
+    "ms-azuretools.vscode-docker",
+    "github.copilot"
+  ]
+}
