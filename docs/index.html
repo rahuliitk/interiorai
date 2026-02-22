@@ -1,0 +1,1602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenLintel — End-to-End Home Design Automation</title>
+  <meta name="description" content="Open-source end-to-end home design automation platform. From room photos to finished living spaces, with every cut list, wire run, and pipe fitting accounted for.">
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --accent: #6C63FF;
+      --accent-dim: rgba(108, 99, 255, 0.15);
+      --accent-glow: rgba(108, 99, 255, 0.4);
+      --bg-primary: #0A0A0F;
+      --bg-secondary: #101018;
+      --bg-card: #14141F;
+      --bg-card-hover: #1A1A28;
+      --border: rgba(255, 255, 255, 0.06);
+      --border-hover: rgba(108, 99, 255, 0.3);
+      --text-primary: #F0F0F5;
+      --text-secondary: #9090A8;
+      --text-dim: #606078;
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', Consolas, monospace;
+      --max-width: 1200px;
+      --section-padding: 120px 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.7;
+      font-size: 16px;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    a:hover {
+      opacity: 0.85;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(108, 99, 255, 0.1); }
+      50% { box-shadow: 0 0 40px rgba(108, 99, 255, 0.2); }
+    }
+
+    .fade-in {
+      opacity: 0;
+      animation: fadeInUp 0.8s ease forwards;
+    }
+
+    .fade-in-delay-1 { animation-delay: 0.1s; }
+    .fade-in-delay-2 { animation-delay: 0.2s; }
+    .fade-in-delay-3 { animation-delay: 0.3s; }
+    .fade-in-delay-4 { animation-delay: 0.4s; }
+
+    /* ===== NAVIGATION ===== */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .nav-logo {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+
+    .nav-logo span {
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-primary);
+      opacity: 1;
+    }
+
+    .nav-github {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(108, 99, 255, 0.25);
+      border-radius: 8px;
+      color: var(--accent) !important;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .nav-github:hover {
+      background: rgba(108, 99, 255, 0.25);
+      opacity: 1 !important;
+    }
+
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .nav-toggle span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text-secondary);
+      margin: 5px 0;
+      transition: 0.2s;
+    }
+
+    /* ===== SECTION HEADERS ===== */
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      margin-bottom: 20px;
+    }
+
+    .section-subtitle {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 640px;
+      line-height: 1.7;
+    }
+
+    section {
+      padding: var(--section-padding);
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 64px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -40%;
+      left: -20%;
+      width: 80%;
+      height: 80%;
+      background: radial-gradient(ellipse, rgba(108, 99, 255, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -20%;
+      right: -10%;
+      width: 60%;
+      height: 60%;
+      background: radial-gradient(ellipse, rgba(108, 99, 255, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero .container {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(108, 99, 255, 0.2);
+      border-radius: 100px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 32px;
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    .hero-badge .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .hero-title {
+      font-size: clamp(48px, 8vw, 88px);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -3px;
+      margin-bottom: 28px;
+      background: linear-gradient(135deg, var(--text-primary) 0%, #C0BDF0 50%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-tagline {
+      font-size: clamp(17px, 2vw, 20px);
+      color: var(--text-secondary);
+      max-width: 680px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #5B52EE;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 30px rgba(108, 99, 255, 0.3);
+      color: #fff;
+      opacity: 1;
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 32px;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--border-hover);
+      background: var(--accent-dim);
+      opacity: 1;
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 24px;
+      font-size: 13px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+
+    .hero-meta span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ===== DIVIDER ===== */
+    .divider {
+      border: none;
+      height: 1px;
+      background: var(--border);
+      margin: 0;
+    }
+
+    /* ===== PROBLEM ===== */
+    .problem {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .problem-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .problem-header .section-subtitle {
+      margin: 0 auto;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+    }
+
+    .problem-card {
+      padding: 32px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .problem-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+    }
+
+    .problem-stat {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .problem-label {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ===== PIPELINE ===== */
+    .pipeline-header {
+      text-align: center;
+      margin-bottom: 72px;
+    }
+
+    .pipeline-header .section-subtitle {
+      margin: 0 auto;
+    }
+
+    .pipeline-flow {
+      max-width: 680px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .pipeline-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      position: relative;
+      padding-bottom: 8px;
+    }
+
+    .pipeline-connector {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 48px;
+      position: relative;
+    }
+
+    .pipeline-dot {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
+      transition: all 0.3s;
+      z-index: 1;
+    }
+
+    .pipeline-step:hover .pipeline-dot {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+      box-shadow: 0 0 20px rgba(108, 99, 255, 0.15);
+    }
+
+    .pipeline-line {
+      width: 1px;
+      height: 32px;
+      background: linear-gradient(to bottom, var(--border), rgba(108, 99, 255, 0.2));
+      margin: 4px 0;
+    }
+
+    .pipeline-content {
+      padding: 12px 0;
+      flex: 1;
+    }
+
+    .pipeline-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .pipeline-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .pipeline-desc code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* ===== HOW IT WORKS ===== */
+    .how-it-works {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .how-header {
+      text-align: center;
+      margin-bottom: 72px;
+    }
+
+    .how-header .section-subtitle {
+      margin: 0 auto;
+    }
+
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    .how-card {
+      padding: 40px 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .how-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+
+    .how-number {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+
+    .how-card-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .how-input {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .how-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+
+    .how-output {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .how-output strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* ===== ARCHITECTURE ===== */
+    #architecture {
+      position: relative;
+    }
+
+    .arch-header {
+      text-align: center;
+      margin-bottom: 72px;
+    }
+
+    .arch-header .section-subtitle {
+      margin: 0 auto;
+    }
+
+    .arch-philosophy {
+      max-width: 800px;
+      margin: 0 auto 64px;
+      padding: 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 4px 12px 12px 4px;
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+
+    .arch-philosophy strong {
+      color: var(--text-primary);
+    }
+
+    .arch-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .arch-item {
+      padding: 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: all 0.3s;
+    }
+
+    .arch-item:hover {
+      border-color: var(--border-hover);
+    }
+
+    .arch-layer {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .arch-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .arch-detail {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .arch-tools {
+      margin-top: 48px;
+    }
+
+    .arch-tools-label {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+    }
+
+    .arch-tool-tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .arch-tool-tag {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 8px 16px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(108, 99, 255, 0.15);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+
+    .arch-tool-tag:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ===== WHO IT SERVES ===== */
+    .serves {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .serves-header {
+      text-align: center;
+      margin-bottom: 72px;
+    }
+
+    .serves-header .section-subtitle {
+      margin: 0 auto;
+    }
+
+    .serves-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .serves-card {
+      padding: 32px 28px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: all 0.3s;
+    }
+
+    .serves-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .serves-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(108, 99, 255, 0.2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 16px;
+      color: var(--accent);
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .serves-role {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .serves-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ===== ROADMAP ===== */
+    .roadmap-header {
+      text-align: center;
+      margin-bottom: 72px;
+    }
+
+    .roadmap-header .section-subtitle {
+      margin: 0 auto;
+    }
+
+    .roadmap-timeline {
+      max-width: 720px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .roadmap-timeline::before {
+      content: '';
+      position: absolute;
+      left: 23px;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--accent), var(--border));
+    }
+
+    .roadmap-item {
+      display: flex;
+      gap: 32px;
+      padding-bottom: 48px;
+      position: relative;
+    }
+
+    .roadmap-item:last-child {
+      padding-bottom: 0;
+    }
+
+    .roadmap-marker {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .roadmap-dot {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-dim);
+      z-index: 1;
+      position: relative;
+    }
+
+    .roadmap-item.active .roadmap-dot {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+      animation: pulseGlow 3s ease-in-out infinite;
+    }
+
+    .roadmap-body {
+      padding-top: 10px;
+      flex: 1;
+    }
+
+    .roadmap-phase {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+
+    .roadmap-item.active .roadmap-phase {
+      color: var(--accent);
+    }
+
+    .roadmap-name {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .roadmap-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .roadmap-active-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+      background: var(--accent-dim);
+      padding: 3px 10px;
+      border-radius: 100px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* ===== CONTRIBUTE ===== */
+    .contribute {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .contribute-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .contribute-header .section-subtitle {
+      margin: 0 auto;
+    }
+
+    .contribute-callout {
+      text-align: center;
+      font-size: 18px;
+      color: var(--text-secondary);
+      margin-bottom: 56px;
+      line-height: 1.7;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .contribute-areas {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      max-width: 900px;
+      margin: 0 auto 56px;
+    }
+
+    .contribute-area {
+      padding: 20px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      text-align: center;
+      transition: all 0.3s;
+      color: var(--text-primary);
+    }
+
+    .contribute-area:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-card-hover);
+    }
+
+    .contribute-area .priority {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .contribute-links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+
+    .contribute-links a {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 10px 20px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+
+    .contribute-links a:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      opacity: 1;
+    }
+
+    .contribute-cta {
+      text-align: center;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      padding: 48px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .footer-left {
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+
+    .footer-left strong {
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .footer-links a {
+      font-size: 13px;
+      color: var(--text-dim);
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--text-secondary);
+      opacity: 1;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .how-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .arch-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      :root {
+        --section-padding: 80px 0;
+      }
+
+      .container {
+        padding: 0 20px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .nav-toggle {
+        display: block;
+      }
+
+      .hero-title {
+        letter-spacing: -1.5px;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+      }
+
+      .btn-primary, .btn-secondary {
+        justify-content: center;
+        width: 100%;
+      }
+
+      .hero-meta {
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .problem-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .serves-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .contribute-areas {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .problem-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .serves-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .contribute-areas {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-meta {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAV ===== -->
+  <nav>
+    <div class="container">
+      <a href="#" class="nav-logo">&lt;<span>OpenLintel</span>/&gt;</a>
+      <ul class="nav-links">
+        <li><a href="#problem">Problem</a></li>
+        <li><a href="#pipeline">Pipeline</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+        <li><a href="https://github.com/rahuliitk/interiorai" class="nav-github">GitHub</a></li>
+      </ul>
+      <button class="nav-toggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge fade-in">
+        <span class="dot"></span>
+        AGPL-3.0 Open Source
+      </div>
+      <h1 class="hero-title fade-in fade-in-delay-1">OpenLintel</h1>
+      <p class="hero-tagline fade-in fade-in-delay-2">
+        End-to-end home design automation &mdash; from room photos to finished living spaces, with every cut list, wire run, and pipe fitting accounted for.
+      </p>
+      <div class="hero-actions fade-in fade-in-delay-3">
+        <a href="https://github.com/rahuliitk/interiorai" class="btn-primary">
+          View on GitHub &nbsp;&rarr;
+        </a>
+        <a href="#architecture" class="btn-secondary">
+          Read the Docs
+        </a>
+      </div>
+      <div class="hero-meta fade-in fade-in-delay-4">
+        <span>Python + TypeScript</span>
+        <span>|</span>
+        <span>LangGraph Agents</span>
+        <span>|</span>
+        <span>24 Specialized Tools</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROBLEM ===== -->
+  <section class="problem" id="problem">
+    <div class="container">
+      <div class="problem-header">
+        <div class="section-label">The Problem</div>
+        <h2 class="section-title">Home interiors are stuck in 1995</h2>
+        <p class="section-subtitle">
+          A single room renovation involves a dozen professionals, zero digital coordination, and staggering inefficiency.
+        </p>
+      </div>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="problem-stat">10-15</div>
+          <div class="problem-label">Professionals per project with no shared system</div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-stat">WhatsApp</div>
+          <div class="problem-label">is the industry's "version control" system</div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-stat">0%</div>
+          <div class="problem-label">Pretty renders that produce zero manufacturing output</div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-stat">10-15%</div>
+          <div class="problem-label">Material waste from imprecise ordering</div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-stat">30-60%</div>
+          <div class="problem-label">Markup stacking across fragmented supply chain</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PIPELINE ===== -->
+  <section id="pipeline">
+    <div class="container">
+      <div class="pipeline-header">
+        <div class="section-label">The Pipeline</div>
+        <h2 class="section-title">Photo to finished home, automated</h2>
+        <p class="section-subtitle">
+          Nine stages. One continuous pipeline. Every output feeds the next.
+        </p>
+      </div>
+      <div class="pipeline-flow">
+
+        <div class="pipeline-step">
+          <div class="pipeline-connector">
+            <div class="pipeline-dot">01</div>
+            <div class="pipeline-line"></div>
+          </div>
+          <div class="pipeline-content">
+            <div class="pipeline-title">Room Photo / Floor Plan</div>
+            <div class="pipeline-desc">Upload photos, scanned floor plans, or DWG files. The system builds a 3D understanding of your space.</div>
+          </div>
+        </div>
+
+        <div class="pipeline-step">
+          <div class="pipeline-connector">
+            <div class="pipeline-dot">02</div>
+            <div class="pipeline-line"></div>
+          </div>
+          <div class="pipeline-content">
+            <div class="pipeline-title">AI Design Engine</div>
+            <div class="pipeline-desc">Generates <code>3 variants</code> at different budget tiers, respecting your constraints and style preferences.</div>
+          </div>
+        </div>
+
+        <div class="pipeline-step">
+          <div class="pipeline-connector">
+            <div class="pipeline-dot">03</div>
+            <div class="pipeline-line"></div>
+          </div>
+          <div class="pipeline-content">
+            <div class="pipeline-title">Technical Drawings</div>
+            <div class="pipeline-desc">Produces <code>DWG/DXF</code> floor plans, elevations, and sections &mdash; industry-standard formats, not just renders.</div>
+          </div>
+        </div>
+
+        <div class="pipeline-step">
+          <div class="pipeline-connector">
+            <div class="pipeline-dot">04</div>
+            <div class="pipeline-line"></div>
+          </div>
+          <div class="pipeline-content">
+            <div class="pipeline-title">Bill of Materials</div>
+            <div class="pipeline-desc">Room-by-room, exact quantities. Every screw, hinge, panel, and fitting &mdash; nothing estimated.</div>
+          </div>
+        </div>
+
+        <div class="pipeline-step">
+          <div class="pipeline-connector">
+            <div class="pipeline-dot">05</div>
+            <div class="pipeline-line"></div>
+          </div>
+          <div class="pipeline-content">
+            <div class="pipeline-title">CNC Cut Lists</div>
+            <div class="pipeline-desc">Nesting-optimized cut lists with grain direction, edge banding schedules, and waste minimization.</div>
+          </div>
+        </div>
+
+        <div class="pipeline-step">
+          <div class="pipeline-connector">
+            <div class="pipeline-dot">06</div>
+            <div class="pipeline-line"></div>
+          </div>
+          <div class="pipeline-content">
+            <div class="pipeline-title">MEP Engineering</div>
+            <div class="pipeline-desc">Electrical circuit loads, plumbing layouts, and HVAC sizing &mdash; calculated, not guessed.</div>
+          </div>
+        </div>
+
+        <div class="pipeline-step">
+          <div class="pipeline-connector">
+            <div class="pipeline-dot">07</div>
+            <div class="pipeline-line"></div>
+          </div>
+          <div class="pipeline-content">
+            <div class="pipeline-title">Procurement</div>
+            <div class="pipeline-desc">Multi-vendor pricing comparison with phased ordering to match the construction schedule.</div>
+          </div>
+        </div>
+
+        <div class="pipeline-step">
+          <div class="pipeline-connector">
+            <div class="pipeline-dot">08</div>
+            <div class="pipeline-line"></div>
+          </div>
+          <div class="pipeline-content">
+            <div class="pipeline-title">Project Execution</div>
+            <div class="pipeline-desc">Task scheduling, daily progress logs, and milestone-based payments &mdash; transparent and trackable.</div>
+          </div>
+        </div>
+
+        <div class="pipeline-step">
+          <div class="pipeline-connector">
+            <div class="pipeline-dot">09</div>
+          </div>
+          <div class="pipeline-content">
+            <div class="pipeline-title">Handover</div>
+            <div class="pipeline-desc">As-built drawings, warranty tracking, maintenance schedules, and a digital twin of the finished space.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS ===== -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="how-header">
+        <div class="section-label">How It Works</div>
+        <h2 class="section-title">Three steps. Fully automated.</h2>
+        <p class="section-subtitle">
+          From raw input to construction-ready output, with AI handling the heavy lifting.
+        </p>
+      </div>
+      <div class="how-grid">
+
+        <div class="how-card">
+          <div class="how-number">Step 01</div>
+          <h3 class="how-card-title">Capture</h3>
+          <div class="how-input">
+            Photos, floor plans, DWG files,<br>AR measurements
+          </div>
+          <div class="how-arrow">&darr;</div>
+          <div class="how-output">
+            <strong>3D room model</strong> with accurate dimensions, material detection, and spatial understanding built from whatever input you have.
+          </div>
+        </div>
+
+        <div class="how-card">
+          <div class="how-number">Step 02</div>
+          <h3 class="how-card-title">Design</h3>
+          <div class="how-input">
+            Style preferences, budget range,<br>constraints ("keep the floors")
+          </div>
+          <div class="how-arrow">&darr;</div>
+          <div class="how-output">
+            <strong>VLM-generated design variants</strong> that respect your constraints, with 3D visualization and iterative refinement.
+          </div>
+        </div>
+
+        <div class="how-card">
+          <div class="how-number">Step 03</div>
+          <h3 class="how-card-title">Build</h3>
+          <div class="how-input">
+            Approved design +<br>selected materials
+          </div>
+          <div class="how-arrow">&darr;</div>
+          <div class="how-output">
+            <strong>Complete output package:</strong> technical drawings, CNC cut lists, material orders, MEP plans, and construction schedule &mdash; all automated.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ARCHITECTURE ===== -->
+  <section id="architecture">
+    <div class="container">
+      <div class="arch-header">
+        <div class="section-label">Architecture</div>
+        <h2 class="section-title">Built on proven foundations</h2>
+        <p class="section-subtitle">
+          A pragmatic architecture that uses the right tool for each job.
+        </p>
+      </div>
+
+      <div class="arch-philosophy">
+        <strong>Design philosophy:</strong> Use LLM/VLM APIs for everything they are good at. Use open-source tools only where they cannot help &mdash; pixel-level vision, 3D geometry, binary file formats, and combinatorial optimization.
+      </div>
+
+      <div class="arch-grid">
+        <div class="arch-item">
+          <div class="arch-layer">AI Layer</div>
+          <div class="arch-name">VLM/LLM APIs via LiteLLM</div>
+          <div class="arch-detail">Users bring their own API keys. Swap between GPT-4o, Claude, Gemini, or any provider through a unified interface.</div>
+        </div>
+        <div class="arch-item">
+          <div class="arch-layer">Orchestration</div>
+          <div class="arch-name">LangGraph Agent Orchestration</div>
+          <div class="arch-detail">Stateful, multi-step agent graphs that coordinate across all pipeline stages with built-in retry and human-in-the-loop.</div>
+        </div>
+        <div class="arch-item">
+          <div class="arch-layer">Tools</div>
+          <div class="arch-name">24 Specialized Open-Source Tools</div>
+          <div class="arch-detail">Purpose-built tools for tasks that LLMs cannot handle: segmentation, depth estimation, 3D reconstruction, file generation, and optimization.</div>
+        </div>
+        <div class="arch-item">
+          <div class="arch-layer">Infrastructure</div>
+          <div class="arch-name">Temporal + Event-Driven</div>
+          <div class="arch-detail">Durable workflow execution with Temporal, event-driven microservices, and a real-time 3D frontend powered by Three.js.</div>
+        </div>
+      </div>
+
+      <div class="arch-tools">
+        <div class="arch-tools-label">Key Technologies</div>
+        <div class="arch-tool-tags">
+          <span class="arch-tool-tag">SAM 2</span>
+          <span class="arch-tool-tag">Depth Anything V2</span>
+          <span class="arch-tool-tag">COLMAP</span>
+          <span class="arch-tool-tag">ezdxf</span>
+          <span class="arch-tool-tag">LibreDWG</span>
+          <span class="arch-tool-tag">OR-Tools</span>
+          <span class="arch-tool-tag">Three.js</span>
+          <span class="arch-tool-tag">Temporal</span>
+          <span class="arch-tool-tag">LiteLLM</span>
+          <span class="arch-tool-tag">LangGraph</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== WHO IT SERVES ===== -->
+  <section class="serves" id="serves">
+    <div class="container">
+      <div class="serves-header">
+        <div class="section-label">Who It Serves</div>
+        <h2 class="section-title">One platform, every stakeholder</h2>
+        <p class="section-subtitle">
+          Everyone involved in a home project gets a purpose-built interface.
+        </p>
+      </div>
+      <div class="serves-grid">
+
+        <div class="serves-card">
+          <div class="serves-icon">H</div>
+          <div class="serves-role">Homeowner</div>
+          <div class="serves-desc">See designs in 3D, track progress in real time, and pay against verified milestones. No more guesswork.</div>
+        </div>
+
+        <div class="serves-card">
+          <div class="serves-icon">ID</div>
+          <div class="serves-role">Interior Designer</div>
+          <div class="serves-desc">Generate production-ready drawings from your designs. Focus on aesthetics while the system handles engineering.</div>
+        </div>
+
+        <div class="serves-card">
+          <div class="serves-icon">A</div>
+          <div class="serves-role">Architect</div>
+          <div class="serves-desc">Integrate interior layouts with structural plans. Export DWG/DXF files compatible with your existing tools.</div>
+        </div>
+
+        <div class="serves-card">
+          <div class="serves-icon">GC</div>
+          <div class="serves-role">Contractor</div>
+          <div class="serves-desc">Get detailed task schedules, material lists ready for ordering, and daily log templates.</div>
+        </div>
+
+        <div class="serves-card">
+          <div class="serves-icon">F</div>
+          <div class="serves-role">Factory / CNC</div>
+          <div class="serves-desc">Receive nesting-optimized cut lists with edge banding, grain direction, and hardware schedules.</div>
+        </div>
+
+        <div class="serves-card">
+          <div class="serves-icon">EP</div>
+          <div class="serves-role">Electrician / Plumber</div>
+          <div class="serves-desc">Calculated circuit loads, wire gauges, pipe sizing, and point-marked layout drawings.</div>
+        </div>
+
+        <div class="serves-card">
+          <div class="serves-icon">MS</div>
+          <div class="serves-role">Material Supplier</div>
+          <div class="serves-desc">Receive accurate, phased purchase orders. Less returns, better inventory planning.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ROADMAP ===== -->
+  <section id="roadmap">
+    <div class="container">
+      <div class="roadmap-header">
+        <div class="section-label">Roadmap</div>
+        <h2 class="section-title">Where we are headed</h2>
+        <p class="section-subtitle">
+          An ambitious plan built in phases, each delivering standalone value.
+        </p>
+      </div>
+      <div class="roadmap-timeline">
+
+        <div class="roadmap-item active">
+          <div class="roadmap-marker">
+            <div class="roadmap-dot">1</div>
+          </div>
+          <div class="roadmap-body">
+            <div class="roadmap-phase">Phase 1 <span class="roadmap-active-badge">Active</span></div>
+            <div class="roadmap-name">Photo to Design to Drawings</div>
+            <div class="roadmap-desc">Room capture from photos, AI-generated design variants at multiple budgets, and production-quality technical drawings in DWG/DXF format.</div>
+          </div>
+        </div>
+
+        <div class="roadmap-item">
+          <div class="roadmap-marker">
+            <div class="roadmap-dot">2</div>
+          </div>
+          <div class="roadmap-body">
+            <div class="roadmap-phase">Phase 2</div>
+            <div class="roadmap-name">Manufacturing-Ready Output</div>
+            <div class="roadmap-desc">CNC cut lists with nesting optimization, complete bills of materials, edge banding schedules, and hardware specifications.</div>
+          </div>
+        </div>
+
+        <div class="roadmap-item">
+          <div class="roadmap-marker">
+            <div class="roadmap-dot">3</div>
+          </div>
+          <div class="roadmap-body">
+            <div class="roadmap-phase">Phase 3</div>
+            <div class="roadmap-name">Design to Doorstep</div>
+            <div class="roadmap-desc">Multi-vendor procurement, phased material ordering, construction scheduling, daily progress logs, and milestone-based payments.</div>
+          </div>
+        </div>
+
+        <div class="roadmap-item">
+          <div class="roadmap-marker">
+            <div class="roadmap-dot">4</div>
+          </div>
+          <div class="roadmap-body">
+            <div class="roadmap-phase">Phase 4</div>
+            <div class="roadmap-name">Predictive and Proactive</div>
+            <div class="roadmap-desc">AI-driven cost prediction, timeline estimation, risk flagging, and proactive issue resolution before problems reach the site.</div>
+          </div>
+        </div>
+
+        <div class="roadmap-item">
+          <div class="roadmap-marker">
+            <div class="roadmap-dot">5</div>
+          </div>
+          <div class="roadmap-body">
+            <div class="roadmap-phase">Phase 5</div>
+            <div class="roadmap-name">The Home Operating System</div>
+            <div class="roadmap-desc">Digital twin of the finished space, IoT integration, predictive maintenance, and a living document that evolves with the home.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTRIBUTE ===== -->
+  <section class="contribute" id="contribute">
+    <div class="container">
+      <div class="contribute-header">
+        <div class="section-label">Contribute</div>
+        <h2 class="section-title">Help build the future of home design</h2>
+      </div>
+
+      <p class="contribute-callout">
+        This is a massive project. We need every kind of contributor &mdash; from 3D graphics engineers to domain experts who know how a kitchen gets built.
+      </p>
+
+      <div class="contribute-areas">
+        <div class="contribute-area">
+          <span class="priority">High Priority</span>
+          3D Editor / Viewer
+        </div>
+        <div class="contribute-area">
+          <span class="priority">High Priority</span>
+          Floor Plan Digitizer
+        </div>
+        <div class="contribute-area">
+          <span class="priority">High Priority</span>
+          Drawing Generator
+        </div>
+        <div class="contribute-area">
+          <span class="priority">High Priority</span>
+          Cut List Engine
+        </div>
+        <div class="contribute-area">
+          <span class="priority">High Priority</span>
+          MEP Calculations
+        </div>
+      </div>
+
+      <div class="contribute-links">
+        <a href="https://github.com/rahuliitk/interiorai/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>
+        <a href="https://github.com/rahuliitk/interiorai/blob/main/TECH_STACK.md">TECH_STACK.md</a>
+        <a href="https://github.com/rahuliitk/interiorai/blob/main/docs/architecture.md">Architecture Docs</a>
+      </div>
+
+      <div class="contribute-cta">
+        <a href="https://github.com/rahuliitk/interiorai" class="btn-primary">
+          Star on GitHub &nbsp;&rarr;
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-left">
+          <strong>OpenLintel</strong> is AGPL-3.0 open source.
+        </div>
+        <ul class="footer-links">
+          <li><a href="https://github.com/rahuliitk/interiorai">GitHub</a></li>
+          <li><a href="https://github.com/rahuliitk/interiorai/blob/main/CONTRIBUTING.md">Contributing</a></li>
+          <li><a href="https://github.com/rahuliitk/interiorai/blob/main/TECH_STACK.md">Tech Stack</a></li>
+          <li><a href="https://github.com/rahuliitk/interiorai/blob/main/docs/architecture.md">Architecture</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
