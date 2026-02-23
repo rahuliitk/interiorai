@@ -12,6 +12,11 @@ import { scheduleRouter } from './schedule';
 import { paymentRouter } from './payment';
 import { contractorRouter } from './contractor';
 import { notificationRouter } from './notification';
+import { adminRouter } from './admin';
+import { analyticsRouter } from './analytics';
+import { catalogueRouter } from './catalogue';
+import { procurementRouter } from './procurement';
+import { floorPlanRouter } from './floorPlan';
 
 export const appRouter = router({
   project: projectRouter,
@@ -27,6 +32,11 @@ export const appRouter = router({
   payment: paymentRouter,
   contractor: contractorRouter,
   notification: notificationRouter,
+  admin: adminRouter,
+  analytics: analyticsRouter,
+  catalogue: catalogueRouter,
+  procurement: procurementRouter,
+  floorPlan: floorPlanRouter,
 });
 
 export type AppRouter = typeof appRouter;

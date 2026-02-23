@@ -21,7 +21,7 @@ from openlintel_shared.db import dispose_engine
 from openlintel_shared.middleware import configure_logging, setup_middleware
 from openlintel_shared.redis_client import close_redis
 
-from src.routers import change_orders, milestones, schedules, site_logs
+from src.routers import change_orders, milestones, schedules, schedule_job, site_logs
 
 logger = structlog.get_logger(__name__)
 
@@ -96,6 +96,7 @@ async def health_check() -> HealthResponse:
 # -- Include routers -------------------------------------------------------
 
 app.include_router(schedules.router)
+app.include_router(schedule_job.router)
 app.include_router(milestones.router)
 app.include_router(site_logs.router)
 app.include_router(change_orders.router)

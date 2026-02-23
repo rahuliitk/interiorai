@@ -1,6 +1,7 @@
 'use client';
 
-import { use, useState, useMemo } from 'react';
+import { use, useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { trpc } from '@/lib/trpc/client';
 import {
   Button,
@@ -52,6 +53,19 @@ export default function PaymentsPage({ params }: { params: Promise<{ id: string 
     trpc.payment.listInvoices.useQuery({ projectId });
   const { data: schedules = [] } = trpc.schedule.getByProject.useQuery({ projectId });
 
+  const searchParams = useSearchParams();
+
+  // Handle Stripe success/cancel redirect
+  useEffect(() => {
+    const paymentStatus = searchParams.get('payment_status');
+    if (paymentStatus === 'success') {
+      toast({ title: 'Payment successful', description: 'Your payment has been processed.' });
+      utils.payment.listByProject.invalidate({ projectId });
+    } else if (paymentStatus === 'cancelled') {
+      toast({ title: 'Payment cancelled', description: 'You can try again when ready.' });
+    }
+  }, [searchParams, projectId, utils.payment.listByProject]);
+
   const createPayment = trpc.payment.create.useMutation({
     onSuccess: () => {
       utils.payment.listByProject.invalidate({ projectId });
@@ -60,6 +74,21 @@ export default function PaymentsPage({ params }: { params: Promise<{ id: string 
     },
     onError: () => {
       toast({ title: 'Payment failed', variant: 'destructive' });
+    },
+  });
+
+  const createCheckoutSession = trpc.payment.createCheckoutSession.useMutation({
+    onSuccess: (data) => {
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      }
+    },
+    onError: (err) => {
+      toast({
+        title: 'Checkout failed',
+        description: err.message || 'Could not create checkout session.',
+        variant: 'destructive',
+      });
     },
   });
 
@@ -254,10 +283,10 @@ export default function PaymentsPage({ params }: { params: Promise<{ id: string 
                       paidAt: payment.paidAt ? new Date(payment.paidAt).toISOString() : null,
                       createdAt: new Date(payment.createdAt).toISOString(),
                     }]}
-                    onPayNow={(provider) => {
-                      toast({
-                        title: `Redirecting to ${provider}`,
-                        description: 'Payment gateway integration will handle checkout.',
+                    onPayNow={() => {
+                      createCheckoutSession.mutate({
+                        paymentId: payment.id,
+                        projectId,
                       });
                     }}
                   />

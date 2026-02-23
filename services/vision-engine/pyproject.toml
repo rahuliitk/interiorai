@@ -1,0 +1,25 @@
+[project]
+name = "openlintel-vision-engine"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "openlintel-shared",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "httpx>=0.28.0",
+    "litellm>=1.50.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-asyncio", "httpx"]
+
+[tool.setuptools.package-data]
+"*" = ["py.typed"]
+
+[build-system]
+requires = ["setuptools>=75.0"]
+build-backend = "setuptools.build_meta"

@@ -43,6 +43,8 @@ import { Toolbar, type EditorTool, type ViewPreset } from '@/components/editor-3
 import { MaterialPanel, type MaterialPreset } from '@/components/editor-3d/material-panel';
 import { LightingPanel, getDefaultLightingConfig, type LightingConfig } from '@/components/editor-3d/lighting-panel';
 import { SnapGrid, SnapGridControls } from '@/components/editor-3d/snap-grid';
+import { CollabPresence } from '@/components/editor-3d/collab-presence';
+import { createCollabSession, type CollabSession } from '@/lib/collaboration';
 import {
   FURNITURE_CATALOGUE,
   getCatalogueByCategory,
@@ -90,6 +92,56 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
   // Ceiling toggle
   const [showCeiling, setShowCeiling] = useState(false);
 
+  // Collaboration session
+  const [collab, setCollab] = useState<CollabSession | null>(null);
+
+  useEffect(() => {
+    if (!project) return;
+    const userId = 'user'; // In production, this comes from the auth session
+    const session = createCollabSession(id, userId);
+    setCollab(session);
+
+    // Observe remote furniture changes from Y.js
+    const observer = () => {
+      const remoteFurniture: PlacedFurniture[] = [];
+      session.furnitureMap.forEach((value, key) => {
+        if (value && typeof value === 'object') {
+          remoteFurniture.push(value as PlacedFurniture);
+        }
+      });
+      if (remoteFurniture.length > 0) {
+        setFurniture(remoteFurniture);
+      }
+    };
+    session.furnitureMap.observe(observer);
+
+    return () => {
+      session.furnitureMap.unobserve(observer);
+      session.destroy();
+    };
+  }, [project, id]);
+
+  // Sync local furniture changes to Y.js
+  const syncToCollab = useCallback(
+    (items: PlacedFurniture[]) => {
+      if (!collab) return;
+      collab.doc.transact(() => {
+        // Remove items no longer present
+        const currentKeys = new Set(items.map((f) => f.id));
+        collab.furnitureMap.forEach((_value, key) => {
+          if (!currentKeys.has(key)) {
+            collab.furnitureMap.delete(key);
+          }
+        });
+        // Update/add items
+        items.forEach((item) => {
+          collab.furnitureMap.set(item.id, { ...item });
+        });
+      });
+    },
+    [collab],
+  );
+
   // Catalogue grouped by category
   const catalogue = getCatalogueByCategory();
   const [expandedCategory, setExpandedCategory] = useState<string>(Object.keys(catalogue)[0] || '');
@@ -114,15 +166,16 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
   const roomWidthM = roomDimensions.widthMm / 1000;
   const roomHeightM = roomDimensions.heightMm / 1000;
 
-  // Record history
+  // Record history and sync to collaboration
   const pushHistory = useCallback(
     (newFurniture: PlacedFurniture[]) => {
       const newHistory = history.slice(0, historyIndex + 1);
       newHistory.push({ furniture: JSON.parse(JSON.stringify(newFurniture)) });
       setHistory(newHistory);
       setHistoryIndex(newHistory.length - 1);
+      syncToCollab(newFurniture);
     },
-    [history, historyIndex],
+    [history, historyIndex, syncToCollab],
   );
 
   const handleUndo = useCallback(() => {
@@ -352,6 +405,10 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
               </SelectContent>
             </Select>
           )}
+          <CollabPresence
+            socket={collab?.socket ?? null}
+            currentUserId="user"
+          />
           <SnapGridControls
             gridSize={gridSize}
             onGridSizeChange={setGridSize}
