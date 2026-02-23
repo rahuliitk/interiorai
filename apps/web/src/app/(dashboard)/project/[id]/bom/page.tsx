@@ -136,8 +136,10 @@ export default function BOMPage({ params }: { params: Promise<{ id: string }> })
       a.click();
       URL.revokeObjectURL(url);
       toast({ title: 'CSV exported' });
-    } else {
-      toast({ title: `${format.toUpperCase()} export`, description: 'Export service required for this format.' });
+    } else if (latestBom) {
+      const exportFormat = format === 'excel' ? 'xlsx' : 'pdf';
+      window.open(`/api/bom/export/${latestBom.id}?format=${exportFormat}`, '_blank');
+      toast({ title: `${format.toUpperCase()} export started` });
     }
   };
 

@@ -224,6 +224,7 @@ export default function FloorPlanPage({
   const utils = trpc.useUtils();
 
   const [creatingRooms, setCreatingRooms] = useState(false);
+  const [activeJobId, setActiveJobId] = useState<string | null>(null);
 
   const { data: project, isLoading: loadingProject } =
     trpc.project.byId.useQuery({ id: projectId });
@@ -243,17 +244,65 @@ export default function FloorPlanPage({
     },
   });
 
-  // Simulated floor plan data from digitization results
-  // In production, this would come from a job output or dedicated endpoint
-  const [floorPlanData, setFloorPlanData] = useState<FloorPlanData | null>(
-    null,
-  );
+  // Floor plan state from digitization results
+  const [floorPlanData, setFloorPlanData] = useState<FloorPlanData | null>(null);
   const [detectedRooms, setDetectedRooms] = useState<DetectedRoom[]>([]);
 
+  // Digitize mutation
+  const digitize = trpc.floorPlan.digitize.useMutation({
+    onSuccess: (job) => {
+      if (!job) return;
+      setActiveJobId(job.id);
+      toast({ title: 'Digitization started', description: 'Analyzing floor plan...' });
+    },
+    onError: (err) => {
+      toast({ title: 'Digitization failed', description: err.message });
+    },
+  });
+
+  // Job polling
+  const { data: jobStatus } = trpc.floorPlan.jobStatus.useQuery(
+    { jobId: activeJobId! },
+    {
+      enabled: Boolean(activeJobId),
+      refetchInterval: (query) => {
+        const status = query.state.data?.status;
+        if (status === 'completed' || status === 'failed') return false;
+        return 2000;
+      },
+    },
+  );
+
+  // When job completes, parse the output into floor plan data
+  useEffect(() => {
+    if (jobStatus?.status === 'completed' && jobStatus.outputJson) {
+      const output = jobStatus.outputJson as {
+        rooms: DetectedRoom[];
+        width: number;
+        height: number;
+        scale: number;
+      };
+      setDetectedRooms(output.rooms || []);
+      setFloorPlanData({
+        rooms: output.rooms || [],
+        width: output.width || 800,
+        height: output.height || 600,
+        scale: output.scale || 1,
+      });
+      setActiveJobId(null);
+      toast({ title: 'Floor plan digitized successfully', description: `${output.rooms?.length || 0} rooms detected.` });
+    } else if (jobStatus?.status === 'failed') {
+      setActiveJobId(null);
+      toast({ title: 'Digitization failed', description: jobStatus.error || 'Unknown error' });
+    }
+  }, [jobStatus?.status, jobStatus?.outputJson, jobStatus?.error]);
+
+  const handleDigitize = (uploadId: string) => {
+    digitize.mutate({ projectId, uploadId });
+  };
+
   const handleDigitizationComplete = () => {
-    // In a real implementation, we'd fetch the job output
-    // For now, show a success state
-    toast({ title: 'Floor plan digitized successfully' });
+    utils.upload.listByProject.invalidate({ projectId });
   };
 
   const handleCreateRoomsFromFloorPlan = async () => {
@@ -394,17 +443,26 @@ export default function FloorPlanPage({
             />
           ) : floorPlanUploads.length > 0 ? (
             <div className="space-y-4">
-              <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/50">
-                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
-                <div>
-                  <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
-                    Digitization Required
+              <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/50">
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                    Ready to Digitize
                   </p>
-                  <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
-                    Floor plan digitization requires the vision-engine service.
-                    Once available, it will automatically detect rooms and
-                    dimensions from your uploaded floor plan.
+                  <p className="mt-1 text-xs text-blue-700 dark:text-blue-300">
+                    Click &quot;Digitize&quot; to automatically detect rooms and dimensions from your floor plan using AI vision.
                   </p>
+                  <Button
+                    size="sm"
+                    className="mt-2"
+                    disabled={digitize.isPending || Boolean(activeJobId)}
+                    onClick={() => {
+                      const latestUpload = floorPlanUploads[0];
+                      if (latestUpload) handleDigitize(latestUpload.id);
+                    }}
+                  >
+                    {activeJobId ? 'Digitizing...' : 'Digitize Floor Plan'}
+                  </Button>
                 </div>
               </div>
 

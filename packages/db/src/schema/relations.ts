@@ -3,11 +3,12 @@ import { users, accounts, sessions } from './auth';
 import {
   projects, rooms, designVariants, uploads, userApiKeys, jobs,
   bomResults, drawingResults, cutlistResults, mepCalculations,
-  products, vendors, productPrices,
+  categories, products, vendors, productPrices, productEmbeddings,
   schedules, milestones, siteLogs, changeOrders,
   purchaseOrders, payments, invoices,
   comments, approvals, notifications,
   contractors, contractorReviews, contractorAssignments,
+  yjsDocuments,
 } from './app';
 
 // ─── Auth Relations ──────────────────────────────────────────────────────────
@@ -110,9 +111,25 @@ export const mepCalculationsRelations = relations(mepCalculations, ({ one }) => 
 
 // ─── Catalogue ───────────────────────────────────────────────────────────────
 
+export const categoriesRelations = relations(categories, ({ one, many }) => ({
+  parent: one(categories, {
+    fields: [categories.parentId],
+    references: [categories.id],
+    relationName: 'categoryParent',
+  }),
+  children: many(categories, { relationName: 'categoryParent' }),
+  products: many(products),
+}));
+
 export const productsRelations = relations(products, ({ one, many }) => ({
   vendor: one(vendors, { fields: [products.vendorId], references: [vendors.id] }),
+  category_rel: one(categories, { fields: [products.categoryId], references: [categories.id] }),
   prices: many(productPrices),
+  productEmbedding: one(productEmbeddings, { fields: [products.id], references: [productEmbeddings.productId] }),
+}));
+
+export const productEmbeddingsRelations = relations(productEmbeddings, ({ one }) => ({
+  product: one(products, { fields: [productEmbeddings.productId], references: [products.id] }),
 }));
 
 export const vendorsRelations = relations(vendors, ({ many }) => ({

@@ -1,8 +1,9 @@
 'use client';
 
-import { use, useState, useCallback, useMemo } from 'react';
+import { use, useState, useCallback, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { trpc } from '@/lib/trpc/client';
+import QRCode from 'qrcode';
 import {
   Button,
   Card,
@@ -114,6 +115,20 @@ export default function ARPage({ params }: { params: Promise<{ id: string }> }) 
 
   // QR code URL (for sharing with mobile)
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const url = typeof window !== 'undefined'
+      ? window.location.href
+      : `https://app.openlintel.com/project/${id}/ar`;
+    QRCode.toDataURL(url, {
+      width: 384,
+      margin: 2,
+      color: { dark: '#000000', light: '#ffffff' },
+    })
+      .then(setQrDataUrl)
+      .catch(() => setQrDataUrl(null));
+  }, [id]);
 
   if (isLoading) {
     return (
@@ -327,16 +342,21 @@ export default function ARPage({ params }: { params: Promise<{ id: string }> }) 
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col items-center gap-4">
-                  {/* QR code placeholder */}
-                  <div className="flex h-48 w-48 items-center justify-center rounded-lg border-2 border-dashed bg-muted">
-                    <div className="text-center">
-                      <QrCode className="mx-auto mb-2 h-12 w-12 text-muted-foreground" />
-                      <p className="text-xs text-muted-foreground">QR Code</p>
-                      <p className="text-[10px] text-muted-foreground">
-                        Generated from project URL
-                      </p>
+                  {/* QR code */}
+                  {qrDataUrl ? (
+                    <img
+                      src={qrDataUrl}
+                      alt="QR Code for AR viewer"
+                      className="h-48 w-48 rounded-lg"
+                    />
+                  ) : (
+                    <div className="flex h-48 w-48 items-center justify-center rounded-lg border-2 border-dashed bg-muted">
+                      <div className="text-center">
+                        <QrCode className="mx-auto mb-2 h-12 w-12 text-muted-foreground" />
+                        <p className="text-xs text-muted-foreground">Generating...</p>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   <div className="w-full rounded-lg bg-muted p-3">
                     <p className="break-all text-xs font-mono text-muted-foreground">
@@ -344,17 +364,33 @@ export default function ARPage({ params }: { params: Promise<{ id: string }> }) 
                     </p>
                   </div>
 
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => {
-                      navigator.clipboard.writeText(
-                        currentUrl || `https://app.openlintel.com/project/${id}/ar`,
-                      );
-                    }}
-                  >
-                    Copy Link
-                  </Button>
+                  <div className="flex w-full gap-2">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          currentUrl || `https://app.openlintel.com/project/${id}/ar`,
+                        );
+                      }}
+                    >
+                      Copy Link
+                    </Button>
+                    {qrDataUrl && (
+                      <Button
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => {
+                          const a = document.createElement('a');
+                          a.href = qrDataUrl;
+                          a.download = `qr-project-${id.slice(0, 8)}.png`;
+                          a.click();
+                        }}
+                      >
+                        Download QR
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>

@@ -114,4 +114,18 @@ export const bomRouter = router({
       if (!job) throw new Error('Job not found');
       return job;
     }),
+
+  exportUrl: protectedProcedure
+    .input(z.object({ bomResultId: z.string(), format: z.enum(['xlsx', 'pdf']) }))
+    .query(async ({ ctx, input }) => {
+      // Verify ownership
+      const bom = await ctx.db.query.bomResults.findFirst({
+        where: eq(bomResults.id, input.bomResultId),
+        with: { designVariant: { with: { room: { with: { project: true } } } } },
+      });
+      if (!bom || (bom.designVariant as any).room.project.userId !== ctx.userId) {
+        throw new Error('BOM result not found');
+      }
+      return { url: `/api/bom/export/${input.bomResultId}?format=${input.format}` };
+    }),
 });

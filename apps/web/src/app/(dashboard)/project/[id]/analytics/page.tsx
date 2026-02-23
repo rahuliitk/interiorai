@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useMemo } from 'react';
+import { use } from 'react';
 import Link from 'next/link';
 import { trpc } from '@/lib/trpc/client';
 import {
@@ -26,80 +26,6 @@ import { CostBreakdownChart, type CostCategory } from '@/components/analytics/co
 import { TimelineProgress, type Milestone } from '@/components/analytics/timeline-progress';
 import { BudgetVsActual, type BudgetItem } from '@/components/analytics/budget-vs-actual';
 
-// Demo data generators (will be replaced by real tRPC data when the analytics API is built)
-function generateCostBreakdown(roomCount: number): CostCategory[] {
-  const base = [
-    { name: 'Furniture', amount: 185000, color: '#3b82f6' },
-    { name: 'Flooring', amount: 95000, color: '#10b981' },
-    { name: 'Wall Finishes', amount: 62000, color: '#f59e0b' },
-    { name: 'Lighting', amount: 48000, color: '#8b5cf6' },
-    { name: 'Plumbing Fixtures', amount: 35000, color: '#06b6d4' },
-    { name: 'Electrical', amount: 28000, color: '#f97316' },
-    { name: 'Soft Furnishings', amount: 42000, color: '#ec4899' },
-    { name: 'Hardware', amount: 18000, color: '#14b8a6' },
-    { name: 'Decorative', amount: 22000, color: '#a855f7' },
-    { name: 'Ceiling', amount: 15000, color: '#ef4444' },
-  ];
-  // Scale slightly by room count
-  const factor = Math.max(1, roomCount * 0.8);
-  return base.map((c) => ({
-    ...c,
-    amount: Math.round(c.amount * factor),
-  }));
-}
-
-function generateMilestones(): Milestone[] {
-  const today = new Date();
-  const start = new Date(today);
-  start.setMonth(start.getMonth() - 2);
-
-  return [
-    {
-      id: 'm1',
-      name: 'Design Approval',
-      date: new Date(start.getTime() + 14 * 86400000).toISOString(),
-      completed: true,
-    },
-    {
-      id: 'm2',
-      name: 'Material Procurement',
-      date: new Date(start.getTime() + 35 * 86400000).toISOString(),
-      completed: true,
-    },
-    {
-      id: 'm3',
-      name: 'Civil Work Complete',
-      date: new Date(start.getTime() + 56 * 86400000).toISOString(),
-      completed: true,
-    },
-    {
-      id: 'm4',
-      name: 'Furniture Installation',
-      date: new Date(start.getTime() + 77 * 86400000).toISOString(),
-      completed: false,
-    },
-    {
-      id: 'm5',
-      name: 'Final Handover',
-      date: new Date(start.getTime() + 98 * 86400000).toISOString(),
-      completed: false,
-    },
-  ];
-}
-
-function generateBudgetItems(): BudgetItem[] {
-  return [
-    { name: 'Furniture', budgeted: 200000, actual: 185000 },
-    { name: 'Flooring', budgeted: 90000, actual: 95000 },
-    { name: 'Wall Finishes', budgeted: 70000, actual: 62000 },
-    { name: 'Lighting', budgeted: 50000, actual: 48000 },
-    { name: 'Plumbing', budgeted: 30000, actual: 35000 },
-    { name: 'Electrical', budgeted: 25000, actual: 28000 },
-    { name: 'Soft Furnishings', budgeted: 40000, actual: 42000 },
-    { name: 'Decorative', budgeted: 20000, actual: 22000 },
-  ];
-}
-
 export default function ProjectAnalyticsPage({
   params,
 }: {
@@ -108,20 +34,9 @@ export default function ProjectAnalyticsPage({
   const { id } = use(params);
   const { data: project, isLoading: loadingProject } = trpc.project.byId.useQuery({ id });
   const { data: variants = [], isLoading: loadingVariants } = trpc.designVariant.listByProject.useQuery({ projectId: id });
+  const { data: overview, isLoading: loadingOverview } = trpc.analytics.projectOverview.useQuery({ projectId: id });
 
-  const roomCount = project?.rooms?.length ?? 0;
-
-  const costCategories = useMemo(() => generateCostBreakdown(roomCount), [roomCount]);
-  const milestones = useMemo(() => generateMilestones(), []);
-  const budgetItems = useMemo(() => generateBudgetItems(), []);
-
-  const today = new Date();
-  const startDate = new Date(today);
-  startDate.setMonth(startDate.getMonth() - 2);
-  const endDate = new Date(today);
-  endDate.setMonth(endDate.getMonth() + 1);
-
-  if (loadingProject || loadingVariants) {
+  if (loadingProject || loadingVariants || loadingOverview) {
     return (
       <div className="space-y-4">
         <Skeleton className="h-8 w-48" />
@@ -138,13 +53,26 @@ export default function ProjectAnalyticsPage({
     return <p className="text-muted-foreground">Project not found.</p>;
   }
 
-  const totalCost = costCategories.reduce((s, c) => s + c.amount, 0);
+  const totalCost = overview?.totalCost ?? 0;
+  const costCategories: CostCategory[] = (overview?.costBreakdown ?? []).map((c) => ({
+    ...c,
+    color: c.color ?? '#94a3b8',
+  }));
+  const milestonesData: Milestone[] = overview?.milestones ?? [];
+  const budgetItems: BudgetItem[] = overview?.budgetItems ?? [];
+  const completionPercent = overview?.completionPercent ?? 0;
+  const roomCount = overview?.roomCount ?? 0;
+  const variantCount = overview?.variantCount ?? variants.length;
+
   const totalBudget = budgetItems.reduce((s, i) => s + i.budgeted, 0);
   const totalActual = budgetItems.reduce((s, i) => s + i.actual, 0);
 
+  const startDate = overview?.startDate ?? new Date().toISOString();
+  const endDate = overview?.endDate ?? new Date().toISOString();
+
   // Group variants by style
   const styleCount: Record<string, number> = {};
-  variants.forEach((v) => {
+  variants.forEach((v: { style: string }) => {
     styleCount[v.style] = (styleCount[v.style] || 0) + 1;
   });
   const styleEntries = Object.entries(styleCount).sort((a, b) => b[1] - a[1]);
@@ -206,9 +134,11 @@ export default function ProjectAnalyticsPage({
                   }`}
                 >
                   {totalBudget >= totalActual ? 'Under' : 'Over'} by{' '}
-                  {Math.abs(
-                    ((totalBudget - totalActual) / totalBudget) * 100,
-                  ).toFixed(1)}
+                  {totalBudget > 0
+                    ? Math.abs(
+                        ((totalBudget - totalActual) / totalBudget) * 100,
+                      ).toFixed(1)
+                    : '0.0'}
                   %
                 </p>
               </div>
@@ -238,7 +168,7 @@ export default function ProjectAnalyticsPage({
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Design Variants</p>
-                <p className="text-lg font-bold">{variants.length}</p>
+                <p className="text-lg font-bold">{variantCount}</p>
               </div>
             </div>
           </CardContent>
@@ -262,10 +192,10 @@ export default function ProjectAnalyticsPage({
       {/* Timeline */}
       <div className="mb-6">
         <TimelineProgress
-          startDate={startDate.toISOString()}
-          endDate={endDate.toISOString()}
-          milestones={milestones}
-          completionPercent={62}
+          startDate={startDate}
+          endDate={endDate}
+          milestones={milestonesData}
+          completionPercent={completionPercent}
           title="Schedule Progress"
         />
       </div>
@@ -284,7 +214,7 @@ export default function ProjectAnalyticsPage({
                 .sort((a, b) => b.amount - a.amount)
                 .slice(0, 6)
                 .map((cat) => {
-                  const pct = (cat.amount / totalCost) * 100;
+                  const pct = totalCost > 0 ? (cat.amount / totalCost) * 100 : 0;
                   return (
                     <div key={cat.name} className="flex items-center gap-3">
                       <div
@@ -348,7 +278,7 @@ export default function ProjectAnalyticsPage({
                 {/* Variant list with budget tiers */}
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-muted-foreground">Variants</p>
-                  {variants.map((variant) => {
+                  {variants.map((variant: any) => {
                     const tierColors: Record<string, string> = {
                       economy: 'bg-green-100 text-green-700',
                       standard: 'bg-blue-100 text-blue-700',

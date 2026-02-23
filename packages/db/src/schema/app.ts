@@ -210,6 +210,54 @@ export const mepCalculations = pgTable('mep_calculations', {
 });
 
 // ---------------------------------------------------------------------------
+// Categories — hierarchical product categories
+// ---------------------------------------------------------------------------
+export const categories = pgTable('categories', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text('name').notNull(),
+  slug: text('slug').notNull().unique(),
+  description: text('description'),
+  parentId: text('parent_id'), // self-reference for hierarchy
+  icon: text('icon'),
+  imageUrl: text('image_url'),
+  sortOrder: integer('sort_order').default(0),
+  isActive: boolean('is_active').default(true),
+  productCount: integer('product_count').default(0),
+  metadata: jsonb('metadata'),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Vendors
+// ---------------------------------------------------------------------------
+export const vendors = pgTable('vendors', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text('name').notNull(),
+  code: text('code').unique(),
+  description: text('description'),
+  website: text('website'),
+  contactEmail: text('contact_email'),
+  contactPhone: text('contact_phone'),
+  phone: text('phone'),
+  address: text('address'),
+  city: text('city'),
+  state: text('state'),
+  country: text('country').default('IN'),
+  gstNumber: text('gst_number'),
+  paymentTerms: text('payment_terms'),
+  rating: real('rating'),
+  isActive: boolean('is_active').default(true),
+  productCount: integer('product_count').default(0),
+  metadata: jsonb('metadata'),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
 // Products Catalogue (pgvector for visual similarity)
 // ---------------------------------------------------------------------------
 export const products = pgTable('products', {
@@ -218,32 +266,41 @@ export const products = pgTable('products', {
     .$defaultFn(() => crypto.randomUUID()),
   name: text('name').notNull(),
   description: text('description'),
+  brand: text('brand'),
   category: text('category').notNull(),
+  categoryId: text('category_id').references(() => categories.id, { onDelete: 'set null' }),
   subcategory: text('subcategory'),
   vendorId: text('vendor_id').references(() => vendors.id, { onDelete: 'set null' }),
   sku: text('sku'),
+  status: text('status').notNull().default('active'),
+  unit: text('unit').default('piece'),
   imageUrl: text('image_url'),
   imageStorageKey: text('image_storage_key'),
+  images: jsonb('images'), // string[] of image URLs
+  tags: jsonb('tags'), // string[]
   specifications: jsonb('specifications'),
   dimensions: jsonb('dimensions'), // { length_mm, width_mm, height_mm }
   weight_kg: real('weight_kg'),
+  material: text('material'),
+  finish: text('finish'),
+  color: text('color'),
+  prices: jsonb('prices'), // vendor price entries
+  minPrice: real('min_price'),
+  maxPrice: real('max_price'),
   embedding: text('embedding'), // stored as text, cast to vector in queries
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
 });
 
-export const vendors = pgTable('vendors', {
-  id: text('id')
+// ---------------------------------------------------------------------------
+// Product Embeddings — separate table for vector search
+// ---------------------------------------------------------------------------
+export const productEmbeddings = pgTable('product_embeddings', {
+  productId: text('product_id')
     .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  name: text('name').notNull(),
-  website: text('website'),
-  contactEmail: text('contact_email'),
-  phone: text('phone'),
-  address: text('address'),
-  rating: real('rating'),
-  metadata: jsonb('metadata'),
-  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+    .references(() => products.id, { onDelete: 'cascade' }),
+  embedding: text('embedding'), // stored as text, cast to vector in queries
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
 });
 
 export const productPrices = pgTable('product_prices', {
@@ -511,4 +568,13 @@ export const contractorAssignments = pgTable('contractor_assignments', {
   agreedAmount: real('agreed_amount'),
   currency: text('currency').default('USD'),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Y.js Collaboration Documents — persisted editor state
+// ---------------------------------------------------------------------------
+export const yjsDocuments = pgTable('yjs_documents', {
+  docId: text('doc_id').primaryKey(),
+  state: text('state'), // base64-encoded Y.js binary state
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
 });

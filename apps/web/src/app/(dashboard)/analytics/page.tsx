@@ -1,6 +1,5 @@
 'use client';
 
-import { useMemo } from 'react';
 import Link from 'next/link';
 import { trpc } from '@/lib/trpc/client';
 import {
@@ -97,77 +96,9 @@ function SpendingTrend({ data }: { data: { month: string; amount: number }[] }) 
 }
 
 export default function GlobalAnalyticsPage() {
-  const { data: projects, isLoading } = trpc.project.list.useQuery();
+  const { data: overview, isLoading } = trpc.analytics.globalOverview.useQuery();
 
-  const analytics = useMemo(() => {
-    if (!projects) {
-      return {
-        total: 0,
-        active: 0,
-        completed: 0,
-        totalRooms: 0,
-        statusCounts: {} as Record<string, number>,
-        spendingTrend: [] as { month: string; amount: number }[],
-        styleCounts: {} as Record<string, number>,
-        budgetDistribution: [] as { label: string; value: number }[],
-      };
-    }
-
-    const total = projects.length;
-    const completed = projects.filter((p) => p.status === 'completed').length;
-    const active = total - completed;
-    const totalRooms = projects.reduce((sum, p) => sum + (p.rooms?.length ?? 0), 0);
-
-    // Status distribution
-    const statusCounts: Record<string, number> = {};
-    projects.forEach((p) => {
-      statusCounts[p.status] = (statusCounts[p.status] || 0) + 1;
-    });
-
-    // Simulated spending trend (past 6 months)
-    const months = ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'];
-    const baseAmounts = [120000, 185000, 95000, 210000, 165000, 140000];
-    const factor = Math.max(1, total * 0.5);
-    const spendingTrend = months.map((month, i) => ({
-      month,
-      amount: Math.round(baseAmounts[i] * factor),
-    }));
-
-    // Simulated style popularity
-    const styles = [
-      { name: 'Modern', count: 8 },
-      { name: 'Contemporary', count: 6 },
-      { name: 'Minimalist', count: 5 },
-      { name: 'Scandinavian', count: 4 },
-      { name: 'Industrial', count: 3 },
-      { name: 'Traditional', count: 2 },
-    ];
-    const styleCounts: Record<string, number> = {};
-    styles.forEach((s) => {
-      styleCounts[s.name] = s.count * Math.max(1, Math.ceil(total / 3));
-    });
-
-    // Budget distribution
-    const budgetDistribution = [
-      { label: 'Economy', value: Math.round(total * 0.2) || 1 },
-      { label: 'Standard', value: Math.round(total * 0.45) || 2 },
-      { label: 'Premium', value: Math.round(total * 0.25) || 1 },
-      { label: 'Luxury', value: Math.round(total * 0.1) || 0 },
-    ];
-
-    return {
-      total,
-      active,
-      completed,
-      totalRooms,
-      statusCounts,
-      spendingTrend,
-      styleCounts,
-      budgetDistribution,
-    };
-  }, [projects]);
-
-  if (isLoading) {
+  if (isLoading || !overview) {
     return (
       <div className="space-y-4">
         <Skeleton className="h-8 w-48" />
@@ -184,11 +115,11 @@ export default function GlobalAnalyticsPage() {
     );
   }
 
-  const totalSpending = analytics.spendingTrend.reduce((s, d) => s + d.amount, 0);
-  const styleEntries = Object.entries(analytics.styleCounts).sort((a, b) => b[1] - a[1]);
+  const totalSpending = overview.totalSpent;
+  const styleEntries = overview.styleDistribution.map(s => [s.name, s.count] as [string, number]);
   const maxStyleCount = Math.max(...styleEntries.map(([, c]) => c), 1);
 
-  const statusEntries = Object.entries(analytics.statusCounts);
+  const statusEntries = Object.entries(overview.statusCounts) as [string, number][];
   const statusColors: Record<string, string> = {
     draft: '#94a3b8',
     designing: '#3b82f6',
@@ -199,7 +130,7 @@ export default function GlobalAnalyticsPage() {
   };
 
   const budgetColors = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b'];
-  const maxBudgetVal = Math.max(...analytics.budgetDistribution.map((d) => d.value), 1);
+  const maxBudgetVal = Math.max(...overview.budgetDistribution.map((d) => d.value), 1);
 
   return (
     <div>
@@ -221,7 +152,7 @@ export default function GlobalAnalyticsPage() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Total Projects</p>
-                <p className="text-2xl font-bold">{analytics.total}</p>
+                <p className="text-2xl font-bold">{overview.totalProjects}</p>
               </div>
             </div>
           </CardContent>
@@ -235,7 +166,7 @@ export default function GlobalAnalyticsPage() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Active</p>
-                <p className="text-2xl font-bold">{analytics.active}</p>
+                <p className="text-2xl font-bold">{overview.activeProjects}</p>
               </div>
             </div>
           </CardContent>
@@ -249,7 +180,7 @@ export default function GlobalAnalyticsPage() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Completed</p>
-                <p className="text-2xl font-bold">{analytics.completed}</p>
+                <p className="text-2xl font-bold">{overview.completedProjects}</p>
               </div>
             </div>
           </CardContent>
@@ -275,7 +206,7 @@ export default function GlobalAnalyticsPage() {
       {/* Charts row 1 */}
       <div className="mb-6 grid gap-4 lg:grid-cols-2">
         {/* Spending trend */}
-        <SpendingTrend data={analytics.spendingTrend} />
+        <SpendingTrend data={overview.spendingTrend as { month: string; amount: number }[]} />
 
         {/* Project status distribution */}
         <Card>
@@ -290,7 +221,7 @@ export default function GlobalAnalyticsPage() {
               <div className="space-y-3">
                 {statusEntries.map(([status, count]) => {
                   const pct =
-                    analytics.total > 0 ? (count / analytics.total) * 100 : 0;
+                    overview.totalProjects > 0 ? (count / overview.totalProjects) * 100 : 0;
                   const color = statusColors[status] || '#94a3b8';
                   return (
                     <div key={status}>
@@ -354,7 +285,7 @@ export default function GlobalAnalyticsPage() {
                       label={style}
                       value={count}
                       maxValue={maxStyleCount}
-                      color={colors[i % colors.length]}
+                      color={colors[i % colors.length] ?? '#94a3b8'}
                     />
                   );
                 })}
@@ -374,13 +305,13 @@ export default function GlobalAnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-2.5">
-              {analytics.budgetDistribution.map((tier, i) => (
+              {(overview.budgetDistribution as { label: string; value: number }[]).map((tier, i) => (
                 <BarRow
                   key={tier.label}
                   label={tier.label}
                   value={tier.value}
                   maxValue={maxBudgetVal}
-                  color={budgetColors[i % budgetColors.length]}
+                  color={budgetColors[i % budgetColors.length] ?? '#94a3b8'}
                   suffix={tier.value === 1 ? ' project' : ' projects'}
                 />
               ))}
@@ -394,7 +325,7 @@ export default function GlobalAnalyticsPage() {
                 <Layers className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">Total Rooms</span>
               </div>
-              <span className="text-sm font-bold">{analytics.totalRooms}</span>
+              <span className="text-sm font-bold">{overview.totalRooms}</span>
             </div>
             <div className="mt-2 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -402,8 +333,8 @@ export default function GlobalAnalyticsPage() {
                 <span className="text-sm text-muted-foreground">Avg Rooms per Project</span>
               </div>
               <span className="text-sm font-bold">
-                {analytics.total > 0
-                  ? (analytics.totalRooms / analytics.total).toFixed(1)
+                {overview.totalProjects > 0
+                  ? (overview.totalRooms / overview.totalProjects).toFixed(1)
                   : '0'}
               </span>
             </div>
