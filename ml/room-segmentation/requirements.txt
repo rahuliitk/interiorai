@@ -1,0 +1,24 @@
+# Core ML model dependencies for room segmentation.
+# Install with: pip install -r requirements.txt
+#
+# Note: SAM 2 and Depth Anything V2 may require installation from source
+# or specific channels. See each project's README for GPU-specific wheels.
+
+torch>=2.2,<3
+torchvision>=0.17,<1
+opencv-python-headless>=4.9,<5
+numpy>=1.26,<3
+pillow>=11.0.0
+pydantic>=2.7,<3
+litellm>=1.40,<2
+structlog>=24.1,<25
+
+# SAM 2 — Meta's Segment Anything Model 2
+# Install from: https://github.com/facebookresearch/segment-anything-2
+# pip install git+https://github.com/facebookresearch/segment-anything-2.git
+# segment-anything-2
+
+# Depth Anything V2 — Monocular depth estimation
+# Install from: https://github.com/DepthAnything/Depth-Anything-V2
+# pip install git+https://github.com/DepthAnything/Depth-Anything-V2.git
+# depth-anything-v2

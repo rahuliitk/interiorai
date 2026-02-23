@@ -1,0 +1,71 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "openlintel-product-matching"
+version = "0.1.0"
+description = "Visual product search using CLIP/DINOv2 embeddings and pgvector similarity"
+requires-python = ">=3.11"
+license = "AGPL-3.0-only"
+authors = [{ name = "OpenLintel Team" }]
+dependencies = [
+    "openlintel-shared",
+    "torch>=2.2,<3",
+    "torchvision>=0.17,<1",
+    "pillow>=11.0.0",
+    "numpy>=1.26,<3",
+    "pydantic>=2.7,<3",
+    "litellm>=1.40,<2",
+    "structlog>=24.1,<25",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8,<9",
+    "pytest-asyncio>=0.23,<1",
+    "pytest-cov>=5,<6",
+    "mypy>=1.10,<2",
+    "ruff>=0.4,<1",
+]
+db = [
+    "asyncpg>=0.29,<1",
+    "sqlalchemy[asyncio]>=2.0,<3",
+    "pgvector>=0.3,<1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/openlintel_product_matching"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.envs.default]
+dependencies = [
+    "openlintel-shared @ {root:uri}/../../packages/python-shared",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+addopts = "-v --tb=short"
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+plugins = ["pydantic.mypy"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "N", "UP", "B", "SIM", "TCH", "RUF"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["openlintel_product_matching", "openlintel_shared"]

@@ -1,0 +1,175 @@
+##############################################################################
+# NGINX Ingress Controller Configuration for OpenLintel
+# Path-based routing to all services with TLS termination
+##############################################################################
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: openlintel-api-ingress
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: openlintel-ingress
+    app.kubernetes.io/part-of: openlintel
+  annotations:
+    # NGINX configuration
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "8k"
+    # Rate limiting
+    nginx.ingress.kubernetes.io/limit-rps: "50"
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
+    # CORS
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://app.openlintel.io"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization"
+    # TLS
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Security headers
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-XSS-Protection: 1; mode=block";
+      more_set_headers "Referrer-Policy: strict-origin-when-cross-origin";
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - api.openlintel.io
+      secretName: api-tls
+  rules:
+    - host: api.openlintel.io
+      http:
+        paths:
+          # Design engine — AI design generation
+          - path: /api/v1/design(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: design-engine
+                port:
+                  number: 8000
+
+          # Media service — file uploads and processing
+          - path: /api/v1/media(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: media-service
+                port:
+                  number: 8001
+
+          # BOM engine — bill of materials
+          - path: /api/v1/bom(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: bom-engine
+                port:
+                  number: 8002
+
+          # Drawing generator — CAD drawings
+          - path: /api/v1/drawings(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: drawing-generator
+                port:
+                  number: 8003
+
+          # Cut list engine — material optimization
+          - path: /api/v1/cutlist(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: cutlist-engine
+                port:
+                  number: 8004
+
+          # MEP calculator — mechanical/electrical/plumbing
+          - path: /api/v1/mep(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: mep-calculator
+                port:
+                  number: 8005
+
+          # Catalogue service — materials and furniture
+          - path: /api/v1/catalogue(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: catalogue-service
+                port:
+                  number: 8006
+
+          # Project service — project management
+          - path: /api/v1/projects(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: project-service
+                port:
+                  number: 8007
+
+          # Procurement service — vendor and purchasing
+          - path: /api/v1/procurement(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: procurement-service
+                port:
+                  number: 8008
+
+          # Collaboration — real-time WebSocket
+          - path: /api/v1/collab(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: collaboration
+                port:
+                  number: 8009
+
+---
+# WebSocket-specific ingress for collaboration service
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: openlintel-ws-ingress
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: openlintel-ws-ingress
+    app.kubernetes.io/part-of: openlintel
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - ws.openlintel.io
+      secretName: ws-tls
+  rules:
+    - host: ws.openlintel.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: collaboration
+                port:
+                  number: 8009

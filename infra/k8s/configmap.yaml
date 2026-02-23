@@ -1,0 +1,53 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openlintel-config
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: openlintel-config
+    app.kubernetes.io/part-of: openlintel
+data:
+  # Environment
+  NODE_ENV: production
+  PYTHON_ENV: production
+  LOG_LEVEL: info
+
+  # Application URLs
+  APP_URL: "https://app.openlintel.io"
+  API_URL: "https://api.openlintel.io"
+  WS_URL: "wss://ws.openlintel.io"
+
+  # Internal service URLs (Kubernetes DNS)
+  POSTGRES_HOST: postgres.openlintel.svc.cluster.local
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: openlintel
+
+  REDIS_HOST: redis.openlintel.svc.cluster.local
+  REDIS_PORT: "6379"
+  REDIS_URL: "redis://redis.openlintel.svc.cluster.local:6379"
+
+  MINIO_ENDPOINT: minio.openlintel.svc.cluster.local
+  MINIO_PORT: "9000"
+  MINIO_USE_SSL: "false"
+  MINIO_BUCKET: openlintel-uploads
+
+  MEILISEARCH_HOST: "http://meilisearch.openlintel.svc.cluster.local:7700"
+
+  # Internal microservice URLs
+  DESIGN_ENGINE_URL: "http://design-engine.openlintel.svc.cluster.local:8000"
+  MEDIA_SERVICE_URL: "http://media-service.openlintel.svc.cluster.local:8001"
+  BOM_ENGINE_URL: "http://bom-engine.openlintel.svc.cluster.local:8002"
+  DRAWING_GENERATOR_URL: "http://drawing-generator.openlintel.svc.cluster.local:8003"
+  CUTLIST_ENGINE_URL: "http://cutlist-engine.openlintel.svc.cluster.local:8004"
+  MEP_CALCULATOR_URL: "http://mep-calculator.openlintel.svc.cluster.local:8005"
+  CATALOGUE_SERVICE_URL: "http://catalogue-service.openlintel.svc.cluster.local:8006"
+  PROJECT_SERVICE_URL: "http://project-service.openlintel.svc.cluster.local:8007"
+  PROCUREMENT_SERVICE_URL: "http://procurement-service.openlintel.svc.cluster.local:8008"
+  COLLABORATION_URL: "http://collaboration.openlintel.svc.cluster.local:8009"
+
+  # Feature flags
+  ENABLE_GPU_ACCELERATION: "false"
+  ENABLE_REALTIME_COLLAB: "true"
+  MAX_UPLOAD_SIZE_MB: "50"
+  MAX_CONCURRENT_JOBS: "10"

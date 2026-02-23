@@ -1,0 +1,816 @@
+##############################################################################
+# OpenLintel Microservices — Deployment + Service definitions
+# Each service follows the same pattern:
+#   - Deployment with health checks, resource limits, and config
+#   - ClusterIP Service for internal routing
+##############################################################################
+
+# ============================================================================
+# media-service — handles file uploads, image processing, thumbnails
+# ============================================================================
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: media-service
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: media-service
+    app.kubernetes.io/part-of: openlintel
+    app.kubernetes.io/component: service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: media-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: media-service
+        app.kubernetes.io/part-of: openlintel
+        app.kubernetes.io/component: service
+    spec:
+      containers:
+        - name: media-service
+          image: ghcr.io/rahuliitk/openlintel-media-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8001
+              name: http
+          envFrom:
+            - configMapRef:
+                name: openlintel-config
+            - secretRef:
+                name: openlintel-secrets
+          env:
+            - name: SERVICE_NAME
+              value: media-service
+            - name: PORT
+              value: "8001"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: media-service
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: media-service
+    app.kubernetes.io/part-of: openlintel
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8001
+      targetPort: 8001
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: media-service
+
+# ============================================================================
+# bom-engine — bill of materials calculation
+# ============================================================================
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bom-engine
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: bom-engine
+    app.kubernetes.io/part-of: openlintel
+    app.kubernetes.io/component: service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: bom-engine
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: bom-engine
+        app.kubernetes.io/part-of: openlintel
+        app.kubernetes.io/component: service
+    spec:
+      containers:
+        - name: bom-engine
+          image: ghcr.io/rahuliitk/openlintel-bom-engine:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8002
+              name: http
+          envFrom:
+            - configMapRef:
+                name: openlintel-config
+            - secretRef:
+                name: openlintel-secrets
+          env:
+            - name: SERVICE_NAME
+              value: bom-engine
+            - name: PORT
+              value: "8002"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8002
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8002
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bom-engine
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: bom-engine
+    app.kubernetes.io/part-of: openlintel
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8002
+      targetPort: 8002
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: bom-engine
+
+# ============================================================================
+# drawing-generator — AutoCAD-style drawing generation
+# ============================================================================
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drawing-generator
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: drawing-generator
+    app.kubernetes.io/part-of: openlintel
+    app.kubernetes.io/component: service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: drawing-generator
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: drawing-generator
+        app.kubernetes.io/part-of: openlintel
+        app.kubernetes.io/component: service
+    spec:
+      containers:
+        - name: drawing-generator
+          image: ghcr.io/rahuliitk/openlintel-drawing-generator:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8003
+              name: http
+          envFrom:
+            - configMapRef:
+                name: openlintel-config
+            - secretRef:
+                name: openlintel-secrets
+          env:
+            - name: SERVICE_NAME
+              value: drawing-generator
+            - name: PORT
+              value: "8003"
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8003
+            initialDelaySeconds: 20
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8003
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: drawing-generator
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: drawing-generator
+    app.kubernetes.io/part-of: openlintel
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8003
+      targetPort: 8003
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: drawing-generator
+
+# ============================================================================
+# cutlist-engine — cut list optimization for materials
+# ============================================================================
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cutlist-engine
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: cutlist-engine
+    app.kubernetes.io/part-of: openlintel
+    app.kubernetes.io/component: service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cutlist-engine
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cutlist-engine
+        app.kubernetes.io/part-of: openlintel
+        app.kubernetes.io/component: service
+    spec:
+      containers:
+        - name: cutlist-engine
+          image: ghcr.io/rahuliitk/openlintel-cutlist-engine:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8004
+              name: http
+          envFrom:
+            - configMapRef:
+                name: openlintel-config
+            - secretRef:
+                name: openlintel-secrets
+          env:
+            - name: SERVICE_NAME
+              value: cutlist-engine
+            - name: PORT
+              value: "8004"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8004
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8004
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cutlist-engine
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: cutlist-engine
+    app.kubernetes.io/part-of: openlintel
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8004
+      targetPort: 8004
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: cutlist-engine
+
+# ============================================================================
+# mep-calculator — MEP (mechanical, electrical, plumbing) calculations
+# ============================================================================
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mep-calculator
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: mep-calculator
+    app.kubernetes.io/part-of: openlintel
+    app.kubernetes.io/component: service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: mep-calculator
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: mep-calculator
+        app.kubernetes.io/part-of: openlintel
+        app.kubernetes.io/component: service
+    spec:
+      containers:
+        - name: mep-calculator
+          image: ghcr.io/rahuliitk/openlintel-mep-calculator:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8005
+              name: http
+          envFrom:
+            - configMapRef:
+                name: openlintel-config
+            - secretRef:
+                name: openlintel-secrets
+          env:
+            - name: SERVICE_NAME
+              value: mep-calculator
+            - name: PORT
+              value: "8005"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8005
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8005
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mep-calculator
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: mep-calculator
+    app.kubernetes.io/part-of: openlintel
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8005
+      targetPort: 8005
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: mep-calculator
+
+# ============================================================================
+# catalogue-service — material and furniture catalogue management
+# ============================================================================
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalogue-service
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: catalogue-service
+    app.kubernetes.io/part-of: openlintel
+    app.kubernetes.io/component: service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: catalogue-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: catalogue-service
+        app.kubernetes.io/part-of: openlintel
+        app.kubernetes.io/component: service
+    spec:
+      containers:
+        - name: catalogue-service
+          image: ghcr.io/rahuliitk/openlintel-catalogue-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8006
+              name: http
+          envFrom:
+            - configMapRef:
+                name: openlintel-config
+            - secretRef:
+                name: openlintel-secrets
+          env:
+            - name: SERVICE_NAME
+              value: catalogue-service
+            - name: PORT
+              value: "8006"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8006
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8006
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalogue-service
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: catalogue-service
+    app.kubernetes.io/part-of: openlintel
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8006
+      targetPort: 8006
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: catalogue-service
+
+# ============================================================================
+# project-service — project management, templates, cloning
+# ============================================================================
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project-service
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: project-service
+    app.kubernetes.io/part-of: openlintel
+    app.kubernetes.io/component: service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: project-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: project-service
+        app.kubernetes.io/part-of: openlintel
+        app.kubernetes.io/component: service
+    spec:
+      containers:
+        - name: project-service
+          image: ghcr.io/rahuliitk/openlintel-project-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8007
+              name: http
+          envFrom:
+            - configMapRef:
+                name: openlintel-config
+            - secretRef:
+                name: openlintel-secrets
+          env:
+            - name: SERVICE_NAME
+              value: project-service
+            - name: PORT
+              value: "8007"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8007
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8007
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: project-service
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: project-service
+    app.kubernetes.io/part-of: openlintel
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8007
+      targetPort: 8007
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: project-service
+
+# ============================================================================
+# procurement-service — vendor management, purchase orders, pricing
+# ============================================================================
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: procurement-service
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: procurement-service
+    app.kubernetes.io/part-of: openlintel
+    app.kubernetes.io/component: service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: procurement-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: procurement-service
+        app.kubernetes.io/part-of: openlintel
+        app.kubernetes.io/component: service
+    spec:
+      containers:
+        - name: procurement-service
+          image: ghcr.io/rahuliitk/openlintel-procurement-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8008
+              name: http
+          envFrom:
+            - configMapRef:
+                name: openlintel-config
+            - secretRef:
+                name: openlintel-secrets
+          env:
+            - name: SERVICE_NAME
+              value: procurement-service
+            - name: PORT
+              value: "8008"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8008
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8008
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: procurement-service
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: procurement-service
+    app.kubernetes.io/part-of: openlintel
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8008
+      targetPort: 8008
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: procurement-service
+
+# ============================================================================
+# collaboration — real-time collaboration, WebSocket hub, notifications
+# ============================================================================
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: collaboration
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: collaboration
+    app.kubernetes.io/part-of: openlintel
+    app.kubernetes.io/component: service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: collaboration
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: collaboration
+        app.kubernetes.io/part-of: openlintel
+        app.kubernetes.io/component: service
+    spec:
+      containers:
+        - name: collaboration
+          image: ghcr.io/rahuliitk/openlintel-collaboration:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8009
+              name: http
+          envFrom:
+            - configMapRef:
+                name: openlintel-config
+            - secretRef:
+                name: openlintel-secrets
+          env:
+            - name: SERVICE_NAME
+              value: collaboration
+            - name: PORT
+              value: "8009"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8009
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8009
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: collaboration
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: collaboration
+    app.kubernetes.io/part-of: openlintel
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8009
+      targetPort: 8009
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: collaboration
