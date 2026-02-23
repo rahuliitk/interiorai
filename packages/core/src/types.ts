@@ -46,6 +46,12 @@ export interface DesignVariant {
   style: DesignStyle;
   budgetTier: BudgetTier;
   renderUrl?: string;
+  renderUrls?: string[];
+  promptUsed?: string;
+  constraints?: string[];
+  jobId?: string;
+  sourceUploadId?: string;
+  metadata?: Record<string, unknown>;
   createdAt: string;
 }
 
@@ -147,4 +153,269 @@ export interface Project {
   unitSystem: UnitSystem;
   createdAt: string;
   updatedAt: string;
+}
+
+// =============================================================================
+// Job / Async Processing Types
+// =============================================================================
+
+export type JobType =
+  | 'design_generation'
+  | 'bom_calculation'
+  | 'drawing_generation'
+  | 'cutlist_generation'
+  | 'mep_electrical'
+  | 'mep_plumbing'
+  | 'mep_hvac'
+  | 'schedule_generation'
+  | 'room_segmentation'
+  | 'floor_plan_digitization';
+
+export type JobStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+
+export interface Job {
+  id: string;
+  userId: string;
+  type: JobType;
+  status: JobStatus;
+  progress: number;
+  error?: string;
+  inputJson?: Record<string, unknown>;
+  outputJson?: Record<string, unknown>;
+  createdAt: string;
+  completedAt?: string;
+}
+
+// =============================================================================
+// Drawing Types
+// =============================================================================
+
+export type DrawingType =
+  | 'floor_plan'
+  | 'furnished_plan'
+  | 'elevation'
+  | 'section'
+  | 'rcp'
+  | 'flooring_layout'
+  | 'electrical_layout';
+
+export interface DrawingResult {
+  id: string;
+  designVariantId: string;
+  drawingType: DrawingType;
+  dxfStorageKey?: string;
+  pdfStorageKey?: string;
+  svgStorageKey?: string;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+}
+
+// =============================================================================
+// MEP Types
+// =============================================================================
+
+export type MEPCalcType = 'electrical' | 'plumbing' | 'hvac';
+
+export interface CircuitSchedule {
+  circuits: {
+    number: number;
+    description: string;
+    breakerSize: number;
+    wireGauge: string;
+    load_watts: number;
+    type: 'lighting' | 'power' | 'dedicated';
+  }[];
+  totalLoad_watts: number;
+  mainBreakerSize: number;
+  standard: string;
+}
+
+export interface FixtureUnitCalc {
+  fixtures: {
+    name: string;
+    count: number;
+    fixtureUnits: number;
+    totalUnits: number;
+  }[];
+  totalFixtureUnits: number;
+  recommendedPipeSize_mm: number;
+  standard: string;
+}
+
+export interface CoolingLoad {
+  sensibleLoad_btu: number;
+  latentLoad_btu: number;
+  totalLoad_btu: number;
+  tonnage: number;
+  recommendedEquipment: string;
+  standard: string;
+}
+
+// =============================================================================
+// Schedule / Timeline Types
+// =============================================================================
+
+export type TradeType =
+  | 'demolition'
+  | 'civil'
+  | 'plumbing_rough_in'
+  | 'electrical_rough_in'
+  | 'false_ceiling'
+  | 'flooring'
+  | 'carpentry'
+  | 'painting'
+  | 'mep_fixtures'
+  | 'soft_furnishing'
+  | 'cleanup';
+
+export interface ScheduleTask {
+  id: string;
+  name: string;
+  trade: TradeType;
+  startDay: number;
+  durationDays: number;
+  dependencies: string[];
+  isCritical?: boolean;
+}
+
+export interface Milestone {
+  id: string;
+  name: string;
+  dueDate: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'overdue';
+  paymentLinked: boolean;
+}
+
+// =============================================================================
+// Nesting / Sheet Layout Types
+// =============================================================================
+
+export interface NestingResult {
+  sheets: SheetLayout[];
+  totalSheets: number;
+  wastePercent: number;
+}
+
+export interface SheetLayout {
+  sheetSize: string; // e.g. '8x4'
+  length_mm: number;
+  width_mm: number;
+  panels: PlacedPanel[];
+  wastePercent: number;
+}
+
+export interface PlacedPanel {
+  panelId: string;
+  partName: string;
+  x: number;
+  y: number;
+  length_mm: number;
+  width_mm: number;
+  rotated: boolean;
+}
+
+// =============================================================================
+// Contractor / Marketplace Types
+// =============================================================================
+
+export interface Contractor {
+  id: string;
+  name: string;
+  companyName?: string;
+  specializations: string[];
+  city?: string;
+  rating: number;
+  totalReviews: number;
+  verified: boolean;
+}
+
+export interface ContractorReview {
+  id: string;
+  contractorId: string;
+  userId: string;
+  rating: number;
+  title?: string;
+  review?: string;
+  createdAt: string;
+}
+
+// =============================================================================
+// Collaboration Types
+// =============================================================================
+
+export type ApprovalStatus = 'pending' | 'approved' | 'rejected' | 'revision_requested';
+
+export interface Notification {
+  id: string;
+  userId: string;
+  type: string;
+  title: string;
+  message?: string;
+  link?: string;
+  read: boolean;
+  createdAt: string;
+}
+
+// =============================================================================
+// Product Catalogue Types
+// =============================================================================
+
+export interface Product {
+  id: string;
+  name: string;
+  description?: string;
+  category: string;
+  subcategory?: string;
+  vendorId?: string;
+  sku?: string;
+  imageUrl?: string;
+  specifications?: Record<string, unknown>;
+  dimensions?: Dimensions;
+  weight_kg?: number;
+}
+
+export interface Vendor {
+  id: string;
+  name: string;
+  website?: string;
+  contactEmail?: string;
+  rating?: number;
+}
+
+// =============================================================================
+// Segmentation / Floor Plan Types
+// =============================================================================
+
+export interface SegmentationResult {
+  objects: DetectedObject[];
+  depthMap?: string; // storage key for depth map image
+}
+
+export interface DetectedObject {
+  label: string;
+  confidence: number;
+  bbox: { x: number; y: number; width: number; height: number };
+  maskKey?: string;
+}
+
+export interface FloorPlanData {
+  rooms: RoomPolygon[];
+  doors: DoorWindow[];
+  windows: DoorWindow[];
+  dimensions: { start: [number, number]; end: [number, number]; value_mm: number }[];
+}
+
+export interface RoomPolygon {
+  name: string;
+  type: RoomType;
+  vertices: [number, number][];
+  area_sqm: number;
+}
+
+export interface DoorWindow {
+  type: 'door' | 'window';
+  position: [number, number];
+  width_mm: number;
+  height_mm?: number;
+  wallId?: string;
 }

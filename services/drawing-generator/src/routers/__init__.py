@@ -1,0 +1,1 @@
+"""Drawing generator routers package."""

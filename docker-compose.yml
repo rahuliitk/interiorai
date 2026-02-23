@@ -71,41 +71,221 @@ services:
       retries: 5
 
   # ---------------------------------------------------------------------------
-  # Application Services (uncomment as you build them)
+  # Python Microservices
   # ---------------------------------------------------------------------------
+  media-service:
+    build:
+      context: .
+      dockerfile: services/media-service/Dockerfile
+    container_name: openlintel-media-service
+    restart: unless-stopped
+    ports:
+      - '8001:8001'
+    environment:
+      DATABASE_URL: postgresql+asyncpg://openlintel:openlintel_dev@postgres:5432/openlintel
+      REDIS_URL: redis://redis:6379
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: openlintel
+      JWT_SECRET: ${NEXTAUTH_SECRET:-dev-secret}
+      API_KEY_ENCRYPTION_SECRET: ${API_KEY_ENCRYPTION_SECRET:-dev-encryption-secret-32chars!!}
+      LOG_LEVEL: info
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    healthcheck:
+      test: ['CMD', 'python', '-c', 'import httpx; httpx.get("http://localhost:8001/health")']
+      interval: 15s
+      timeout: 10s
+      retries: 3
 
-  # web:
-  #   build:
-  #     context: .
-  #     dockerfile: infra/docker/web.Dockerfile
-  #   container_name: openlintel-web
-  #   restart: unless-stopped
-  #   ports:
-  #     - '3000:3000'
-  #   environment:
-  #     - DATABASE_URL=postgresql://openlintel:openlintel_dev@postgres:5432/openlintel
-  #     - REDIS_URL=redis://redis:6379
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     redis:
-  #       condition: service_healthy
+  design-engine:
+    build:
+      context: .
+      dockerfile: services/design-engine/Dockerfile
+    container_name: openlintel-design-engine
+    restart: unless-stopped
+    ports:
+      - '8000:8000'
+    environment:
+      DATABASE_URL: postgresql+asyncpg://openlintel:openlintel_dev@postgres:5432/openlintel
+      REDIS_URL: redis://redis:6379
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: openlintel
+      JWT_SECRET: ${NEXTAUTH_SECRET:-dev-secret}
+      API_KEY_ENCRYPTION_SECRET: ${API_KEY_ENCRYPTION_SECRET:-dev-encryption-secret-32chars!!}
+      LOG_LEVEL: info
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
 
-  # design-engine:
-  #   build:
-  #     context: .
-  #     dockerfile: infra/docker/design-engine.Dockerfile
-  #   container_name: openlintel-design-engine
-  #   restart: unless-stopped
-  #   ports:
-  #     - '8000:8000'
-  #   deploy:
-  #     resources:
-  #       reservations:
-  #         devices:
-  #           - driver: nvidia
-  #             count: 1
-  #             capabilities: [gpu]
+  bom-engine:
+    build:
+      context: .
+      dockerfile: services/bom-engine/Dockerfile
+    container_name: openlintel-bom-engine
+    restart: unless-stopped
+    ports:
+      - '8002:8002'
+    environment:
+      DATABASE_URL: postgresql+asyncpg://openlintel:openlintel_dev@postgres:5432/openlintel
+      REDIS_URL: redis://redis:6379
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: openlintel
+      JWT_SECRET: ${NEXTAUTH_SECRET:-dev-secret}
+      API_KEY_ENCRYPTION_SECRET: ${API_KEY_ENCRYPTION_SECRET:-dev-encryption-secret-32chars!!}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  drawing-generator:
+    build:
+      context: .
+      dockerfile: services/drawing-generator/Dockerfile
+    container_name: openlintel-drawing-generator
+    restart: unless-stopped
+    ports:
+      - '8003:8003'
+    environment:
+      DATABASE_URL: postgresql+asyncpg://openlintel:openlintel_dev@postgres:5432/openlintel
+      REDIS_URL: redis://redis:6379
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: openlintel
+      JWT_SECRET: ${NEXTAUTH_SECRET:-dev-secret}
+      API_KEY_ENCRYPTION_SECRET: ${API_KEY_ENCRYPTION_SECRET:-dev-encryption-secret-32chars!!}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  cutlist-engine:
+    build:
+      context: .
+      dockerfile: services/cutlist-engine/Dockerfile
+    container_name: openlintel-cutlist-engine
+    restart: unless-stopped
+    ports:
+      - '8004:8004'
+    environment:
+      DATABASE_URL: postgresql+asyncpg://openlintel:openlintel_dev@postgres:5432/openlintel
+      REDIS_URL: redis://redis:6379
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: openlintel
+      JWT_SECRET: ${NEXTAUTH_SECRET:-dev-secret}
+      API_KEY_ENCRYPTION_SECRET: ${API_KEY_ENCRYPTION_SECRET:-dev-encryption-secret-32chars!!}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  mep-calculator:
+    build:
+      context: .
+      dockerfile: services/mep-calculator/Dockerfile
+    container_name: openlintel-mep-calculator
+    restart: unless-stopped
+    ports:
+      - '8005:8005'
+    environment:
+      DATABASE_URL: postgresql+asyncpg://openlintel:openlintel_dev@postgres:5432/openlintel
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${NEXTAUTH_SECRET:-dev-secret}
+      API_KEY_ENCRYPTION_SECRET: ${API_KEY_ENCRYPTION_SECRET:-dev-encryption-secret-32chars!!}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  catalogue-service:
+    build:
+      context: .
+      dockerfile: services/catalogue-service/Dockerfile
+    container_name: openlintel-catalogue-service
+    restart: unless-stopped
+    ports:
+      - '8006:8006'
+    environment:
+      DATABASE_URL: postgresql+asyncpg://openlintel:openlintel_dev@postgres:5432/openlintel
+      REDIS_URL: redis://redis:6379
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: openlintel
+      MEILI_URL: http://meilisearch:7700
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-openlintel_dev_key}
+      JWT_SECRET: ${NEXTAUTH_SECRET:-dev-secret}
+      API_KEY_ENCRYPTION_SECRET: ${API_KEY_ENCRYPTION_SECRET:-dev-encryption-secret-32chars!!}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
+
+  project-service:
+    build:
+      context: .
+      dockerfile: services/project-service/Dockerfile
+    container_name: openlintel-project-service
+    restart: unless-stopped
+    ports:
+      - '8007:8007'
+    environment:
+      DATABASE_URL: postgresql+asyncpg://openlintel:openlintel_dev@postgres:5432/openlintel
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${NEXTAUTH_SECRET:-dev-secret}
+      API_KEY_ENCRYPTION_SECRET: ${API_KEY_ENCRYPTION_SECRET:-dev-encryption-secret-32chars!!}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  procurement-service:
+    build:
+      context: .
+      dockerfile: services/procurement-service/Dockerfile
+    container_name: openlintel-procurement-service
+    restart: unless-stopped
+    ports:
+      - '8008:8008'
+    environment:
+      DATABASE_URL: postgresql+asyncpg://openlintel:openlintel_dev@postgres:5432/openlintel
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${NEXTAUTH_SECRET:-dev-secret}
+      API_KEY_ENCRYPTION_SECRET: ${API_KEY_ENCRYPTION_SECRET:-dev-encryption-secret-32chars!!}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  collaboration:
+    build:
+      context: .
+      dockerfile: services/collaboration/Dockerfile
+    container_name: openlintel-collaboration
+    restart: unless-stopped
+    ports:
+      - '8009:8009'
+    environment:
+      DATABASE_URL: postgresql://openlintel:openlintel_dev@postgres:5432/openlintel
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${NEXTAUTH_SECRET:-dev-secret}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
 volumes:
   postgres_data:
