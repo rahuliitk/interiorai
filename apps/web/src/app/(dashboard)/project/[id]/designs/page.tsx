@@ -1,6 +1,7 @@
 'use client';
 
 import { use, useState } from 'react';
+import Link from 'next/link';
 import { trpc } from '@/lib/trpc/client';
 import {
   Button,
@@ -224,28 +225,33 @@ export default function DesignsPage({ params }: { params: Promise<{ id: string }
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredVariants.map((variant) => (
             <Card key={variant.id} className="overflow-hidden">
-              <div className="flex aspect-video items-center justify-center bg-muted">
-                {variant.renderUrl ? (
-                  <img
-                    src={variant.renderUrl}
-                    alt={variant.name}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <ImageIcon className="h-10 w-10 text-muted-foreground/50" />
-                )}
-              </div>
+              <Link href={`/project/${projectId}/designs/${variant.id}`}>
+                <div className="flex aspect-video items-center justify-center bg-muted">
+                  {variant.renderUrl ? (
+                    <img
+                      src={variant.renderUrl}
+                      alt={variant.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <ImageIcon className="h-10 w-10 text-muted-foreground/50" />
+                  )}
+                </div>
+              </Link>
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between">
                   <div>
-                    <CardTitle className="text-base">{variant.name}</CardTitle>
+                    <Link href={`/project/${projectId}/designs/${variant.id}`}>
+                      <CardTitle className="text-base hover:underline">{variant.name}</CardTitle>
+                    </Link>
                     <CardDescription>{variant.roomName}</CardDescription>
                   </div>
                   <Button
                     variant="ghost"
                     size="icon"
                     className="h-7 w-7"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
                       if (confirm('Delete this design variant?')) {
                         deleteVariant.mutate({ id: variant.id });
                       }

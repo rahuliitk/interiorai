@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
   const buffer = Buffer.from(await file.arrayBuffer());
   const storageKey = generateStorageKey(file.name);
-  await saveFile(buffer, storageKey);
+  await saveFile(buffer, storageKey, file.type);
 
   const [upload] = await db
     .insert(uploads)

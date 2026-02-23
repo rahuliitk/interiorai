@@ -9,19 +9,42 @@ import {
   Palette,
   FileText,
   ShoppingCart,
+  Scissors,
+  Zap,
+  CalendarDays,
+  CreditCard,
+  Users,
+  MessageSquare,
+  Box,
+  BarChart3,
+  Map,
+  Store,
+  ClipboardList,
+  Bell,
 } from 'lucide-react';
 import { cn } from '@openlintel/ui';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Projects', href: '/dashboard', icon: FolderKanban },
+  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Marketplace', href: '/marketplace', icon: Store },
+  { name: 'Notifications', href: '/notifications', icon: Bell },
 ];
 
 const projectNavigation = [
   { name: 'Rooms', href: 'rooms', icon: LayoutDashboard },
   { name: 'Designs', href: 'designs', icon: Palette },
+  { name: 'Floor Plan', href: 'floor-plan', icon: Map },
+  { name: '3D Editor', href: 'editor', icon: Box },
   { name: 'Drawings', href: 'drawings', icon: FileText },
   { name: 'BOM', href: 'bom', icon: ShoppingCart },
+  { name: 'Cut List', href: 'cutlist', icon: Scissors },
+  { name: 'MEP', href: 'mep', icon: Zap },
+  { name: 'Timeline', href: 'timeline', icon: CalendarDays },
+  { name: 'Site Logs', href: 'site-logs', icon: ClipboardList },
+  { name: 'Payments', href: 'payments', icon: CreditCard },
+  { name: 'Analytics', href: 'analytics', icon: BarChart3 },
 ];
 
 export function Sidebar({ projectId }: { projectId?: string }) {
@@ -38,7 +61,7 @@ export function Sidebar({ projectId }: { projectId?: string }) {
         </Link>
       </div>
 
-      <nav className="flex-1 space-y-1 px-3 py-2">
+      <nav className="flex-1 space-y-1 px-3 py-2 overflow-y-auto">
         <div className="mb-4">
           <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Main

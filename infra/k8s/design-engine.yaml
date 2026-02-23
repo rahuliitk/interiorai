@@ -1,0 +1,146 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: design-engine
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: design-engine
+    app.kubernetes.io/part-of: openlintel
+    app.kubernetes.io/component: ai
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: design-engine
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: design-engine
+        app.kubernetes.io/part-of: openlintel
+        app.kubernetes.io/component: ai
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: design-engine
+          image: ghcr.io/rahuliitk/openlintel-design-engine:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+              name: http
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: openlintel-config
+            - secretRef:
+                name: openlintel-secrets
+          env:
+            - name: SERVICE_NAME
+              value: design-engine
+            - name: PORT
+              value: "8000"
+            - name: WORKERS
+              value: "2"
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+              # Optional GPU request — uncomment if GPU nodes are available
+              # nvidia.com/gpu: "1"
+            limits:
+              cpu: "2"
+              memory: 4Gi
+              # nvidia.com/gpu: "1"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 10
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 30
+      # Optional: Node selector for GPU nodes
+      # nodeSelector:
+      #   accelerator: nvidia-gpu
+      # tolerations:
+      #   - key: nvidia.com/gpu
+      #     operator: Exists
+      #     effect: NoSchedule
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: design-engine
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: design-engine
+    app.kubernetes.io/part-of: openlintel
+    app.kubernetes.io/component: ai
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: design-engine
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: design-engine-hpa
+  namespace: openlintel
+  labels:
+    app.kubernetes.io/name: design-engine
+    app.kubernetes.io/part-of: openlintel
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: design-engine
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 600
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 120
+    scaleUp:
+      stabilizationWindowSeconds: 30
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 60

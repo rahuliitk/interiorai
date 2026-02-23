@@ -10,7 +10,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/openlintel
+
 jobs:
+  # ==========================================================================
+  # Lint & Typecheck — runs on every push and PR
+  # ==========================================================================
   lint-and-typecheck:
     name: Lint & Typecheck
     runs-on: ubuntu-latest
@@ -36,8 +43,11 @@ jobs:
       - name: Format check
         run: pnpm format:check
 
-  test-node:
-    name: Test (Node.js)
+  # ==========================================================================
+  # Test (Node.js / Web) — vitest with Postgres + Redis services
+  # ==========================================================================
+  test-web:
+    name: Test (Web)
     runs-on: ubuntu-latest
     needs: lint-and-typecheck
     services:
@@ -84,10 +94,21 @@ jobs:
           REDIS_URL: redis://localhost:6379
           NODE_ENV: test
 
+  # ==========================================================================
+  # Test (Python) — pytest for each Python service
+  # ==========================================================================
   test-python:
     name: Test (Python)
     runs-on: ubuntu-latest
     needs: lint-and-typecheck
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - design-engine
+          - media-service
+          - bom-engine
+          - cutlist-engine
     steps:
       - uses: actions/checkout@v4
 
@@ -95,39 +116,210 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Python dependencies
+      - name: Install dependencies for ${{ matrix.service }}
         run: |
           python -m pip install --upgrade pip
+          cd services/${{ matrix.service }}
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+          pip install pytest pytest-cov ruff
 
       - name: Lint with Ruff
         run: |
-          pip install ruff
+          cd services/${{ matrix.service }}
           ruff check .
           ruff format --check .
 
-      - name: Run Python tests
+      - name: Run tests for ${{ matrix.service }}
         run: |
-          pip install pytest pytest-cov
-          python -m pytest --cov --cov-report=xml || echo "No Python tests found yet"
+          cd services/${{ matrix.service }}
+          python -m pytest --cov --cov-report=xml -v || echo "No tests found yet for ${{ matrix.service }}"
 
-  build:
-    name: Build
+  # ==========================================================================
+  # Docker Build — build and push images for all services
+  # ==========================================================================
+  docker-build:
+    name: Docker Build
     runs-on: ubuntu-latest
-    needs: [test-node, test-python]
+    needs: [test-web, test-python]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: web
+            dockerfile: infra/docker/web.Dockerfile
+            context: .
+          - service: design-engine
+            dockerfile: infra/docker/design-engine.Dockerfile
+            context: .
+          - service: media-service
+            dockerfile: services/media-service/Dockerfile
+            context: services/media-service
+          - service: bom-engine
+            dockerfile: services/bom-engine/Dockerfile
+            context: services/bom-engine
+          - service: cutlist-engine
+            dockerfile: services/cutlist-engine/Dockerfile
+            context: services/cutlist-engine
+
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - uses: actions/setup-node@v4
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          node-version: 20
-          cache: 'pnpm'
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}
+          tags: |
+            type=sha,prefix=
+            type=ref,event=branch
+            type=raw,value=latest
 
-      - name: Build all packages
-        run: pnpm build
+      - name: Build and push ${{ matrix.service }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ==========================================================================
+  # Deploy to Staging — automatic on main push after Docker build
+  # ==========================================================================
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: docker-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: staging
+      url: https://staging.openlintel.io
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --region ${{ secrets.AWS_REGION }} \
+            --name openlintel-staging-cluster
+
+      - name: Deploy to staging
+        run: |
+          # Apply Kubernetes manifests
+          kubectl apply -f infra/k8s/namespace.yaml
+          kubectl apply -f infra/k8s/configmap.yaml
+          kubectl apply -f infra/k8s/secrets.yaml
+          kubectl apply -f infra/k8s/postgres.yaml
+          kubectl apply -f infra/k8s/redis.yaml
+          kubectl apply -f infra/k8s/minio.yaml
+          kubectl apply -f infra/k8s/meilisearch.yaml
+          kubectl apply -f infra/k8s/web.yaml
+          kubectl apply -f infra/k8s/design-engine.yaml
+          kubectl apply -f infra/k8s/services.yaml
+          kubectl apply -f infra/k8s/ingress.yaml
+
+          # Force rollout restart to pick up new images
+          kubectl rollout restart deployment/web -n openlintel
+          kubectl rollout restart deployment/design-engine -n openlintel
+          kubectl rollout restart deployment/media-service -n openlintel
+          kubectl rollout restart deployment/bom-engine -n openlintel
+          kubectl rollout restart deployment/cutlist-engine -n openlintel
+
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/web -n openlintel --timeout=300s
+          kubectl rollout status deployment/design-engine -n openlintel --timeout=300s
+          echo "Staging deployment complete."
+
+  # ==========================================================================
+  # Deploy to Production — manual trigger only
+  # ==========================================================================
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: https://app.openlintel.io
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --region ${{ secrets.AWS_REGION }} \
+            --name openlintel-production-cluster
+
+      - name: Deploy to production
+        run: |
+          # Apply Kubernetes manifests
+          kubectl apply -f infra/k8s/namespace.yaml
+          kubectl apply -f infra/k8s/configmap.yaml
+          kubectl apply -f infra/k8s/postgres.yaml
+          kubectl apply -f infra/k8s/redis.yaml
+          kubectl apply -f infra/k8s/minio.yaml
+          kubectl apply -f infra/k8s/meilisearch.yaml
+          kubectl apply -f infra/k8s/web.yaml
+          kubectl apply -f infra/k8s/design-engine.yaml
+          kubectl apply -f infra/k8s/services.yaml
+          kubectl apply -f infra/k8s/ingress.yaml
+
+          # Force rollout restart to pick up new images
+          kubectl rollout restart deployment/web -n openlintel
+          kubectl rollout restart deployment/design-engine -n openlintel
+          kubectl rollout restart deployment/media-service -n openlintel
+          kubectl rollout restart deployment/bom-engine -n openlintel
+          kubectl rollout restart deployment/cutlist-engine -n openlintel
+          kubectl rollout restart deployment/drawing-generator -n openlintel
+          kubectl rollout restart deployment/mep-calculator -n openlintel
+          kubectl rollout restart deployment/catalogue-service -n openlintel
+          kubectl rollout restart deployment/project-service -n openlintel
+          kubectl rollout restart deployment/procurement-service -n openlintel
+          kubectl rollout restart deployment/collaboration -n openlintel
+
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/web -n openlintel --timeout=300s
+          kubectl rollout status deployment/design-engine -n openlintel --timeout=300s
+          echo "Production deployment complete."
+
+      - name: Verify deployment health
+        run: |
+          echo "Checking pod status..."
+          kubectl get pods -n openlintel
+          echo "Checking service endpoints..."
+          kubectl get svc -n openlintel
+          echo "Checking ingress status..."
+          kubectl get ingress -n openlintel

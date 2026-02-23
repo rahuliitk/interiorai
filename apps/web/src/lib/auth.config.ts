@@ -38,9 +38,11 @@ export const authConfig: NextAuthConfig = {
       const isOnDashboard =
         nextUrl.pathname.startsWith('/dashboard') ||
         nextUrl.pathname.startsWith('/project');
+      const isOnAdmin = nextUrl.pathname.startsWith('/admin');
       const isAuthPage = nextUrl.pathname.startsWith('/auth');
 
-      if (isOnDashboard && !isLoggedIn) return false; // redirects to signIn page
+      // Protected routes require login
+      if ((isOnDashboard || isOnAdmin) && !isLoggedIn) return false; // redirects to signIn page
       if (isAuthPage && isLoggedIn) {
         return Response.redirect(new URL('/dashboard', nextUrl));
       }
