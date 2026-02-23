@@ -43,10 +43,14 @@ export const scheduleRouter = router({
         })
         .returning();
 
-      fetch(`${PROJECT_SERVICE_URL}/api/v1/schedules/generate`, {
+      fetch(`${PROJECT_SERVICE_URL}/api/v1/schedules/job`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ job_id: job.id, project_id: input.projectId }),
+        body: JSON.stringify({
+          job_id: job.id,
+          project_id: input.projectId,
+          user_id: ctx.userId,
+        }),
       }).catch(() => {});
 
       return job;

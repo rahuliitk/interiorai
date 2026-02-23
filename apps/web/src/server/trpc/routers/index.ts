@@ -12,6 +12,7 @@ import { scheduleRouter } from './schedule';
 import { paymentRouter } from './payment';
 import { contractorRouter } from './contractor';
 import { notificationRouter } from './notification';
+import { adminRouter } from './admin';
 
 export const appRouter = router({
   project: projectRouter,
@@ -27,6 +28,7 @@ export const appRouter = router({
   payment: paymentRouter,
   contractor: contractorRouter,
   notification: notificationRouter,
+  admin: adminRouter,
 });
 
 export type AppRouter = typeof appRouter;
