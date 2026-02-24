@@ -5,7 +5,7 @@ OpenLintel is an end-to-end home design automation platform that automates the f
 
 ---
 
-## Developed Features (37)
+## Developed Features (43)
 
 ### Core Platform
 
@@ -21,7 +21,8 @@ OpenLintel is an end-to-end home design automation platform that automates the f
 | # | Feature | Description | Key Files |
 |---|---------|-------------|-----------|
 | 5 | **AI Design Generation** | Multi-provider VLM (OpenAI/Anthropic/Google) via LangGraph; 10 styles, 4 budget tiers; async job queue | `services/design-engine/`, `apps/web/src/server/trpc/routers/designVariant.ts` |
-| 6 | **Floor Plan Digitization** | Upload floor plan image → AI extracts rooms, dimensions, polygons; interactive SVG viewer | `apps/web/src/app/(dashboard)/project/[id]/floor-plan/page.tsx`, `services/vision-engine/` |
+| 6 | **Floor Plan Digitization** | Upload floor plan image → AI extracts rooms, dimensions, polygons; interactive SVG viewer; vision-engine deployed with Dockerfile | `apps/web/src/app/(dashboard)/project/[id]/floor-plan/page.tsx`, `services/vision-engine/` |
+| 7 | **Photo-to-3D Reconstruction** | Upload room photos → VLM depth estimation → calibrated measurements → room dimensions with confidence scores → glTF mesh generation | `apps/web/src/app/(dashboard)/project/[id]/reconstruction/page.tsx`, `services/vision-engine/src/routers/reconstruction.py` |
 | 7 | **3D Interactive Editor** | React Three Fiber editor with furniture catalogue, move/rotate/scale tools, undo/redo, snap-to-grid, material panel, lighting, real-time collaboration via Y.js | `apps/web/src/app/(dashboard)/project/[id]/editor/page.tsx` |
 | 8 | **Style Quiz & Mood Board** | 5-step wizard quiz, AI-detected style preferences, budget tier detection, color palette, mood board items | `apps/web/src/app/(dashboard)/project/[id]/style-quiz/page.tsx` |
 | 9 | **AR/VR Viewer (WebXR)** | AR furniture placement, VR room walkthrough with teleportation, QR sharing, device capability detection | `apps/web/src/app/(dashboard)/project/[id]/ar/page.tsx` |
@@ -34,7 +35,8 @@ OpenLintel is an end-to-end home design automation platform that automates the f
 | 11 | **Technical Drawing Generation** | DXF, PDF, SVG output; floor plans, elevations, sections, RCP, flooring, electrical drawings | `services/drawing-generator/` |
 | 12 | **CNC Cut List & Nesting** | Panel cut lists with grain direction & edge banding, nesting optimization for 8x4 sheets, offcut tracking, DXF output | `services/cutlist-engine/` |
 | 13 | **MEP Engineering** | Electrical (NEC 2020), Plumbing (IPC 2021), HVAC (ASHRAE 90.1) calculations via AI agents | `services/mep-calculator/`, `apps/web/src/app/(dashboard)/project/[id]/mep/page.tsx` |
-| 14 | **Building Code Compliance** | Indian NBC 2016 checks — room dimensions, ventilation, fire safety, electrical, plumbing, accessibility | `apps/web/src/app/(dashboard)/project/[id]/compliance/page.tsx` |
+| 14 | **Building Code Compliance** | Multi-jurisdiction checks (India NBC 2016, US IRC 2021, EU Eurocode, UK Building Regs) — room dimensions, ventilation, fire safety, electrical, plumbing, accessibility | `apps/web/src/app/(dashboard)/project/[id]/compliance/page.tsx`, `data/building-codes/` |
+| 15 | **IFC/BIM Export** | IFC4-compliant BIM export using ifcopenshell — walls, doors, windows, furniture mapped to IFC entities alongside DXF/SVG output | `services/drawing-generator/src/services/ifc_writer.py` |
 
 ### Project Management
 
@@ -42,7 +44,7 @@ OpenLintel is an end-to-end home design automation platform that automates the f
 |---|---------|-------------|-----------|
 | 15 | **Project Timeline & Scheduling** | AI-generated Gantt chart, critical path calculation, Gantt export | `services/project-service/`, `apps/web/src/components/gantt-chart.tsx` |
 | 16 | **Site Logs** | Daily logs with date, title, notes, weather, worker count, photo attachments, tags | `apps/web/src/app/(dashboard)/project/[id]/site-logs/page.tsx` |
-| 17 | **Change Orders** | AI-powered cost + time impact analysis, status workflow (proposed → approved/rejected → implemented) | `apps/web/src/components/change-order-dialog.tsx` |
+| 17 | **Change Orders** | Full-page dashboard with summary cards, status filter tabs, create/approve/reject flow, AI-powered cost + time impact analysis | `apps/web/src/app/(dashboard)/project/[id]/change-orders/page.tsx`, `apps/web/src/server/trpc/routers/schedule.ts` |
 | 18 | **Quality Assurance & Punch List** | Stage-gate checkpoints, per-item pass/fail, punch list with severity levels, status tracking | `apps/web/src/app/(dashboard)/project/[id]/quality/page.tsx` |
 | 19 | **Handover Package** | As-built drawings, material register, contractor directory, operational guides, maintenance manual, client signature | `apps/web/src/app/(dashboard)/project/[id]/handover/page.tsx` |
 
@@ -105,23 +107,18 @@ OpenLintel is an end-to-end home design automation platform that automates the f
 | 42 | **Floor Plan Digitizer** | VLM extractor + image preprocessor → structured rooms + DXF | `ml/floor-plan-digitizer/` |
 | 43 | **Design Generation Model** | LangGraph multi-node graph with style database | `ml/design-gen/` |
 | 44 | **AI Measurement Estimation** | Depth-to-metric conversion, multi-view geometry, calibration | `ml/measurement/` |
+| 45 | **Visual Product Matching** | CLIP ViT-B/32 embedder (512-dim), pgvector indexer/searcher, VLM reranker (GPT-4o-mini), end-to-end pipeline with graceful degradation | `ml/product-matching/` |
 
 ---
 
-## Pending / Not Yet Implemented (10)
+## Pending / Not Yet Implemented (4)
 
 | # | Feature | Status | Details |
 |---|---------|--------|---------|
 | 1 | **Mobile App** | Not started | React Native / Flutter planned; only a README placeholder exists at `apps/mobile/` |
 | 2 | **Desktop App** | Not started | Electron / Tauri planned; only a README placeholder exists at `apps/desktop/` |
-| 3 | **Visual Product Matching (ML)** | Stub only | Package exists at `ml/product-matching/` but contains only `__init__.py` — no matching logic |
-| 4 | **Photo-to-3D Reconstruction** | Not implemented | Mentioned in README as a key capability; measurement ML module exists but no end-to-end 3D reconstruction pipeline connected to the frontend |
-| 5 | **Vision Engine Deployment** | Service code ready, deployment pending | `services/vision-engine/` has no Dockerfile; floor plan UI shows "requires vision-engine microservice" notice |
-| 6 | **Retailer API Integrations** | Not implemented | REQUIREMENTS.md describes live pricing from Amazon India, Flipkart, IKEA, etc. — catalogue service supports multi-vendor pricing but no actual retailer API connections |
-| 7 | **IFC/BIM Export** | Not implemented | DXF output works, but full IFC (Industry Foundation Classes) or native DWG export is not available |
-| 8 | **Global Building Codes** | Partial | Only Indian NBC 2016 compliance is implemented; US IRC, EU codes, and others are not yet supported |
-| 9 | **Full Kubernetes Production Deployment** | Partial | K8s manifests exist for ~2 of 10+ services in `infra/k8s/`; Terraform configs are incomplete stubs |
-| 10 | **Change Order Full-Page UI** | Partial | Backend AI agent and dialog exist, but no dedicated full-page change order management view |
+| 3 | **Retailer API Integrations** | Not implemented | REQUIREMENTS.md describes live pricing from Amazon India, Flipkart, IKEA, etc. — catalogue service supports multi-vendor pricing but no actual retailer API connections |
+| 4 | **Full Kubernetes Production Deployment** | Partial | K8s manifests exist for ~2 of 10+ services in `infra/k8s/`; Terraform configs are incomplete stubs |
 
 ---
 
