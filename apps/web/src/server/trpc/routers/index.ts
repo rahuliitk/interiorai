@@ -30,6 +30,14 @@ import { warrantyRouter } from './warranty';
 import { communityRouter } from './community';
 import { developerPortalRouter } from './developerPortal';
 import { localizationRouter } from './localization';
+// Missing features
+import { qualityRouter } from './quality';
+import { handoverRouter } from './handover';
+import { collaborationRouter } from './collaboration';
+import { deliveryRouter } from './delivery';
+import { financialReportRouter } from './financialReport';
+import { vendorManagementRouter } from './vendorManagement';
+import { styleQuizRouter } from './styleQuiz';
 
 export const appRouter = router({
   project: projectRouter,
@@ -63,6 +71,14 @@ export const appRouter = router({
   community: communityRouter,
   developerPortal: developerPortalRouter,
   localization: localizationRouter,
+  // Missing features
+  quality: qualityRouter,
+  handover: handoverRouter,
+  collaboration: collaborationRouter,
+  delivery: deliveryRouter,
+  financialReport: financialReportRouter,
+  vendorManagement: vendorManagementRouter,
+  styleQuiz: styleQuizRouter,
 });
 
 export type AppRouter = typeof appRouter;

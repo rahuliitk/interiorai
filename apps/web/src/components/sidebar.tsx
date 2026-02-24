@@ -30,6 +30,13 @@ import {
   Shield,
   Briefcase,
   Code2,
+  CheckSquare,
+  Package,
+  MessageSquare,
+  TruckIcon,
+  DollarSign,
+  Users,
+  Sparkles,
 } from 'lucide-react';
 import { cn } from '@openlintel/ui';
 
@@ -65,6 +72,13 @@ const projectNavigation = [
   { name: 'Digital Twin', href: 'digital-twin', icon: Cpu },
   { name: 'Maintenance', href: 'maintenance', icon: Wrench },
   { name: 'Warranties', href: 'warranties', icon: Shield },
+  { name: 'Quality & Punch List', href: 'quality', icon: CheckSquare },
+  { name: 'Handover', href: 'handover', icon: Package },
+  { name: 'Collaboration', href: 'collaboration', icon: MessageSquare },
+  { name: 'Deliveries', href: 'deliveries', icon: TruckIcon },
+  { name: 'Financial Reports', href: 'financial-reports', icon: DollarSign },
+  { name: 'Vendors', href: 'vendors', icon: Users },
+  { name: 'Style Quiz', href: 'style-quiz', icon: Sparkles },
 ];
 
 export function Sidebar({ projectId }: { projectId?: string }) {
