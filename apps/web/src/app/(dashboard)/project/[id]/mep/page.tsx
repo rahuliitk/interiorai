@@ -141,13 +141,13 @@ export default function MEPPage({ params }: { params: Promise<{ id: string }> })
   const hvacResults = mepResults.filter((r: any) => r.calcType === 'hvac');
 
   const latestElectrical = electricalResults.length > 0
-    ? (electricalResults[0].result as ElectricalResult)
+    ? (electricalResults[0]!.result as ElectricalResult)
     : null;
   const latestPlumbing = plumbingResults.length > 0
-    ? (plumbingResults[0].result as PlumbingResult)
+    ? (plumbingResults[0]!.result as PlumbingResult)
     : null;
   const latestHvac = hvacResults.length > 0
-    ? (hvacResults[0].result as HvacResult)
+    ? (hvacResults[0]!.result as HvacResult)
     : null;
 
   if (loadingVariants || loadingMep) {

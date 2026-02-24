@@ -9,6 +9,15 @@ import {
   comments, approvals, notifications,
   contractors, contractorReviews, contractorAssignments,
   yjsDocuments,
+  // Phase 4
+  costPredictions, timelinePredictions, budgetScenarios,
+  sustainabilityReports, portfolios, portfolioProjects,
+  // Phase 5
+  digitalTwins, iotDevices, iotDataPoints, emergencyReferences,
+  maintenanceSchedules, maintenanceLogs, warranties, warrantyClaims,
+  offcutListings, offcutInquiries, projectGalleryEntries, contractorReferrals,
+  developerApps, apiAccessTokens, apiRequestLogs, webhookSubscriptions,
+  exchangeRates,
 } from './app';
 
 // ─── Auth Relations ──────────────────────────────────────────────────────────
@@ -24,6 +33,14 @@ export const usersRelations = relations(users, ({ many }) => ({
   notifications: many(notifications),
   siteLogs: many(siteLogs),
   contractorReviews: many(contractorReviews),
+  // Phase 4
+  portfolios: many(portfolios),
+  // Phase 5
+  offcutListings: many(offcutListings),
+  offcutInquiries: many(offcutInquiries),
+  contractorReferrals: many(contractorReferrals),
+  developerApps: many(developerApps),
+  apiAccessTokens: many(apiAccessTokens),
 }));
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
@@ -54,6 +71,18 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   comments: many(comments),
   approvals: many(approvals),
   contractorAssignments: many(contractorAssignments),
+  // Phase 4
+  costPredictions: many(costPredictions),
+  timelinePredictions: many(timelinePredictions),
+  budgetScenarios: many(budgetScenarios),
+  sustainabilityReports: many(sustainabilityReports),
+  portfolioProjects: many(portfolioProjects),
+  // Phase 5
+  digitalTwins: many(digitalTwins),
+  emergencyReferences: many(emergencyReferences),
+  maintenanceSchedules: many(maintenanceSchedules),
+  warranties: many(warranties),
+  projectGalleryEntries: many(projectGalleryEntries),
 }));
 
 export const roomsRelations = relations(rooms, ({ one, many }) => ({
@@ -61,6 +90,9 @@ export const roomsRelations = relations(rooms, ({ one, many }) => ({
   designVariants: many(designVariants),
   uploads: many(uploads),
   jobs: many(jobs),
+  // Phase 5
+  iotDevices: many(iotDevices),
+  emergencyReferences: many(emergencyReferences),
 }));
 
 export const designVariantsRelations = relations(designVariants, ({ one, many }) => ({
@@ -205,6 +237,7 @@ export const contractorsRelations = relations(contractors, ({ one, many }) => ({
   user: one(users, { fields: [contractors.userId], references: [users.id] }),
   reviews: many(contractorReviews),
   assignments: many(contractorAssignments),
+  referrals: many(contractorReferrals),
 }));
 
 export const contractorReviewsRelations = relations(contractorReviews, ({ one }) => ({
@@ -216,4 +249,115 @@ export const contractorReviewsRelations = relations(contractorReviews, ({ one })
 export const contractorAssignmentsRelations = relations(contractorAssignments, ({ one }) => ({
   contractor: one(contractors, { fields: [contractorAssignments.contractorId], references: [contractors.id] }),
   project: one(projects, { fields: [contractorAssignments.projectId], references: [projects.id] }),
+}));
+
+// ===========================================================================
+// PHASE 4: INTELLIGENCE
+// ===========================================================================
+
+export const costPredictionsRelations = relations(costPredictions, ({ one }) => ({
+  project: one(projects, { fields: [costPredictions.projectId], references: [projects.id] }),
+}));
+
+export const timelinePredictionsRelations = relations(timelinePredictions, ({ one }) => ({
+  project: one(projects, { fields: [timelinePredictions.projectId], references: [projects.id] }),
+}));
+
+export const budgetScenariosRelations = relations(budgetScenarios, ({ one }) => ({
+  project: one(projects, { fields: [budgetScenarios.projectId], references: [projects.id] }),
+}));
+
+export const sustainabilityReportsRelations = relations(sustainabilityReports, ({ one }) => ({
+  project: one(projects, { fields: [sustainabilityReports.projectId], references: [projects.id] }),
+}));
+
+export const portfoliosRelations = relations(portfolios, ({ one, many }) => ({
+  user: one(users, { fields: [portfolios.userId], references: [users.id] }),
+  portfolioProjects: many(portfolioProjects),
+}));
+
+export const portfolioProjectsRelations = relations(portfolioProjects, ({ one }) => ({
+  portfolio: one(portfolios, { fields: [portfolioProjects.portfolioId], references: [portfolios.id] }),
+  project: one(projects, { fields: [portfolioProjects.projectId], references: [projects.id] }),
+}));
+
+// ===========================================================================
+// PHASE 5: ECOSYSTEM
+// ===========================================================================
+
+export const digitalTwinsRelations = relations(digitalTwins, ({ one, many }) => ({
+  project: one(projects, { fields: [digitalTwins.projectId], references: [projects.id] }),
+  iotDevices: many(iotDevices),
+}));
+
+export const iotDevicesRelations = relations(iotDevices, ({ one, many }) => ({
+  digitalTwin: one(digitalTwins, { fields: [iotDevices.digitalTwinId], references: [digitalTwins.id] }),
+  room: one(rooms, { fields: [iotDevices.roomId], references: [rooms.id] }),
+  dataPoints: many(iotDataPoints),
+}));
+
+export const iotDataPointsRelations = relations(iotDataPoints, ({ one }) => ({
+  device: one(iotDevices, { fields: [iotDataPoints.deviceId], references: [iotDevices.id] }),
+}));
+
+export const emergencyReferencesRelations = relations(emergencyReferences, ({ one }) => ({
+  project: one(projects, { fields: [emergencyReferences.projectId], references: [projects.id] }),
+  room: one(rooms, { fields: [emergencyReferences.roomId], references: [rooms.id] }),
+}));
+
+export const maintenanceSchedulesRelations = relations(maintenanceSchedules, ({ one, many }) => ({
+  project: one(projects, { fields: [maintenanceSchedules.projectId], references: [projects.id] }),
+  logs: many(maintenanceLogs),
+}));
+
+export const maintenanceLogsRelations = relations(maintenanceLogs, ({ one }) => ({
+  schedule: one(maintenanceSchedules, { fields: [maintenanceLogs.scheduleId], references: [maintenanceSchedules.id] }),
+}));
+
+export const warrantiesRelations = relations(warranties, ({ one, many }) => ({
+  project: one(projects, { fields: [warranties.projectId], references: [projects.id] }),
+  claims: many(warrantyClaims),
+}));
+
+export const warrantyClaimsRelations = relations(warrantyClaims, ({ one }) => ({
+  warranty: one(warranties, { fields: [warrantyClaims.warrantyId], references: [warranties.id] }),
+}));
+
+export const offcutListingsRelations = relations(offcutListings, ({ one, many }) => ({
+  user: one(users, { fields: [offcutListings.userId], references: [users.id] }),
+  inquiries: many(offcutInquiries),
+}));
+
+export const offcutInquiriesRelations = relations(offcutInquiries, ({ one }) => ({
+  listing: one(offcutListings, { fields: [offcutInquiries.listingId], references: [offcutListings.id] }),
+  buyer: one(users, { fields: [offcutInquiries.buyerUserId], references: [users.id] }),
+}));
+
+export const projectGalleryEntriesRelations = relations(projectGalleryEntries, ({ one }) => ({
+  project: one(projects, { fields: [projectGalleryEntries.projectId], references: [projects.id] }),
+}));
+
+export const contractorReferralsRelations = relations(contractorReferrals, ({ one }) => ({
+  referrer: one(users, { fields: [contractorReferrals.referrerUserId], references: [users.id] }),
+  contractor: one(contractors, { fields: [contractorReferrals.contractorId], references: [contractors.id] }),
+}));
+
+export const developerAppsRelations = relations(developerApps, ({ one, many }) => ({
+  user: one(users, { fields: [developerApps.userId], references: [users.id] }),
+  accessTokens: many(apiAccessTokens),
+  requestLogs: many(apiRequestLogs),
+  webhookSubscriptions: many(webhookSubscriptions),
+}));
+
+export const apiAccessTokensRelations = relations(apiAccessTokens, ({ one }) => ({
+  app: one(developerApps, { fields: [apiAccessTokens.appId], references: [developerApps.id] }),
+  user: one(users, { fields: [apiAccessTokens.userId], references: [users.id] }),
+}));
+
+export const apiRequestLogsRelations = relations(apiRequestLogs, ({ one }) => ({
+  app: one(developerApps, { fields: [apiRequestLogs.appId], references: [developerApps.id] }),
+}));
+
+export const webhookSubscriptionsRelations = relations(webhookSubscriptions, ({ one }) => ({
+  app: one(developerApps, { fields: [webhookSubscriptions.appId], references: [developerApps.id] }),
 }));

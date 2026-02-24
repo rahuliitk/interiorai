@@ -164,4 +164,116 @@ export const analyticsRouter = router({
         variantCount: project.rooms.reduce((s, r) => s + r.designVariants.length, 0),
       };
     }),
+
+  categorySpend: protectedProcedure
+    .input(z.object({ projectId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const project = await ctx.db.query.projects.findFirst({
+        where: and(eq(projects.id, input.projectId), eq(projects.userId, ctx.userId)),
+        with: {
+          rooms: {
+            with: {
+              designVariants: {
+                with: { bomResults: true },
+              },
+            },
+          },
+        },
+      });
+      if (!project) throw new Error('Project not found');
+
+      const categoryMap: Record<string, { totalCost: number; itemCount: number }> = {};
+      project.rooms.forEach(room => {
+        room.designVariants.forEach(variant => {
+          variant.bomResults.forEach(bom => {
+            const items = (bom.items as Array<{ category: string; total: number; quantity: number }>) || [];
+            items.forEach(item => {
+              if (!categoryMap[item.category]) {
+                categoryMap[item.category] = { totalCost: 0, itemCount: 0 };
+              }
+              categoryMap[item.category].totalCost += item.total || 0;
+              categoryMap[item.category].itemCount += item.quantity || 1;
+            });
+          });
+        });
+      });
+
+      return Object.entries(categoryMap)
+        .map(([category, data]) => ({ category, ...data }))
+        .sort((a, b) => b.totalCost - a.totalCost);
+    }),
+
+  perSqftBenchmark: protectedProcedure
+    .input(z.object({ projectId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const project = await ctx.db.query.projects.findFirst({
+        where: and(eq(projects.id, input.projectId), eq(projects.userId, ctx.userId)),
+        with: {
+          rooms: {
+            with: {
+              designVariants: {
+                with: { bomResults: true },
+              },
+            },
+          },
+        },
+      });
+      if (!project) throw new Error('Project not found');
+
+      return project.rooms.map(room => {
+        const areaSqft = room.lengthMm && room.widthMm
+          ? (room.lengthMm * room.widthMm) / (304.8 * 304.8)
+          : 0;
+        let totalCost = 0;
+        room.designVariants.forEach(variant => {
+          variant.bomResults.forEach(bom => {
+            totalCost += bom.totalCost || 0;
+          });
+        });
+        return {
+          roomId: room.id,
+          roomName: room.name,
+          roomType: room.type,
+          areaSqft: Math.round(areaSqft * 100) / 100,
+          totalCost,
+          costPerSqft: areaSqft > 0 ? Math.round((totalCost / areaSqft) * 100) / 100 : 0,
+        };
+      });
+    }),
+
+  exportReport: protectedProcedure
+    .input(z.object({ projectId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const project = await ctx.db.query.projects.findFirst({
+        where: and(eq(projects.id, input.projectId), eq(projects.userId, ctx.userId)),
+        with: {
+          rooms: {
+            with: {
+              designVariants: {
+                with: { bomResults: true },
+              },
+            },
+          },
+        },
+      });
+      if (!project) throw new Error('Project not found');
+
+      const rows: string[] = ['Category,Item,Quantity,Unit Price,Total,Room'];
+      project.rooms.forEach(room => {
+        room.designVariants.forEach(variant => {
+          variant.bomResults.forEach(bom => {
+            const items = (bom.items as Array<{
+              category: string; name: string; quantity: number; unitPrice: number; total: number;
+            }>) || [];
+            items.forEach(item => {
+              rows.push(
+                `"${item.category}","${item.name}",${item.quantity},${item.unitPrice},${item.total},"${room.name}"`,
+              );
+            });
+          });
+        });
+      });
+
+      return { csv: rows.join('\n'), filename: `${project.name}-report.csv` };
+    }),
 });

@@ -22,6 +22,9 @@ export const users = pgTable('users', {
   image: text('image'),
   role: text('role').notNull().default('user'), // user | admin
   enabled: boolean('enabled').notNull().default(true),
+  preferredCurrency: text('preferred_currency').default('USD'),
+  preferredUnitSystem: text('preferred_unit_system').default('metric'), // metric | imperial
+  preferredLocale: text('preferred_locale').default('en'),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
 });

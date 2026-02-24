@@ -3,9 +3,15 @@ import { payments, invoices, purchaseOrders, projects, eq, and } from '@openlint
 import { router, protectedProcedure } from '../init';
 import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-12-18.acacia' as Stripe.LatestApiVersion,
-});
+let _stripe: Stripe | null = null;
+function getStripe(): Stripe {
+  if (!_stripe) {
+    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_not_configured', {
+      apiVersion: '2024-12-18.acacia' as Stripe.LatestApiVersion,
+    });
+  }
+  return _stripe;
+}
 
 export const paymentRouter = router({
   // ── Payments ───────────────────────────────────────────────
@@ -85,7 +91,7 @@ export const paymentRouter = router({
       if (!payment) throw new Error('Payment not found');
 
       const origin = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-      const session = await stripe.checkout.sessions.create({
+      const session = await getStripe().checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [
           {
@@ -131,7 +137,7 @@ export const paymentRouter = router({
       // If payment has a Stripe session ID, check its status
       if (payment.externalId && payment.paymentProvider === 'stripe') {
         try {
-          const session = await stripe.checkout.sessions.retrieve(payment.externalId);
+          const session = await getStripe().checkout.sessions.retrieve(payment.externalId);
           return {
             id: payment.id,
             status: payment.status,

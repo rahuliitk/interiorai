@@ -28,7 +28,7 @@ import {
   Badge,
   toast,
 } from '@openlintel/ui';
-import { Settings, Key, Plus, Trash2, Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import { Settings, Key, Plus, Trash2, Eye, EyeOff, ShieldCheck, Globe, Loader2 } from 'lucide-react';
 
 const PROVIDERS = [
   { value: 'openai', label: 'OpenAI' },
@@ -243,7 +243,156 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+        <LocalizationCard />
       </div>
     </div>
+  );
+}
+
+const CURRENCIES = [
+  { value: 'USD', label: 'USD — US Dollar' },
+  { value: 'EUR', label: 'EUR — Euro' },
+  { value: 'GBP', label: 'GBP — British Pound' },
+  { value: 'INR', label: 'INR — Indian Rupee' },
+  { value: 'AUD', label: 'AUD — Australian Dollar' },
+  { value: 'CAD', label: 'CAD — Canadian Dollar' },
+  { value: 'JPY', label: 'JPY — Japanese Yen' },
+  { value: 'CNY', label: 'CNY — Chinese Yuan' },
+] as const;
+
+const UNIT_SYSTEMS = [
+  { value: 'metric', label: 'Metric (mm, m, sq m)' },
+  { value: 'imperial', label: 'Imperial (inches, ft, sq ft)' },
+] as const;
+
+const LOCALES = [
+  { value: 'en', label: 'English' },
+  { value: 'hi', label: 'Hindi' },
+  { value: 'es', label: 'Spanish' },
+  { value: 'fr', label: 'French' },
+  { value: 'de', label: 'German' },
+  { value: 'ja', label: 'Japanese' },
+  { value: 'zh', label: 'Chinese' },
+] as const;
+
+function LocalizationCard() {
+  const utils = trpc.useUtils();
+  const { data: prefs, isLoading } = trpc.localization.getPreferences.useQuery();
+
+  const [currency, setCurrency] = useState<string>('');
+  const [unitSystem, setUnitSystem] = useState<string>('');
+  const [locale, setLocale] = useState<string>('');
+  const [initialized, setInitialized] = useState(false);
+
+  // Initialize form state from server data
+  if (prefs && !initialized) {
+    setCurrency(prefs.preferredCurrency ?? 'USD');
+    setUnitSystem(prefs.preferredUnitSystem ?? 'metric');
+    setLocale(prefs.preferredLocale ?? 'en');
+    setInitialized(true);
+  }
+
+  const savePrefs = trpc.localization.setPreferences.useMutation({
+    onSuccess: () => {
+      utils.localization.getPreferences.invalidate();
+      toast({ title: 'Preferences saved' });
+    },
+    onError: (err) => {
+      toast({ title: 'Failed to save', description: err.message, variant: 'destructive' });
+    },
+  });
+
+  const handleSave = () => {
+    savePrefs.mutate({ currency, unitSystem, locale });
+  };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Globe className="h-4 w-4" />
+            Localization
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="h-8 w-full animate-pulse rounded bg-muted" />
+          <div className="h-8 w-full animate-pulse rounded bg-muted" />
+          <div className="h-8 w-full animate-pulse rounded bg-muted" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Globe className="h-4 w-4" />
+          Localization
+        </CardTitle>
+        <CardDescription>Set your preferred currency, units, and language.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label>Currency</Label>
+          <Select value={currency} onValueChange={setCurrency}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CURRENCIES.map((c) => (
+                <SelectItem key={c.value} value={c.value}>
+                  {c.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Unit System</Label>
+          <Select value={unitSystem} onValueChange={setUnitSystem}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {UNIT_SYSTEMS.map((u) => (
+                <SelectItem key={u.value} value={u.value}>
+                  {u.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Language</Label>
+          <Select value={locale} onValueChange={setLocale}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {LOCALES.map((l) => (
+                <SelectItem key={l.value} value={l.value}>
+                  {l.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <Button onClick={handleSave} disabled={savePrefs.isPending}>
+          {savePrefs.isPending ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            'Save Preferences'
+          )}
+        </Button>
+      </CardContent>
+    </Card>
   );
 }

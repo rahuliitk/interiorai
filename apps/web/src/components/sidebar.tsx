@@ -19,6 +19,17 @@ import {
   Store,
   ClipboardList,
   Bell,
+  Truck,
+  ShieldCheck,
+  Glasses,
+  TrendingUp,
+  PiggyBank,
+  Leaf,
+  Cpu,
+  Wrench,
+  Shield,
+  Briefcase,
+  Code2,
 } from 'lucide-react';
 import { cn } from '@openlintel/ui';
 
@@ -26,7 +37,9 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Projects', href: '/dashboard', icon: FolderKanban },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Portfolios', href: '/portfolios', icon: Briefcase },
   { name: 'Marketplace', href: '/marketplace', icon: Store },
+  { name: 'API Portal', href: '/developer', icon: Code2 },
   { name: 'Notifications', href: '/notifications', icon: Bell },
 ];
 
@@ -42,7 +55,16 @@ const projectNavigation = [
   { name: 'Timeline', href: 'timeline', icon: CalendarDays },
   { name: 'Site Logs', href: 'site-logs', icon: ClipboardList },
   { name: 'Payments', href: 'payments', icon: CreditCard },
+  { name: 'Procurement', href: 'procurement', icon: Truck },
+  { name: 'Compliance', href: 'compliance', icon: ShieldCheck },
+  { name: 'AR/VR', href: 'ar', icon: Glasses },
   { name: 'Analytics', href: 'analytics', icon: BarChart3 },
+  { name: 'Predictions', href: 'predictions', icon: TrendingUp },
+  { name: 'Budget Optimizer', href: 'budget-optimizer', icon: PiggyBank },
+  { name: 'Sustainability', href: 'sustainability', icon: Leaf },
+  { name: 'Digital Twin', href: 'digital-twin', icon: Cpu },
+  { name: 'Maintenance', href: 'maintenance', icon: Wrench },
+  { name: 'Warranties', href: 'warranties', icon: Shield },
 ];
 
 export function Sidebar({ projectId }: { projectId?: string }) {
