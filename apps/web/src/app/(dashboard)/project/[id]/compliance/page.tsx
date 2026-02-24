@@ -12,6 +12,11 @@ import {
   Tabs,
   TabsList,
   TabsTrigger,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
 } from '@openlintel/ui';
 import {
   ShieldCheck,
@@ -43,10 +48,13 @@ export default function CompliancePage({ params }: { params: Promise<{ id: strin
   const { id: projectId } = use(params);
   const [expandedRooms, setExpandedRooms] = useState<Set<string>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [jurisdiction, setJurisdiction] = useState<string>('IN');
+
+  const { data: jurisdictions } = trpc.compliance.listJurisdictions.useQuery();
 
   const { data: report, isLoading } = trpc.compliance.checkProject.useQuery({
     projectId,
-    jurisdiction: 'IN',
+    jurisdiction,
   });
 
   const toggleRoom = (roomId: string) => {
@@ -88,11 +96,25 @@ export default function CompliancePage({ params }: { params: Promise<{ id: strin
   return (
     <div>
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Compliance Report</h1>
-        <p className="text-sm text-muted-foreground">
-          Building code compliance check against Indian NBC 2016 standards.
-        </p>
+      <div className="mb-6 flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Compliance Report</h1>
+          <p className="text-sm text-muted-foreground">
+            Building code compliance check against {jurisdictions?.find((j) => j.code === jurisdiction)?.name ?? jurisdiction} standards.
+          </p>
+        </div>
+        <Select value={jurisdiction} onValueChange={setJurisdiction}>
+          <SelectTrigger className="w-[240px]">
+            <SelectValue placeholder="Select jurisdiction" />
+          </SelectTrigger>
+          <SelectContent>
+            {(jurisdictions ?? []).map((j) => (
+              <SelectItem key={j.code} value={j.code}>
+                {j.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Overall compliance score */}

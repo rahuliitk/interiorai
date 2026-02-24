@@ -30,6 +30,8 @@ import { warrantyRouter } from './warranty';
 import { communityRouter } from './community';
 import { developerPortalRouter } from './developerPortal';
 import { localizationRouter } from './localization';
+// Pending features
+import { reconstructionRouter } from './reconstruction';
 // Missing features
 import { qualityRouter } from './quality';
 import { handoverRouter } from './handover';
@@ -71,6 +73,8 @@ export const appRouter = router({
   community: communityRouter,
   developerPortal: developerPortalRouter,
   localization: localizationRouter,
+  // Pending features
+  reconstruction: reconstructionRouter,
   // Missing features
   quality: qualityRouter,
   handover: handoverRouter,

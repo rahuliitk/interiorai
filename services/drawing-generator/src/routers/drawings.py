@@ -27,6 +27,7 @@ from openlintel_shared.storage import upload_file
 from src.agents.drawing_agent import DrawingAgent
 from src.services.dxf_writer import create_dxf_drawing
 from src.services.svg_writer import create_svg_drawing
+from src.services.ifc_writer import create_ifc_drawing
 
 logger = structlog.get_logger(__name__)
 
@@ -97,6 +98,7 @@ async def _run_drawing_job(
 
                     dxf_key: str | None = None
                     svg_key: str | None = None
+                    ifc_key: str | None = None
 
                     if drawing_data:
                         # Generate DXF and upload to MinIO
@@ -115,6 +117,19 @@ async def _run_drawing_job(
                             content_type="image/svg+xml", settings=settings,
                         )
 
+                        # Generate IFC (BIM) and upload
+                        try:
+                            ifc_bytes = create_ifc_drawing(drawing_data, drawing_type=dtype)
+                            ifc_key = f"drawings/{request.job_id}/{dtype}.ifc"
+                            upload_file(
+                                settings.MINIO_BUCKET, ifc_key, ifc_bytes,
+                                content_type="application/x-step", settings=settings,
+                            )
+                        except ImportError:
+                            logger.warning("ifc_skipped", reason="ifcopenshell not installed")
+                        except Exception as ifc_exc:
+                            logger.warning("ifc_generation_failed", error=str(ifc_exc))
+
                     # Persist to DB
                     rid = await write_drawing_result(
                         db,
@@ -123,6 +138,7 @@ async def _run_drawing_job(
                         drawing_type=dtype,
                         dxf_storage_key=dxf_key,
                         svg_storage_key=svg_key,
+                        ifc_storage_key=ifc_key,
                         metadata={"scale": "1:50"},
                     )
                     result_ids.append(rid)

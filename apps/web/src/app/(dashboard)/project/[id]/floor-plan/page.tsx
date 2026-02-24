@@ -559,13 +559,6 @@ export default function FloorPlanPage({
                 Once rooms are detected, you can add them to your project with
                 one click.
               </p>
-              <div className="flex items-start gap-3 max-w-md rounded-lg border border-amber-200 bg-amber-50 p-3 text-left dark:border-amber-900 dark:bg-amber-950/50">
-                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-                <p className="text-xs text-amber-700 dark:text-amber-300">
-                  Room detection requires the vision-engine microservice. This
-                  will be available once the service is deployed.
-                </p>
-              </div>
             </Card>
           )}
 

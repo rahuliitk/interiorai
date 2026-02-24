@@ -161,6 +161,7 @@ async def write_drawing_result(
     dxf_storage_key: str | None = None,
     pdf_storage_key: str | None = None,
     svg_storage_key: str | None = None,
+    ifc_storage_key: str | None = None,
     metadata: dict[str, Any] | None = None,
 ) -> str:
     """Insert a row into ``drawing_results`` and return the new ID."""
@@ -169,9 +170,11 @@ async def write_drawing_result(
         text("""
             INSERT INTO drawing_results
                 (id, design_variant_id, job_id, drawing_type,
-                 dxf_storage_key, pdf_storage_key, svg_storage_key, metadata)
+                 dxf_storage_key, pdf_storage_key, svg_storage_key,
+                 ifc_storage_key, metadata)
             VALUES (:id, :design_variant_id, :job_id, :drawing_type,
-                    :dxf_storage_key, :pdf_storage_key, :svg_storage_key, :metadata)
+                    :dxf_storage_key, :pdf_storage_key, :svg_storage_key,
+                    :ifc_storage_key, :metadata)
         """),
         {
             "id": result_id,
@@ -181,6 +184,7 @@ async def write_drawing_result(
             "dxf_storage_key": dxf_storage_key,
             "pdf_storage_key": pdf_storage_key,
             "svg_storage_key": svg_storage_key,
+            "ifc_storage_key": ifc_storage_key,
             "metadata": json.dumps(metadata or {}),
         },
     )

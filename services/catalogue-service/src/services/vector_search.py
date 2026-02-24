@@ -174,6 +174,50 @@ async def search_similar_products(
     ]
 
 
+async def generate_visual_embedding(
+    image_url: str,
+) -> list[float] | None:
+    """Generate a CLIP visual embedding from an image URL.
+
+    Downloads the image and runs it through the ProductEmbedder (CLIP ViT-B/32)
+    to produce a 512-dimensional embedding for visual similarity search.
+
+    Parameters
+    ----------
+    image_url:
+        HTTP(S) URL of the product image.
+
+    Returns
+    -------
+    list[float] | None
+        512-dimensional CLIP embedding, or None if generation fails.
+    """
+    try:
+        from openlintel_product_matching import ProductEmbedder
+
+        embedder = ProductEmbedder()
+        embedding = embedder.embed_from_url(image_url)
+        logger.debug(
+            "visual_embedding_generated",
+            image_url=image_url,
+            dimension=len(embedding),
+        )
+        return embedding
+    except ImportError:
+        logger.warning(
+            "clip_embedding_unavailable",
+            hint="openlintel-product-matching not installed, falling back to text embedding",
+        )
+        return None
+    except Exception as exc:
+        logger.warning(
+            "visual_embedding_failed",
+            image_url=image_url,
+            error=str(exc),
+        )
+        return None
+
+
 async def delete_product_embedding(
     db: AsyncSession,
     product_id: str,
