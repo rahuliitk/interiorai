@@ -3,7 +3,6 @@
 import { useState, useMemo } from 'react';
 import { Button, Badge } from '@openlintel/ui';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { cn } from '@openlintel/ui';
 
 export interface PlacedPanel {
   id: string;

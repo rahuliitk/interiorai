@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { eq, and } from 'drizzle-orm';
 import {
   schedules, milestones, siteLogs, changeOrders, projects, jobs,
+  eq, and,
 } from '@openlintel/db';
 import { router, protectedProcedure } from '../init';
 

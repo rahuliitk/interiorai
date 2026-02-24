@@ -6,9 +6,6 @@ import { trpc } from '@/lib/trpc/client';
 import {
   Button,
   Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
   CardContent,
   Badge,
   Skeleton,
@@ -22,7 +19,6 @@ import {
   TabsList,
   TabsTrigger,
   TabsContent,
-  Separator,
   toast,
 } from '@openlintel/ui';
 import {
@@ -95,22 +91,22 @@ export default function PaymentsPage({ params }: { params: Promise<{ id: string 
   // Compute milestones from schedule
   const milestones = useMemo(() => {
     const schedule = schedules[0];
-    if (!schedule?.milestones?.length) return [];
-    return schedule.milestones.map((ms: Record<string, unknown>) => ({
+    if (!(schedule as any)?.milestones?.length) return [];
+    return (schedule as any).milestones.map((ms: Record<string, unknown>) => ({
       id: ms.id as string,
       name: (ms.name as string) || 'Unnamed Milestone',
     }));
   }, [schedules]);
 
   // Summary stats
-  const totalBilled = payments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+  const totalBilled = payments.reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
   const totalPaid = payments
-    .filter((p) => p.status === 'completed')
-    .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+    .filter((p: any) => p.status === 'completed')
+    .reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
   const pendingAmount = payments
-    .filter((p) => p.status === 'pending' || p.status === 'processing')
-    .reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
-  const orderTotal = purchaseOrders.reduce((sum, po) => sum + (Number(po.totalAmount) || 0), 0);
+    .filter((p: any) => p.status === 'pending' || p.status === 'processing')
+    .reduce((sum: number, p: any) => sum + (Number(p.amount) || 0), 0);
+  const orderTotal = purchaseOrders.reduce((sum: number, po: any) => sum + (Number(po.totalAmount) || 0), 0);
 
   const isLoading = loadingPayments || loadingOrders || loadingInvoices;
 
@@ -252,7 +248,7 @@ export default function PaymentsPage({ params }: { params: Promise<{ id: string 
             </Card>
           ) : (
             <div className="space-y-3">
-              {payments.map((payment) => {
+              {payments.map((payment: any) => {
                 const milestonePayments = payments.filter(
                   (p) => p.milestoneId === payment.milestoneId && payment.milestoneId,
                 );
@@ -266,7 +262,7 @@ export default function PaymentsPage({ params }: { params: Promise<{ id: string 
                     amountDue={Number(payment.amount) || 0}
                     currency={payment.currency || 'USD'}
                     status={payment.status || 'pending'}
-                    payments={milestonePayments.length > 0 ? milestonePayments.map((p) => ({
+                    payments={milestonePayments.length > 0 ? milestonePayments.map((p: any) => ({
                       id: p.id,
                       amount: Number(p.amount) || 0,
                       currency: p.currency || 'USD',
@@ -321,7 +317,7 @@ export default function PaymentsPage({ params }: { params: Promise<{ id: string 
                       </tr>
                     </thead>
                     <tbody>
-                      {purchaseOrders.map((po) => (
+                      {purchaseOrders.map((po: any) => (
                         <tr key={po.id} className="border-b last:border-0">
                           <td className="px-3 py-2 font-mono text-xs">{po.id.slice(0, 8)}</td>
                           <td className="px-3 py-2">
@@ -371,7 +367,7 @@ export default function PaymentsPage({ params }: { params: Promise<{ id: string 
             <Card>
               <CardContent className="pt-4">
                 <div className="space-y-2">
-                  {invoices.map((invoice) => (
+                  {invoices.map((invoice: any) => (
                     <div
                       key={invoice.id}
                       className="flex items-center justify-between rounded-lg border p-3"

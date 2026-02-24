@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { eq, and } from 'drizzle-orm';
-import { rooms, projects } from '@openlintel/db';
+import { rooms, projects, eq, and } from '@openlintel/db';
 import { router, protectedProcedure } from '../init';
 
 export const roomRouter = router({

@@ -263,6 +263,9 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.3
+      lib0:
+        specifier: ^0.2.117
+        version: 0.2.117
       pg:
         specifier: ^8.13.0
         version: 8.18.0

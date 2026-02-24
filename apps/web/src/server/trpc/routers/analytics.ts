@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { eq, and, sql, count, sum } from 'drizzle-orm';
 import {
-  projects, rooms, designVariants, bomResults, jobs, schedules, milestones,
+  projects, rooms, designVariants, bomResults,
+  eq, and, sql, count, sum,
 } from '@openlintel/db';
 import { router, protectedProcedure } from '../init';
 

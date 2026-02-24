@@ -1,0 +1,197 @@
+[
+  {
+    "code_id": "NBC-RD-001",
+    "jurisdiction": { "country": "IN" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum habitable room area",
+      "requirement": "Every habitable room shall have a floor area of not less than 9.5 sq.m",
+      "min_value": 9.5,
+      "unit": "sqm",
+      "applies_to": ["living_room", "bedroom", "dining", "study"]
+    },
+    "source": { "document": "NBC India 2016", "edition": "2016", "clause": "Part 3, Section 7.2" }
+  },
+  {
+    "code_id": "NBC-RD-002",
+    "jurisdiction": { "country": "IN" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum kitchen area",
+      "requirement": "Kitchen shall have a minimum floor area of 5.0 sq.m",
+      "min_value": 5.0,
+      "unit": "sqm",
+      "applies_to": ["kitchen"]
+    },
+    "source": { "document": "NBC India 2016", "edition": "2016", "clause": "Part 3, Section 7.3" }
+  },
+  {
+    "code_id": "NBC-RD-003",
+    "jurisdiction": { "country": "IN" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum bathroom area",
+      "requirement": "Bathroom shall have a minimum floor area of 1.8 sq.m",
+      "min_value": 1.8,
+      "unit": "sqm",
+      "applies_to": ["bathroom"]
+    },
+    "source": { "document": "NBC India 2016", "edition": "2016", "clause": "Part 3, Section 7.4" }
+  },
+  {
+    "code_id": "NBC-RD-004",
+    "jurisdiction": { "country": "IN" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum habitable room width",
+      "requirement": "No habitable room shall have a width less than 2.4 m",
+      "min_value": 2400,
+      "unit": "mm",
+      "applies_to": ["living_room", "bedroom", "dining", "study"]
+    },
+    "source": { "document": "NBC India 2016", "edition": "2016", "clause": "Part 3, Section 7.2" }
+  },
+  {
+    "code_id": "NBC-RD-005",
+    "jurisdiction": { "country": "IN" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum ceiling height for habitable rooms",
+      "requirement": "Every habitable room shall have a minimum ceiling height of 2.75 m",
+      "min_value": 2750,
+      "unit": "mm",
+      "applies_to": ["living_room", "bedroom", "dining", "study", "kitchen"]
+    },
+    "source": { "document": "NBC India 2016", "edition": "2016", "clause": "Part 3, Section 7.5" }
+  },
+  {
+    "code_id": "NBC-RD-006",
+    "jurisdiction": { "country": "IN" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum corridor width",
+      "requirement": "Corridors shall have a minimum width of 1.0 m",
+      "min_value": 1000,
+      "unit": "mm",
+      "applies_to": ["corridor"]
+    },
+    "source": { "document": "NBC India 2016", "edition": "2016", "clause": "Part 3, Section 8.1" }
+  },
+  {
+    "code_id": "NBC-VT-001",
+    "jurisdiction": { "country": "IN" },
+    "category": "ventilation",
+    "rule": {
+      "description": "Minimum window opening area",
+      "requirement": "Every habitable room shall have openings for ventilation of not less than 1/6th of the floor area",
+      "min_value": 0.1667,
+      "unit": "ratio_of_floor_area",
+      "applies_to": ["living_room", "bedroom", "dining", "study", "kitchen"]
+    },
+    "source": { "document": "NBC India 2016", "edition": "2016", "clause": "Part 8, Section 3.2" }
+  },
+  {
+    "code_id": "NBC-VT-002",
+    "jurisdiction": { "country": "IN" },
+    "category": "ventilation",
+    "rule": {
+      "description": "Bathroom ventilation requirement",
+      "requirement": "Bathrooms shall have natural ventilation or mechanical exhaust of not less than 15 air changes per hour",
+      "min_value": 15,
+      "unit": "ach",
+      "applies_to": ["bathroom"]
+    },
+    "source": { "document": "NBC India 2016", "edition": "2016", "clause": "Part 8, Section 3.4" }
+  },
+  {
+    "code_id": "NBC-FS-001",
+    "jurisdiction": { "country": "IN" },
+    "category": "fire_safety",
+    "rule": {
+      "description": "Fire extinguisher requirement",
+      "requirement": "At least one fire extinguisher per 100 sqm of floor area or part thereof",
+      "min_value": 1,
+      "unit": "per_100sqm",
+      "applies_to": ["living_room", "bedroom", "kitchen", "dining", "study", "corridor"]
+    },
+    "source": { "document": "NBC India 2016", "edition": "2016", "clause": "Part 4, Section 5.1" }
+  },
+  {
+    "code_id": "NBC-FS-002",
+    "jurisdiction": { "country": "IN" },
+    "category": "fire_safety",
+    "rule": {
+      "description": "Smoke detector requirement",
+      "requirement": "Smoke detectors shall be installed in all habitable rooms and corridors",
+      "min_value": 1,
+      "unit": "per_room",
+      "applies_to": ["living_room", "bedroom", "kitchen", "dining", "study", "corridor"]
+    },
+    "source": { "document": "NBC India 2016", "edition": "2016", "clause": "Part 4, Section 6.2" }
+  },
+  {
+    "code_id": "NBC-EL-001",
+    "jurisdiction": { "country": "IN" },
+    "category": "electrical",
+    "rule": {
+      "description": "Minimum power points per habitable room",
+      "requirement": "Each habitable room shall have a minimum of 2 power outlet points",
+      "min_value": 2,
+      "unit": "outlets",
+      "applies_to": ["living_room", "bedroom", "dining", "study"]
+    },
+    "source": { "document": "IS 732:2019", "edition": "2019", "clause": "Section 10.2" }
+  },
+  {
+    "code_id": "NBC-EL-002",
+    "jurisdiction": { "country": "IN" },
+    "category": "electrical",
+    "rule": {
+      "description": "Kitchen electrical requirement",
+      "requirement": "Kitchen shall have a dedicated 20A circuit for heavy appliances",
+      "min_value": 20,
+      "unit": "amps",
+      "applies_to": ["kitchen"]
+    },
+    "source": { "document": "IS 732:2019", "edition": "2019", "clause": "Section 10.4" }
+  },
+  {
+    "code_id": "NBC-PL-001",
+    "jurisdiction": { "country": "IN" },
+    "category": "plumbing",
+    "rule": {
+      "description": "Minimum water supply per person",
+      "requirement": "Minimum 135 litres per capita per day for residential buildings",
+      "min_value": 135,
+      "unit": "lpcd",
+      "applies_to": ["bathroom", "kitchen"]
+    },
+    "source": { "document": "IS 1172:1993", "edition": "1993", "clause": "Section 3.1" }
+  },
+  {
+    "code_id": "NBC-PL-002",
+    "jurisdiction": { "country": "IN" },
+    "category": "plumbing",
+    "rule": {
+      "description": "Bathroom floor slope for drainage",
+      "requirement": "Bathroom floors shall slope towards drain at minimum 1:100",
+      "min_value": 0.01,
+      "unit": "slope_ratio",
+      "applies_to": ["bathroom"]
+    },
+    "source": { "document": "IS 2065:1983", "edition": "1983", "clause": "Section 5.2" }
+  },
+  {
+    "code_id": "NBC-AC-001",
+    "jurisdiction": { "country": "IN" },
+    "category": "accessibility",
+    "rule": {
+      "description": "Minimum door width for accessibility",
+      "requirement": "All doors on accessible route shall have minimum clear opening of 900 mm",
+      "min_value": 900,
+      "unit": "mm",
+      "applies_to": ["living_room", "bedroom", "bathroom", "kitchen", "dining", "corridor"]
+    },
+    "source": { "document": "NBC India 2016", "edition": "2016", "clause": "Part 3, Section 9.1" }
+  }
+]

@@ -1,7 +1,6 @@
 'use client';
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@openlintel/ui';
-import { cn } from '@openlintel/ui';
 
 export interface CostCategory {
   name: string;

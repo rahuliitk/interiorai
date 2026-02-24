@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { trpc } from '@/lib/trpc/client';
 import {
   Card,
@@ -8,17 +7,14 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-  Badge,
   Skeleton,
   Separator,
 } from '@openlintel/ui';
 import {
-  BarChart3,
   FolderKanban,
   CheckCircle2,
   Clock,
   IndianRupee,
-  TrendingUp,
   Palette,
   Layers,
 } from 'lucide-react';

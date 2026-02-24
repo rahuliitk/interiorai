@@ -17,7 +17,7 @@ import {
   toast,
 } from '@openlintel/ui';
 import { trpc } from '@/lib/trpc/client';
-import { Plus, AlertCircle, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { Plus, CheckCircle2, XCircle, Clock } from 'lucide-react';
 
 interface ChangeOrderDialogProps {
   projectId: string;

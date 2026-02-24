@@ -56,7 +56,7 @@ export function MeasurementOverlay({
   imageHeight = 1080,
 }: MeasurementOverlayProps) {
   const [showMeasurements, setShowMeasurements] = useState(true);
-  const [showReference, setShowReference] = useState(true);
+  const [showReference] = useState(true);
   const [selectedMeasurement, setSelectedMeasurement] = useState<string | null>(
     null,
   );

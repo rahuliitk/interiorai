@@ -13,8 +13,6 @@ import {
   Zap,
   CalendarDays,
   CreditCard,
-  Users,
-  MessageSquare,
   Box,
   BarChart3,
   Map,

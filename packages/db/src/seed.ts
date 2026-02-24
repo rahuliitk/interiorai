@@ -188,6 +188,7 @@ async function seed() {
       address: 'Brigade Metropolis, Whitefield, Bengaluru 560066',
       unitSystem: 'metric',
     }).returning();
+    if (!demoProject) throw new Error('Failed to insert demo project');
     console.log(`    OK Demo project: ${demoProject.name}`);
 
     // Create 3 rooms

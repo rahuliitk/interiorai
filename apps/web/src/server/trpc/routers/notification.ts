@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { eq, and, desc } from 'drizzle-orm';
-import { notifications, comments, approvals, projects } from '@openlintel/db';
+import { notifications, comments, approvals, projects, eq, and } from '@openlintel/db';
 import { router, protectedProcedure } from '../init';
 
 export const notificationRouter = router({

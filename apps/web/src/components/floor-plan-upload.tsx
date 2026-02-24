@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import { trpc } from '@/lib/trpc/client';
 import {
   Button,
   Progress,
@@ -15,18 +14,6 @@ import {
 } from '@openlintel/ui';
 import { Upload, X, FileImage, FileText, CheckCircle2 } from 'lucide-react';
 import { JobProgress } from './job-progress';
-
-const ACCEPTED_TYPES = [
-  'image/png',
-  'image/jpeg',
-  'image/webp',
-  'application/pdf',
-  'application/dxf',
-  'application/dwg',
-  'image/vnd.dxf',
-  'application/acad',
-  'application/x-acad',
-];
 
 const ACCEPTED_EXTENSIONS = '.png,.jpg,.jpeg,.webp,.pdf,.dxf,.dwg';
 

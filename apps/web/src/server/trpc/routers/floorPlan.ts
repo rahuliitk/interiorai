@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { eq, and } from 'drizzle-orm';
-import { projects, jobs, uploads } from '@openlintel/db';
+import { projects, jobs, uploads, eq, and } from '@openlintel/db';
 import { router, protectedProcedure } from '../init';
 
 const VISION_SERVICE_URL = process.env.VISION_SERVICE_URL || 'http://localhost:8011';

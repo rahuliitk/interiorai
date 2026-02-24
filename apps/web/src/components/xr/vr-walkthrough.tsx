@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Button, Card, CardHeader, CardTitle, CardContent, Badge } from '@openlintel/ui';
+import { Button, Card, CardContent, Badge } from '@openlintel/ui';
 import { cn } from '@openlintel/ui';
 import {
   Navigation,

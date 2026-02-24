@@ -1,8 +1,8 @@
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import * as Y from 'yjs';
 import * as syncProtocol from 'y-protocols/sync';
-import * as encoding from 'y-protocols/dist/encoding.cjs';
-import * as decoding from 'y-protocols/dist/decoding.cjs';
+import * as encoding from 'lib0/encoding';
+import * as decoding from 'lib0/decoding';
 import { pool } from '../index';
 
 // In-memory Y.js documents keyed by document ID

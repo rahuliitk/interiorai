@@ -78,7 +78,7 @@ export default function DesignsPage({ params }: { params: Promise<{ id: string }
   };
 
   const filteredVariants =
-    roomFilter === 'all' ? variants : variants.filter((v) => v.roomId === roomFilter);
+    roomFilter === 'all' ? variants : variants.filter((v: any) => v.roomId === roomFilter);
 
   if (loadingProject || loadingVariants) {
     return (
@@ -93,7 +93,7 @@ export default function DesignsPage({ params }: { params: Promise<{ id: string }
     );
   }
 
-  const rooms = project?.rooms ?? [];
+  const rooms = (project as any)?.rooms ?? [];
 
   return (
     <div>
@@ -113,7 +113,7 @@ export default function DesignsPage({ params }: { params: Promise<{ id: string }
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Rooms</SelectItem>
-                {rooms.map((room) => (
+                {rooms.map((room: any) => (
                   <SelectItem key={room.id} value={room.id}>
                     {room.name}
                   </SelectItem>
@@ -141,7 +141,7 @@ export default function DesignsPage({ params }: { params: Promise<{ id: string }
                       <SelectValue placeholder="Select a room" />
                     </SelectTrigger>
                     <SelectContent>
-                      {rooms.map((room) => (
+                      {rooms.map((room: any) => (
                         <SelectItem key={room.id} value={room.id}>
                           {room.name}
                         </SelectItem>
@@ -223,7 +223,7 @@ export default function DesignsPage({ params }: { params: Promise<{ id: string }
         </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredVariants.map((variant) => (
+          {filteredVariants.map((variant: any) => (
             <Card key={variant.id} className="overflow-hidden">
               <Link href={`/project/${projectId}/designs/${variant.id}`}>
                 <div className="flex aspect-video items-center justify-center bg-muted">

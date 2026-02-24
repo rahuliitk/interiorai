@@ -9,7 +9,7 @@ import {
   CardContent,
   Badge,
 } from '@openlintel/ui';
-import { Star, MapPin, Briefcase } from 'lucide-react';
+import { Star, MapPin, Briefcase, BadgeCheck } from 'lucide-react';
 
 interface ContractorCardProps {
   id: string;
@@ -20,6 +20,7 @@ interface ContractorCardProps {
   rating?: number | null;
   totalReviews?: number | null;
   profileImageUrl?: string | null;
+  verified?: boolean | null;
 }
 
 function renderStars(rating: number) {
@@ -54,6 +55,7 @@ export function ContractorCard({
   rating,
   totalReviews,
   profileImageUrl,
+  verified,
 }: ContractorCardProps) {
   return (
     <Link href={`/marketplace/${id}`}>
@@ -72,7 +74,12 @@ export function ContractorCard({
               )}
             </div>
             <div>
-              <CardTitle className="text-base">{name}</CardTitle>
+              <div className="flex items-center gap-1.5">
+                <CardTitle className="text-base">{name}</CardTitle>
+                {verified && (
+                  <BadgeCheck className="h-4 w-4 text-blue-500" />
+                )}
+              </div>
               {company && (
                 <CardDescription>{company}</CardDescription>
               )}

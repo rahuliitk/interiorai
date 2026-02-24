@@ -1,8 +1,6 @@
 import { initTRPC, TRPCError } from '@trpc/server';
 import { auth } from '@/lib/auth';
-import { db } from '@openlintel/db';
-import { users } from '@openlintel/db';
-import { eq } from 'drizzle-orm';
+import { db, users, eq } from '@openlintel/db';
 import superjson from 'superjson';
 
 export const createTRPCContext = async () => {

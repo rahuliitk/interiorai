@@ -59,7 +59,7 @@ export default function CutListPage({ params }: { params: Promise<{ id: string }
 
   const generateCutlist = trpc.cutlist.generate.useMutation({
     onSuccess: (job) => {
-      setActiveJobId(job.id);
+      setActiveJobId(job!.id);
       setGenerateOpen(false);
       toast({ title: 'Cut list generation started' });
     },
@@ -211,7 +211,7 @@ export default function CutListPage({ params }: { params: Promise<{ id: string }
                       <SelectValue placeholder="Select design variant" />
                     </SelectTrigger>
                     <SelectContent>
-                      {variants.map((variant) => (
+                      {variants.map((variant: any) => (
                         <SelectItem key={variant.id} value={variant.id}>
                           {variant.name} ({variant.roomName})
                         </SelectItem>
@@ -358,7 +358,7 @@ export default function CutListPage({ params }: { params: Promise<{ id: string }
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {variants.map((variant) => (
+                  {variants.map((variant: any) => (
                     <div
                       key={variant.id}
                       className="flex items-center justify-between rounded-lg border p-3"

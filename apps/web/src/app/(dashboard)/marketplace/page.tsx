@@ -42,7 +42,7 @@ export default function MarketplacePage() {
   // Filter by multiple specializations client-side (API supports one)
   const filteredContractors = useMemo(() => {
     if (specializations.length <= 1) return contractors;
-    return contractors.filter((c) => {
+    return contractors.filter((c: any) => {
       const specs = (c.specializations as string[] | null) || [];
       return specializations.some((s) => specs.includes(s));
     });
@@ -104,17 +104,18 @@ export default function MarketplacePage() {
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {filteredContractors.map((contractor) => (
+                {filteredContractors.map((contractor: any) => (
                   <ContractorCard
                     key={contractor.id}
                     id={contractor.id}
                     name={contractor.name}
-                    company={contractor.company}
+                    company={contractor.companyName}
                     city={contractor.city}
                     specializations={contractor.specializations as string[] | null}
                     rating={contractor.rating ? Number(contractor.rating) : null}
                     totalReviews={contractor.totalReviews}
                     profileImageUrl={contractor.profileImageUrl}
+                    verified={contractor.verified}
                   />
                 ))}
               </div>

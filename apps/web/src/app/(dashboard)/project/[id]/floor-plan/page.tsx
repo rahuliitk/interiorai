@@ -1,15 +1,11 @@
 'use client';
 
-import { use, useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { use, useState, useEffect } from 'react';
 import { trpc } from '@/lib/trpc/client';
 import { FloorPlanUpload } from '@/components/floor-plan-upload';
 import {
   Button,
   Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
   CardContent,
   Badge,
   Skeleton,
@@ -24,7 +20,6 @@ import {
   Map,
   Upload,
   Layers,
-  Plus,
   CheckCircle2,
   AlertCircle,
   ZoomIn,
@@ -220,7 +215,6 @@ export default function FloorPlanPage({
   params: Promise<{ id: string }>;
 }) {
   const { id: projectId } = use(params);
-  const router = useRouter();
   const utils = trpc.useUtils();
 
   const [creatingRooms, setCreatingRooms] = useState(false);
@@ -230,11 +224,11 @@ export default function FloorPlanPage({
     trpc.project.byId.useQuery({ id: projectId });
 
   // Fetch floor plan uploads
-  const { data: uploads = [], isLoading: loadingUploads } =
+  const { data: uploads = [] } =
     trpc.upload.listByProject.useQuery({ projectId });
 
   const floorPlanUploads = uploads.filter(
-    (u) => u.category === 'floor_plan',
+    (u: any) => u.category === 'floor_plan',
   );
 
   // Create room mutation
@@ -398,7 +392,7 @@ export default function FloorPlanPage({
                   Uploaded Floor Plans
                 </h3>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {floorPlanUploads.map((upload) => (
+                  {floorPlanUploads.map((upload: any) => (
                     <Card key={upload.id} className="overflow-hidden">
                       {upload.mimeType.startsWith('image/') ? (
                         <div className="aspect-video bg-muted">
@@ -468,9 +462,9 @@ export default function FloorPlanPage({
 
               {/* Show uploaded floor plan as a simple image viewer */}
               {floorPlanUploads
-                .filter((u) => u.mimeType.startsWith('image/'))
+                .filter((u: any) => u.mimeType.startsWith('image/'))
                 .slice(0, 1)
-                .map((upload) => (
+                .map((upload: any) => (
                   <Card key={upload.id}>
                     <CardContent className="p-4">
                       <div className="overflow-auto rounded-lg border bg-white">
@@ -576,15 +570,15 @@ export default function FloorPlanPage({
           )}
 
           {/* Existing project rooms for reference */}
-          {project.rooms.length > 0 && (
+          {((project as any).rooms ?? []).length > 0 && (
             <>
               <Separator />
               <div>
                 <h3 className="mb-3 text-sm font-medium">
-                  Existing Project Rooms ({project.rooms.length})
+                  Existing Project Rooms ({((project as any).rooms ?? []).length})
                 </h3>
                 <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                  {project.rooms.map((room) => (
+                  {((project as any).rooms ?? []).map((room: any) => (
                     <div
                       key={room.id}
                       className="flex items-center gap-2 rounded-lg border p-3"

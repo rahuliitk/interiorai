@@ -32,7 +32,6 @@ import {
   MessageSquare,
   Send,
   ImageIcon,
-  Clock,
 } from 'lucide-react';
 
 export default function DesignDetailPage({
@@ -51,7 +50,7 @@ export default function DesignDetailPage({
   const { data: variants = [], isLoading: loadingVariants } =
     trpc.designVariant.listByProject.useQuery({ projectId });
 
-  const variant = variants.find((v) => v.id === designId);
+  const variant = variants.find((v: any) => v.id === designId);
 
   // Fetch room photos for before image
   const { data: roomUploads = [] } = trpc.upload.listByRoom.useQuery(
@@ -75,7 +74,7 @@ export default function DesignDetailPage({
   // Generate BOM mutation
   const generateBOM = trpc.bom.generate.useMutation({
     onSuccess: (job) => {
-      setBomJobId(job.id);
+      setBomJobId(job!.id);
       toast({ title: 'BOM generation started' });
     },
     onError: (err) => {
@@ -86,7 +85,7 @@ export default function DesignDetailPage({
   // Generate Drawings mutation
   const generateDrawings = trpc.drawing.generate.useMutation({
     onSuccess: (job) => {
-      setDrawingJobId(job.id);
+      setDrawingJobId(job!.id);
       toast({ title: 'Drawing generation started' });
     },
     onError: (err) => {
@@ -137,7 +136,7 @@ export default function DesignDetailPage({
     );
   }
 
-  const beforeImage = roomUploads.find((u) => u.mimeType.startsWith('image/'));
+  const beforeImage = roomUploads.find((u: any) => u.mimeType.startsWith('image/'));
   const beforeImageUrl = beforeImage
     ? `/api/uploads/${encodeURIComponent(beforeImage.storageKey)}`
     : null;
@@ -258,7 +257,7 @@ export default function DesignDetailPage({
 
           {bomResults.length > 0 ? (
             <div className="space-y-3">
-              {bomResults.map((bom) => (
+              {bomResults.map((bom: any) => (
                 <Card key={bom.id}>
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
@@ -374,7 +373,7 @@ export default function DesignDetailPage({
 
           {drawingResults.length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2">
-              {drawingResults.map((drawing) => (
+              {drawingResults.map((drawing: any) => (
                 <Card key={drawing.id}>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-sm">

@@ -30,6 +30,8 @@ import {
   ArrowLeft,
   ImageIcon,
   MessageSquare,
+  BadgeCheck,
+  Shield,
 } from 'lucide-react';
 import Link from 'next/link';
 import { HireDialog } from '@/components/hire-dialog';
@@ -115,7 +117,8 @@ export default function ContractorDetailPage({
   }
 
   const specializations = (contractor.specializations as string[] | null) || [];
-  const portfolioImages = (contractor.portfolioUrls as string[] | null) || [];
+  const portfolioImages = (contractor.portfolioUrls as string[] | null) || (contractor.portfolioKeys as string[] | null) || [];
+  const certifications = (contractor.certifications as string[] | null) || [];
   const rating = contractor.rating ? Number(contractor.rating) : null;
 
   return (
@@ -144,9 +147,17 @@ export default function ContractorDetailPage({
             )}
           </div>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">{contractor.name}</h1>
-            {contractor.company && (
-              <p className="text-sm text-muted-foreground">{contractor.company}</p>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold tracking-tight">{contractor.name}</h1>
+              {contractor.verified && (
+                <Badge className="bg-blue-100 text-blue-800 gap-1">
+                  <BadgeCheck className="h-3 w-3" />
+                  Verified
+                </Badge>
+              )}
+            </div>
+            {contractor.companyName && (
+              <p className="text-sm text-muted-foreground">{contractor.companyName}</p>
             )}
             {rating != null && (
               <div className="mt-1 flex items-center gap-2">
@@ -411,9 +422,15 @@ export default function ContractorDetailPage({
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Assignments</span>
                 <span className="font-medium">
-                  {(contractor.assignments as unknown[])?.length || 0}
+                  {((contractor as any).assignments as unknown[])?.length || 0}
                 </span>
               </div>
+              {contractor.yearsExperience != null && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Experience</span>
+                  <span className="font-medium">{contractor.yearsExperience} years</span>
+                </div>
+              )}
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Member Since</span>
                 <span className="font-medium">
@@ -425,6 +442,25 @@ export default function ContractorDetailPage({
               </div>
             </CardContent>
           </Card>
+
+          {/* Certifications */}
+          {certifications.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Certifications</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {certifications.map((cert, idx) => (
+                    <div key={idx} className="flex items-center gap-2 text-sm">
+                      <Shield className="h-4 w-4 text-green-600" />
+                      <span>{cert}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

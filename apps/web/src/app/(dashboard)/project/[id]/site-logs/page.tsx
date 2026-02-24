@@ -59,12 +59,12 @@ export default function SiteLogsPage({ params }: { params: Promise<{ id: string 
     let logs = siteLogs;
     if (dateFrom) {
       const from = new Date(dateFrom);
-      logs = logs.filter((log) => new Date(log.date as string) >= from);
+      logs = logs.filter((log: any) => new Date(log.date as string) >= from);
     }
     if (dateTo) {
       const to = new Date(dateTo);
       to.setHours(23, 59, 59, 999);
-      logs = logs.filter((log) => new Date(log.date as string) <= to);
+      logs = logs.filter((log: any) => new Date(log.date as string) <= to);
     }
     return logs;
   }, [siteLogs, dateFrom, dateTo]);
@@ -186,7 +186,7 @@ export default function SiteLogsPage({ params }: { params: Promise<{ id: string 
         </Card>
       ) : (
         <div className="space-y-3">
-          {filteredLogs.map((log) => (
+          {filteredLogs.map((log: any) => (
             <Card key={log.id}>
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between">
@@ -246,7 +246,7 @@ export default function SiteLogsPage({ params }: { params: Promise<{ id: string 
                   <div className="flex items-center gap-1">
                     <Tag className="h-3 w-3 text-muted-foreground" />
                     <div className="flex flex-wrap gap-1">
-                      {(log.tags as string[]).map((tag) => (
+                      {(log.tags as string[]).map((tag: any) => (
                         <Badge key={tag} variant="secondary" className="text-[10px]">
                           {tag}
                         </Badge>
