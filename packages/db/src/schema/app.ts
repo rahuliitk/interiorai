@@ -1021,3 +1021,164 @@ export const exchangeRates = pgTable('exchange_rates', {
   source: text('source').default('manual'), // manual, api
   fetchedAt: timestamp('fetched_at', { mode: 'date' }).defaultNow().notNull(),
 });
+
+// ---------------------------------------------------------------------------
+// Quality Checkpoints — stage-gate quality verification
+// ---------------------------------------------------------------------------
+export const qualityCheckpoints = pgTable('quality_checkpoints', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
+  milestone: text('milestone').notNull(), // e.g. 'demolition_complete', 'rough_in_complete', 'waterproofing_complete'
+  title: text('title').notNull(),
+  description: text('description'),
+  trade: text('trade'), // electrical, plumbing, carpentry, painting, tiling, etc.
+  status: text('status').notNull().default('pending'), // pending, in_progress, passed, failed
+  inspectedBy: text('inspected_by'),
+  checklistItems: jsonb('checklist_items'), // { item: string, checked: boolean, note?: string }[]
+  photoKeys: jsonb('photo_keys'), // string[]
+  notes: text('notes'),
+  inspectedAt: timestamp('inspected_at', { mode: 'date' }),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Punch List Items — snag/defect tracking
+// ---------------------------------------------------------------------------
+export const punchListItems = pgTable('punch_list_items', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
+  roomId: text('room_id')
+    .references(() => rooms.id, { onDelete: 'set null' }),
+  title: text('title').notNull(),
+  description: text('description'),
+  severity: text('severity').notNull().default('minor'), // critical, major, minor, observation
+  category: text('category'), // structural, finish, electrical, plumbing, carpentry, painting
+  status: text('status').notNull().default('open'), // open, in_progress, resolved, verified, reopened
+  assignedTo: text('assigned_to'), // contractor name or ID
+  photoKeys: jsonb('photo_keys'), // string[]
+  locationPin: jsonb('location_pin'), // { x: number, y: number, floorPlanId?: string }
+  resolvedAt: timestamp('resolved_at', { mode: 'date' }),
+  verifiedAt: timestamp('verified_at', { mode: 'date' }),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Handover Packages — project completion & handover documentation
+// ---------------------------------------------------------------------------
+export const handoverPackages = pgTable('handover_packages', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
+  status: text('status').notNull().default('draft'), // draft, in_progress, ready, delivered
+  asBuiltDrawingKeys: jsonb('as_built_drawing_keys'), // string[]
+  materialRegister: jsonb('material_register'), // { item, brand, model, batch, purchaseDate, vendor }[]
+  contractorDirectory: jsonb('contractor_directory'), // { name, trade, phone, email }[]
+  operationalGuides: jsonb('operational_guides'), // { system, instructions }[]
+  maintenanceManualKey: text('maintenance_manual_key'), // file key for generated PDF
+  clientSignedAt: timestamp('client_signed_at', { mode: 'date' }),
+  deliveredAt: timestamp('delivered_at', { mode: 'date' }),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Collaboration Threads — threaded discussions per room/element
+// ---------------------------------------------------------------------------
+export const collaborationThreads = pgTable('collaboration_threads', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
+  roomId: text('room_id')
+    .references(() => rooms.id, { onDelete: 'set null' }),
+  title: text('title').notNull(),
+  category: text('category').notNull().default('general'), // general, design_decision, issue, change_request, approval
+  status: text('status').notNull().default('open'), // open, resolved, archived
+  createdBy: text('created_by')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Collaboration Messages — messages within threads
+// ---------------------------------------------------------------------------
+export const collaborationMessages = pgTable('collaboration_messages', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  threadId: text('thread_id')
+    .notNull()
+    .references(() => collaborationThreads.id, { onDelete: 'cascade' }),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  content: text('content').notNull(),
+  mentions: jsonb('mentions'), // string[] of user IDs
+  attachmentKeys: jsonb('attachment_keys'), // string[]
+  isDecision: boolean('is_decision').default(false),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Delivery Tracking — material delivery logistics
+// ---------------------------------------------------------------------------
+export const deliveryTracking = pgTable('delivery_tracking', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
+  purchaseOrderId: text('purchase_order_id')
+    .references(() => purchaseOrders.id, { onDelete: 'set null' }),
+  vendorName: text('vendor_name').notNull(),
+  description: text('description').notNull(),
+  status: text('status').notNull().default('pending'), // pending, dispatched, in_transit, delivered, inspected, rejected
+  trackingNumber: text('tracking_number'),
+  estimatedDeliveryDate: timestamp('estimated_delivery_date', { mode: 'date' }),
+  actualDeliveryDate: timestamp('actual_delivery_date', { mode: 'date' }),
+  inspectionChecklist: jsonb('inspection_checklist'), // { item: string, passed: boolean, note?: string }[]
+  inspectionPhotoKeys: jsonb('inspection_photo_keys'), // string[]
+  receivedBy: text('received_by'),
+  notes: text('notes'),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Style Preferences — design quiz & mood board
+// ---------------------------------------------------------------------------
+export const stylePreferences = pgTable('style_preferences', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
+  quizResponses: jsonb('quiz_responses'), // { questionId, selectedOption, imageUrl }[]
+  detectedStyles: jsonb('detected_styles'), // { style: string, score: number }[]
+  budgetTier: text('budget_tier'), // economy, mid_range, premium, luxury
+  colorPreferences: jsonb('color_preferences'), // { palette: string[], warm: boolean }
+  moodBoardItems: jsonb('mood_board_items'), // { imageUrl, caption, source, category }[]
+  inspirationUrls: jsonb('inspiration_urls'), // string[]
+  notes: text('notes'),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
+});

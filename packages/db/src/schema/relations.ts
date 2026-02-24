@@ -18,6 +18,10 @@ import {
   offcutListings, offcutInquiries, projectGalleryEntries, contractorReferrals,
   developerApps, apiAccessTokens, apiRequestLogs, webhookSubscriptions,
   exchangeRates,
+  // Missing features
+  qualityCheckpoints, punchListItems, handoverPackages,
+  collaborationThreads, collaborationMessages,
+  deliveryTracking, stylePreferences,
 } from './app';
 
 // ─── Auth Relations ──────────────────────────────────────────────────────────
@@ -83,6 +87,13 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   maintenanceSchedules: many(maintenanceSchedules),
   warranties: many(warranties),
   projectGalleryEntries: many(projectGalleryEntries),
+  // Missing features
+  qualityCheckpoints: many(qualityCheckpoints),
+  punchListItems: many(punchListItems),
+  handoverPackages: many(handoverPackages),
+  collaborationThreads: many(collaborationThreads),
+  deliveryTracking: many(deliveryTracking),
+  stylePreferences: many(stylePreferences),
 }));
 
 export const roomsRelations = relations(rooms, ({ one, many }) => ({
@@ -360,4 +371,42 @@ export const apiRequestLogsRelations = relations(apiRequestLogs, ({ one }) => ({
 
 export const webhookSubscriptionsRelations = relations(webhookSubscriptions, ({ one }) => ({
   app: one(developerApps, { fields: [webhookSubscriptions.appId], references: [developerApps.id] }),
+}));
+
+// ===========================================================================
+// MISSING FEATURES
+// ===========================================================================
+
+export const qualityCheckpointsRelations = relations(qualityCheckpoints, ({ one }) => ({
+  project: one(projects, { fields: [qualityCheckpoints.projectId], references: [projects.id] }),
+}));
+
+export const punchListItemsRelations = relations(punchListItems, ({ one }) => ({
+  project: one(projects, { fields: [punchListItems.projectId], references: [projects.id] }),
+  room: one(rooms, { fields: [punchListItems.roomId], references: [rooms.id] }),
+}));
+
+export const handoverPackagesRelations = relations(handoverPackages, ({ one }) => ({
+  project: one(projects, { fields: [handoverPackages.projectId], references: [projects.id] }),
+}));
+
+export const collaborationThreadsRelations = relations(collaborationThreads, ({ one, many }) => ({
+  project: one(projects, { fields: [collaborationThreads.projectId], references: [projects.id] }),
+  room: one(rooms, { fields: [collaborationThreads.roomId], references: [rooms.id] }),
+  createdByUser: one(users, { fields: [collaborationThreads.createdBy], references: [users.id] }),
+  messages: many(collaborationMessages),
+}));
+
+export const collaborationMessagesRelations = relations(collaborationMessages, ({ one }) => ({
+  thread: one(collaborationThreads, { fields: [collaborationMessages.threadId], references: [collaborationThreads.id] }),
+  user: one(users, { fields: [collaborationMessages.userId], references: [users.id] }),
+}));
+
+export const deliveryTrackingRelations = relations(deliveryTracking, ({ one }) => ({
+  project: one(projects, { fields: [deliveryTracking.projectId], references: [projects.id] }),
+  purchaseOrder: one(purchaseOrders, { fields: [deliveryTracking.purchaseOrderId], references: [purchaseOrders.id] }),
+}));
+
+export const stylePreferencesRelations = relations(stylePreferences, ({ one }) => ({
+  project: one(projects, { fields: [stylePreferences.projectId], references: [projects.id] }),
 }));
