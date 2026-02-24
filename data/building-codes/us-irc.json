@@ -1,0 +1,262 @@
+[
+  {
+    "code_id": "IRC-RD-001",
+    "jurisdiction": { "country": "US" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum habitable room area",
+      "requirement": "Every habitable room shall have a floor area of not less than 6.503 sq.m (70 sq.ft)",
+      "min_value": 6.503,
+      "unit": "sqm",
+      "applies_to": ["living_room", "bedroom", "dining", "study"]
+    },
+    "source": { "document": "IRC 2021", "edition": "2021", "clause": "Section R304.1" }
+  },
+  {
+    "code_id": "IRC-RD-002",
+    "jurisdiction": { "country": "US" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum habitable room width",
+      "requirement": "Habitable rooms shall have a minimum horizontal dimension of not less than 2134 mm (7 ft)",
+      "min_value": 2134,
+      "unit": "mm",
+      "applies_to": ["living_room", "bedroom", "dining", "study"]
+    },
+    "source": { "document": "IRC 2021", "edition": "2021", "clause": "Section R304.2" }
+  },
+  {
+    "code_id": "IRC-RD-003",
+    "jurisdiction": { "country": "US" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum ceiling height for habitable rooms",
+      "requirement": "Habitable rooms shall have a ceiling height of not less than 2134 mm (7 ft)",
+      "min_value": 2134,
+      "unit": "mm",
+      "applies_to": ["living_room", "bedroom", "dining", "study", "kitchen"]
+    },
+    "source": { "document": "IRC 2021", "edition": "2021", "clause": "Section R305.1" }
+  },
+  {
+    "code_id": "IRC-RD-004",
+    "jurisdiction": { "country": "US" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum bathroom ceiling height",
+      "requirement": "Bathrooms shall have a minimum ceiling height of 1981 mm (6 ft 6 in)",
+      "min_value": 1981,
+      "unit": "mm",
+      "applies_to": ["bathroom"]
+    },
+    "source": { "document": "IRC 2021", "edition": "2021", "clause": "Section R305.1.1" }
+  },
+  {
+    "code_id": "IRC-RD-005",
+    "jurisdiction": { "country": "US" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum kitchen area",
+      "requirement": "Kitchen shall have a minimum floor area of 4.645 sq.m (50 sq.ft)",
+      "min_value": 4.645,
+      "unit": "sqm",
+      "applies_to": ["kitchen"]
+    },
+    "source": { "document": "IRC 2021", "edition": "2021", "clause": "Section R304.1" }
+  },
+  {
+    "code_id": "IRC-RD-006",
+    "jurisdiction": { "country": "US" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum corridor width",
+      "requirement": "Hallways shall have a minimum width of 914 mm (3 ft)",
+      "min_value": 914,
+      "unit": "mm",
+      "applies_to": ["corridor"]
+    },
+    "source": { "document": "IRC 2021", "edition": "2021", "clause": "Section R311.6" }
+  },
+  {
+    "code_id": "IRC-VT-001",
+    "jurisdiction": { "country": "US" },
+    "category": "ventilation",
+    "rule": {
+      "description": "Minimum natural ventilation area",
+      "requirement": "Habitable rooms shall have openable area of not less than 4% of the floor area",
+      "min_value": 0.04,
+      "unit": "ratio_of_floor_area",
+      "applies_to": ["living_room", "bedroom", "dining", "study", "kitchen"]
+    },
+    "source": { "document": "IRC 2021", "edition": "2021", "clause": "Section R303.1" }
+  },
+  {
+    "code_id": "IRC-VT-002",
+    "jurisdiction": { "country": "US" },
+    "category": "ventilation",
+    "rule": {
+      "description": "Bathroom exhaust ventilation",
+      "requirement": "Bathrooms shall have mechanical ventilation of not less than 50 cfm (intermittent) or 20 cfm (continuous)",
+      "min_value": 20,
+      "unit": "ach",
+      "applies_to": ["bathroom"]
+    },
+    "source": { "document": "IRC 2021", "edition": "2021", "clause": "Section M1507.4" }
+  },
+  {
+    "code_id": "IRC-FS-001",
+    "jurisdiction": { "country": "US" },
+    "category": "fire_safety",
+    "rule": {
+      "description": "Smoke alarm requirement",
+      "requirement": "Smoke alarms shall be installed in each sleeping room, outside each sleeping area, and on every level",
+      "min_value": 1,
+      "unit": "per_room",
+      "applies_to": ["living_room", "bedroom", "corridor"]
+    },
+    "source": { "document": "IRC 2021", "edition": "2021", "clause": "Section R314.3" }
+  },
+  {
+    "code_id": "IRC-FS-002",
+    "jurisdiction": { "country": "US" },
+    "category": "fire_safety",
+    "rule": {
+      "description": "Carbon monoxide alarm requirement",
+      "requirement": "CO alarms required outside each sleeping area in dwellings with fuel-burning appliances or attached garages",
+      "min_value": 1,
+      "unit": "per_room",
+      "applies_to": ["bedroom", "corridor"]
+    },
+    "source": { "document": "IRC 2021", "edition": "2021", "clause": "Section R315.1" }
+  },
+  {
+    "code_id": "IRC-EL-001",
+    "jurisdiction": { "country": "US" },
+    "category": "electrical",
+    "rule": {
+      "description": "Minimum receptacle outlets per room",
+      "requirement": "Habitable rooms shall have receptacle outlets so that no point along wall is more than 1829 mm (6 ft) from an outlet",
+      "min_value": 2,
+      "unit": "outlets",
+      "applies_to": ["living_room", "bedroom", "dining", "study"]
+    },
+    "source": { "document": "NEC 2020", "edition": "2020", "clause": "Section 210.52(A)" }
+  },
+  {
+    "code_id": "IRC-EL-002",
+    "jurisdiction": { "country": "US" },
+    "category": "electrical",
+    "rule": {
+      "description": "Kitchen dedicated circuits",
+      "requirement": "Kitchen shall have a minimum of two 20-ampere small appliance branch circuits",
+      "min_value": 20,
+      "unit": "amps",
+      "applies_to": ["kitchen"]
+    },
+    "source": { "document": "NEC 2020", "edition": "2020", "clause": "Section 210.11(C)(1)" }
+  },
+  {
+    "code_id": "IRC-EL-003",
+    "jurisdiction": { "country": "US" },
+    "category": "electrical",
+    "rule": {
+      "description": "Bathroom GFCI protection",
+      "requirement": "All 125V receptacles in bathrooms shall have GFCI protection",
+      "min_value": 1,
+      "unit": "outlets",
+      "applies_to": ["bathroom"]
+    },
+    "source": { "document": "NEC 2020", "edition": "2020", "clause": "Section 210.8(A)(1)" }
+  },
+  {
+    "code_id": "IRC-PL-001",
+    "jurisdiction": { "country": "US" },
+    "category": "plumbing",
+    "rule": {
+      "description": "Minimum water supply per person",
+      "requirement": "Minimum 189 litres (50 gallons) per capita per day for residential buildings",
+      "min_value": 189,
+      "unit": "lpcd",
+      "applies_to": ["bathroom", "kitchen"]
+    },
+    "source": { "document": "IPC 2021", "edition": "2021", "clause": "Section 604.1" }
+  },
+  {
+    "code_id": "IRC-PL-002",
+    "jurisdiction": { "country": "US" },
+    "category": "plumbing",
+    "rule": {
+      "description": "Bathroom floor slope for drainage",
+      "requirement": "Shower floors shall slope uniformly at minimum 1/4 inch per foot (1:48)",
+      "min_value": 0.021,
+      "unit": "slope_ratio",
+      "applies_to": ["bathroom"]
+    },
+    "source": { "document": "IPC 2021", "edition": "2021", "clause": "Section 417.5.2" }
+  },
+  {
+    "code_id": "IRC-AC-001",
+    "jurisdiction": { "country": "US" },
+    "category": "accessibility",
+    "rule": {
+      "description": "Minimum door width for accessibility",
+      "requirement": "Accessible doors shall have minimum clear opening of 813 mm (32 in)",
+      "min_value": 813,
+      "unit": "mm",
+      "applies_to": ["living_room", "bedroom", "bathroom", "kitchen", "dining", "corridor"]
+    },
+    "source": { "document": "ADA Standards", "edition": "2010", "clause": "Section 404.2.3" }
+  },
+  {
+    "code_id": "IRC-AC-002",
+    "jurisdiction": { "country": "US" },
+    "category": "accessibility",
+    "rule": {
+      "description": "Accessible bathroom turning radius",
+      "requirement": "Accessible bathrooms shall have a 1524 mm (60 in) diameter turning space",
+      "min_value": 1524,
+      "unit": "mm",
+      "applies_to": ["bathroom"]
+    },
+    "source": { "document": "ADA Standards", "edition": "2010", "clause": "Section 603.2.1" }
+  },
+  {
+    "code_id": "IRC-FS-003",
+    "jurisdiction": { "country": "US" },
+    "category": "fire_safety",
+    "rule": {
+      "description": "Emergency egress window size",
+      "requirement": "Sleeping rooms shall have emergency escape openings of minimum 0.515 sq.m (5.7 sq.ft) net clear",
+      "min_value": 0.515,
+      "unit": "sqm",
+      "applies_to": ["bedroom"]
+    },
+    "source": { "document": "IRC 2021", "edition": "2021", "clause": "Section R310.1" }
+  },
+  {
+    "code_id": "IRC-RD-007",
+    "jurisdiction": { "country": "US" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum bathroom area",
+      "requirement": "Bathroom shall have a minimum floor area of approximately 2.323 sq.m (25 sq.ft)",
+      "min_value": 2.323,
+      "unit": "sqm",
+      "applies_to": ["bathroom"]
+    },
+    "source": { "document": "IRC 2021", "edition": "2021", "clause": "Section R306" }
+  },
+  {
+    "code_id": "IRC-VT-003",
+    "jurisdiction": { "country": "US" },
+    "category": "ventilation",
+    "rule": {
+      "description": "Kitchen ventilation requirement",
+      "requirement": "Kitchen range hoods shall exhaust to the outdoors at minimum 100 cfm",
+      "min_value": 6,
+      "unit": "ach",
+      "applies_to": ["kitchen"]
+    },
+    "source": { "document": "IRC 2021", "edition": "2021", "clause": "Section M1503.1" }
+  }
+]

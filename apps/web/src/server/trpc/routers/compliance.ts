@@ -38,18 +38,36 @@ interface ComplianceResult {
   clause: string;
 }
 
-// Load rules at module init
-let RULES: BuildingCodeRule[] = [];
-try {
-  const rulesPath = join(process.cwd(), '..', '..', 'data', 'building-codes', 'india-nbc.json');
-  RULES = JSON.parse(readFileSync(rulesPath, 'utf-8'));
-} catch {
-  // Try alternate path (monorepo root)
+// All jurisdiction files to load
+const JURISDICTION_FILES = [
+  'india-nbc.json',
+  'us-irc.json',
+  'eu-eurocode.json',
+  'uk-building-regs.json',
+];
+
+const JURISDICTIONS = [
+  { code: 'IN', name: 'India (NBC 2016)' },
+  { code: 'US', name: 'United States (IRC 2021)' },
+  { code: 'EU', name: 'European Union (Eurocode)' },
+  { code: 'GB', name: 'United Kingdom (Building Regs)' },
+];
+
+// Load rules from all jurisdiction files at module init
+let ALL_RULES: BuildingCodeRule[] = [];
+for (const file of JURISDICTION_FILES) {
   try {
-    const rulesPath = join(process.cwd(), 'data', 'building-codes', 'india-nbc.json');
-    RULES = JSON.parse(readFileSync(rulesPath, 'utf-8'));
+    const rulesPath = join(process.cwd(), '..', '..', 'data', 'building-codes', file);
+    const rules: BuildingCodeRule[] = JSON.parse(readFileSync(rulesPath, 'utf-8'));
+    ALL_RULES = ALL_RULES.concat(rules);
   } catch {
-    console.warn('Building codes data not found, compliance checks will return empty results');
+    try {
+      const rulesPath = join(process.cwd(), 'data', 'building-codes', file);
+      const rules: BuildingCodeRule[] = JSON.parse(readFileSync(rulesPath, 'utf-8'));
+      ALL_RULES = ALL_RULES.concat(rules);
+    } catch {
+      console.warn(`Building codes file ${file} not found, skipping`);
+    }
   }
 }
 
@@ -166,7 +184,7 @@ export const complianceRouter = router({
       if (!room) throw new Error('Room not found');
       if (room.project.userId !== ctx.userId) throw new Error('Access denied');
 
-      const applicableRules = RULES.filter(
+      const applicableRules = ALL_RULES.filter(
         (r) => r.jurisdiction.country === input.jurisdiction,
       );
 
@@ -216,7 +234,7 @@ export const complianceRouter = router({
       });
       if (!project) throw new Error('Project not found');
 
-      const applicableRules = RULES.filter(
+      const applicableRules = ALL_RULES.filter(
         (r) => r.jurisdiction.country === input.jurisdiction,
       );
 
@@ -275,12 +293,18 @@ export const complianceRouter = router({
       category: z.string().optional(),
     }))
     .query(async ({ input }) => {
-      let filtered = RULES.filter(
+      let filtered = ALL_RULES.filter(
         (r) => r.jurisdiction.country === input.jurisdiction,
       );
       if (input.category) {
         filtered = filtered.filter((r) => r.category === input.category);
       }
       return filtered;
+    }),
+
+  // List available jurisdictions
+  listJurisdictions: protectedProcedure
+    .query(async () => {
+      return JURISDICTIONS;
     }),
 });

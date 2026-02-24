@@ -37,6 +37,8 @@ import {
   DollarSign,
   Users,
   Sparkles,
+  FileEdit,
+  Camera,
 } from 'lucide-react';
 import { cn } from '@openlintel/ui';
 
@@ -61,9 +63,11 @@ const projectNavigation = [
   { name: 'MEP', href: 'mep', icon: Zap },
   { name: 'Timeline', href: 'timeline', icon: CalendarDays },
   { name: 'Site Logs', href: 'site-logs', icon: ClipboardList },
+  { name: 'Change Orders', href: 'change-orders', icon: FileEdit },
   { name: 'Payments', href: 'payments', icon: CreditCard },
   { name: 'Procurement', href: 'procurement', icon: Truck },
   { name: 'Compliance', href: 'compliance', icon: ShieldCheck },
+  { name: 'Reconstruction', href: 'reconstruction', icon: Camera },
   { name: 'AR/VR', href: 'ar', icon: Glasses },
   { name: 'Analytics', href: 'analytics', icon: BarChart3 },
   { name: 'Predictions', href: 'predictions', icon: TrendingUp },

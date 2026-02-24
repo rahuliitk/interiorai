@@ -293,6 +293,7 @@ export default function DrawingsPage({ params }: { params: Promise<{ id: string 
             const svgUrl = getDownloadUrl(drawing.svgStorageKey);
             const dxfUrl = getDownloadUrl(drawing.dxfStorageKey);
             const pdfUrl = getDownloadUrl(drawing.pdfStorageKey);
+            const ifcUrl = getDownloadUrl(drawing.ifcStorageKey);
 
             return (
               <Card key={drawing.id} className="overflow-hidden">
@@ -373,7 +374,20 @@ export default function DrawingsPage({ params }: { params: Promise<{ id: string 
                         </a>
                       </Button>
                     )}
-                    {!dxfUrl && !pdfUrl && !svgUrl && (
+                    {ifcUrl && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-7 text-xs"
+                        asChild
+                      >
+                        <a href={ifcUrl} download>
+                          <Download className="mr-1 h-3 w-3" />
+                          IFC
+                        </a>
+                      </Button>
+                    )}
+                    {!dxfUrl && !pdfUrl && !svgUrl && !ifcUrl && (
                       <span className="text-xs text-muted-foreground">
                         No downloads available
                       </span>

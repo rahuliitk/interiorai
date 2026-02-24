@@ -287,6 +287,37 @@ services:
       redis:
         condition: service_healthy
 
+  vision-engine:
+    build:
+      context: .
+      dockerfile: services/vision-engine/Dockerfile
+    container_name: openlintel-vision-engine
+    restart: unless-stopped
+    ports:
+      - '8010:8010'
+    environment:
+      DATABASE_URL: postgresql+asyncpg://openlintel:openlintel_dev@postgres:5432/openlintel
+      REDIS_URL: redis://redis:6379
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: openlintel
+      JWT_SECRET: ${NEXTAUTH_SECRET:-dev-secret}
+      API_KEY_ENCRYPTION_SECRET: ${API_KEY_ENCRYPTION_SECRET:-dev-encryption-secret-32chars!!}
+      LOG_LEVEL: info
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    healthcheck:
+      test: ['CMD', 'python', '-c', 'import httpx; httpx.get("http://localhost:8010/health")']
+      interval: 15s
+      timeout: 10s
+      retries: 3
+
 volumes:
   postgres_data:
   redis_data:

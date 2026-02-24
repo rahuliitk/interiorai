@@ -1,0 +1,197 @@
+[
+  {
+    "code_id": "EU-RD-001",
+    "jurisdiction": { "country": "EU" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum habitable room area",
+      "requirement": "Habitable rooms shall have a minimum floor area of 9.0 sq.m",
+      "min_value": 9.0,
+      "unit": "sqm",
+      "applies_to": ["living_room", "bedroom", "dining", "study"]
+    },
+    "source": { "document": "EN 15251:2007", "edition": "2007", "clause": "Annex B, Table B.1" }
+  },
+  {
+    "code_id": "EU-RD-002",
+    "jurisdiction": { "country": "EU" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum kitchen area",
+      "requirement": "Kitchen shall have a minimum floor area of 5.0 sq.m",
+      "min_value": 5.0,
+      "unit": "sqm",
+      "applies_to": ["kitchen"]
+    },
+    "source": { "document": "EN 15251:2007", "edition": "2007", "clause": "Annex B, Table B.2" }
+  },
+  {
+    "code_id": "EU-RD-003",
+    "jurisdiction": { "country": "EU" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum bathroom area",
+      "requirement": "Bathroom shall have a minimum floor area of 2.5 sq.m",
+      "min_value": 2.5,
+      "unit": "sqm",
+      "applies_to": ["bathroom"]
+    },
+    "source": { "document": "EN 15251:2007", "edition": "2007", "clause": "Annex B, Table B.3" }
+  },
+  {
+    "code_id": "EU-RD-004",
+    "jurisdiction": { "country": "EU" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum habitable room width",
+      "requirement": "Habitable rooms shall have a minimum width of 2.4 m",
+      "min_value": 2400,
+      "unit": "mm",
+      "applies_to": ["living_room", "bedroom", "dining", "study"]
+    },
+    "source": { "document": "EN 15251:2007", "edition": "2007", "clause": "Annex B, Section B.2" }
+  },
+  {
+    "code_id": "EU-RD-005",
+    "jurisdiction": { "country": "EU" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum ceiling height for habitable rooms",
+      "requirement": "Habitable rooms shall have a minimum ceiling height of 2500 mm (2.5 m)",
+      "min_value": 2500,
+      "unit": "mm",
+      "applies_to": ["living_room", "bedroom", "dining", "study", "kitchen"]
+    },
+    "source": { "document": "EN 15251:2007", "edition": "2007", "clause": "Section 6.3" }
+  },
+  {
+    "code_id": "EU-RD-006",
+    "jurisdiction": { "country": "EU" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum corridor width",
+      "requirement": "Corridors shall have a minimum clear width of 1.2 m",
+      "min_value": 1200,
+      "unit": "mm",
+      "applies_to": ["corridor"]
+    },
+    "source": { "document": "EN 1991-1-1", "edition": "2002", "clause": "Table 6.2" }
+  },
+  {
+    "code_id": "EU-VT-001",
+    "jurisdiction": { "country": "EU" },
+    "category": "ventilation",
+    "rule": {
+      "description": "Minimum ventilation rate for habitable rooms",
+      "requirement": "Habitable rooms shall have a minimum ventilation rate of 0.5 air changes per hour",
+      "min_value": 0.5,
+      "unit": "ach",
+      "applies_to": ["living_room", "bedroom", "dining", "study"]
+    },
+    "source": { "document": "EN 15251:2007", "edition": "2007", "clause": "Section 6.2, Table 3" }
+  },
+  {
+    "code_id": "EU-VT-002",
+    "jurisdiction": { "country": "EU" },
+    "category": "ventilation",
+    "rule": {
+      "description": "Bathroom mechanical ventilation",
+      "requirement": "Bathrooms shall have mechanical extract ventilation of not less than 15 l/s (54 m3/h)",
+      "min_value": 15,
+      "unit": "ach",
+      "applies_to": ["bathroom"]
+    },
+    "source": { "document": "EN 15251:2007", "edition": "2007", "clause": "Table 5" }
+  },
+  {
+    "code_id": "EU-FS-001",
+    "jurisdiction": { "country": "EU" },
+    "category": "fire_safety",
+    "rule": {
+      "description": "Smoke detector requirement",
+      "requirement": "Smoke detectors shall be installed in all escape routes and habitable rooms as per EN 14604",
+      "min_value": 1,
+      "unit": "per_room",
+      "applies_to": ["living_room", "bedroom", "kitchen", "corridor"]
+    },
+    "source": { "document": "EN 14604:2005", "edition": "2005", "clause": "Section 4" }
+  },
+  {
+    "code_id": "EU-FS-002",
+    "jurisdiction": { "country": "EU" },
+    "category": "fire_safety",
+    "rule": {
+      "description": "Fire resistance of structural elements",
+      "requirement": "Structural elements in residential buildings shall achieve minimum REI 60 fire resistance",
+      "min_value": 60,
+      "unit": "minutes",
+      "applies_to": ["living_room", "bedroom", "kitchen", "dining", "study", "corridor"]
+    },
+    "source": { "document": "EN 1991-1-2", "edition": "2002", "clause": "Section 2.4" }
+  },
+  {
+    "code_id": "EU-EL-001",
+    "jurisdiction": { "country": "EU" },
+    "category": "electrical",
+    "rule": {
+      "description": "Minimum lighting level for habitable rooms",
+      "requirement": "Habitable rooms shall have maintained illuminance of not less than 300 lux on the working plane",
+      "min_value": 300,
+      "unit": "lux",
+      "applies_to": ["living_room", "study", "kitchen"]
+    },
+    "source": { "document": "EN 12464-1:2021", "edition": "2021", "clause": "Table 5.1" }
+  },
+  {
+    "code_id": "EU-EL-002",
+    "jurisdiction": { "country": "EU" },
+    "category": "electrical",
+    "rule": {
+      "description": "Minimum power points per habitable room",
+      "requirement": "Each habitable room shall have a minimum of 2 socket outlets",
+      "min_value": 2,
+      "unit": "outlets",
+      "applies_to": ["living_room", "bedroom", "dining", "study"]
+    },
+    "source": { "document": "IEC 60364-7-701", "edition": "2019", "clause": "Section 701.512" }
+  },
+  {
+    "code_id": "EU-PL-001",
+    "jurisdiction": { "country": "EU" },
+    "category": "plumbing",
+    "rule": {
+      "description": "Minimum water supply per person",
+      "requirement": "Minimum 150 litres per capita per day for residential buildings",
+      "min_value": 150,
+      "unit": "lpcd",
+      "applies_to": ["bathroom", "kitchen"]
+    },
+    "source": { "document": "EN 806-3:2006", "edition": "2006", "clause": "Section 5" }
+  },
+  {
+    "code_id": "EU-AC-001",
+    "jurisdiction": { "country": "EU" },
+    "category": "accessibility",
+    "rule": {
+      "description": "Minimum door width for accessibility",
+      "requirement": "Accessible doors shall have minimum clear opening of 800 mm",
+      "min_value": 800,
+      "unit": "mm",
+      "applies_to": ["living_room", "bedroom", "bathroom", "kitchen", "dining", "corridor"]
+    },
+    "source": { "document": "EN 17210:2021", "edition": "2021", "clause": "Section 8.3" }
+  },
+  {
+    "code_id": "EU-AC-002",
+    "jurisdiction": { "country": "EU" },
+    "category": "accessibility",
+    "rule": {
+      "description": "Accessible bathroom turning space",
+      "requirement": "Accessible bathrooms shall have a turning space of 1500 mm diameter",
+      "min_value": 1500,
+      "unit": "mm",
+      "applies_to": ["bathroom"]
+    },
+    "source": { "document": "EN 17210:2021", "edition": "2021", "clause": "Section 11.2" }
+  }
+]

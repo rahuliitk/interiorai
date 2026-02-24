@@ -183,4 +183,41 @@ export const scheduleRouter = router({
         .returning();
       return updated;
     }),
+
+  analyzeChangeOrderImpact: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const order = await ctx.db.query.changeOrders.findFirst({
+        where: eq(changeOrders.id, input.id),
+        with: { project: true },
+      });
+      if (!order) throw new Error('Change order not found');
+      if ((order as any).project.userId !== ctx.userId) throw new Error('Access denied');
+
+      try {
+        const res = await fetch(
+          `${PROJECT_SERVICE_URL}/api/v1/change-orders/${input.id}/analyze`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              change_order_id: input.id,
+              project_id: (order as any).projectId,
+              title: order.title,
+              description: order.description,
+              cost_impact: order.costImpact,
+              time_impact_days: order.timeImpactDays,
+            }),
+          },
+        );
+        if (!res.ok) throw new Error(`Analysis service returned ${res.status}`);
+        return await res.json() as { summary: string; risks: string[]; recommendations: string[] };
+      } catch {
+        return {
+          summary: `Change order "${order.title}" has a cost impact of $${order.costImpact ?? 0} and time impact of ${order.timeImpactDays ?? 0} days.`,
+          risks: [],
+          recommendations: [],
+        };
+      }
+    }),
 });

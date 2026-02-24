@@ -169,6 +169,7 @@ export const drawingResults = pgTable('drawing_results', {
   dxfStorageKey: text('dxf_storage_key'),
   pdfStorageKey: text('pdf_storage_key'),
   svgStorageKey: text('svg_storage_key'),
+  ifcStorageKey: text('ifc_storage_key'),
   metadata: jsonb('metadata'),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
 });

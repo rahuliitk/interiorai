@@ -1,0 +1,197 @@
+[
+  {
+    "code_id": "UK-RD-001",
+    "jurisdiction": { "country": "GB" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum single bedroom area",
+      "requirement": "A single bedroom shall have a minimum floor area of 7.5 sq.m (NDSS)",
+      "min_value": 7.5,
+      "unit": "sqm",
+      "applies_to": ["bedroom"]
+    },
+    "source": { "document": "Nationally Described Space Standard", "edition": "2015", "clause": "Table 1" }
+  },
+  {
+    "code_id": "UK-RD-002",
+    "jurisdiction": { "country": "GB" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum double bedroom area",
+      "requirement": "A double bedroom shall have a minimum floor area of 11.5 sq.m (NDSS)",
+      "min_value": 11.5,
+      "unit": "sqm",
+      "applies_to": ["bedroom"]
+    },
+    "source": { "document": "Nationally Described Space Standard", "edition": "2015", "clause": "Table 1, Note 1" }
+  },
+  {
+    "code_id": "UK-RD-003",
+    "jurisdiction": { "country": "GB" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum habitable room area",
+      "requirement": "Living rooms shall have a minimum floor area of 13.0 sq.m for 2-person dwellings",
+      "min_value": 13.0,
+      "unit": "sqm",
+      "applies_to": ["living_room", "dining"]
+    },
+    "source": { "document": "Nationally Described Space Standard", "edition": "2015", "clause": "Table 1" }
+  },
+  {
+    "code_id": "UK-RD-004",
+    "jurisdiction": { "country": "GB" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum bedroom width",
+      "requirement": "Bedrooms shall have a minimum width of 2.15 m for single, 2.75 m for double",
+      "min_value": 2150,
+      "unit": "mm",
+      "applies_to": ["bedroom"]
+    },
+    "source": { "document": "Nationally Described Space Standard", "edition": "2015", "clause": "Paragraph 10" }
+  },
+  {
+    "code_id": "UK-RD-005",
+    "jurisdiction": { "country": "GB" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum ceiling height for habitable rooms",
+      "requirement": "Habitable rooms shall have a minimum ceiling height of 2300 mm (2.3 m)",
+      "min_value": 2300,
+      "unit": "mm",
+      "applies_to": ["living_room", "bedroom", "dining", "study", "kitchen"]
+    },
+    "source": { "document": "Nationally Described Space Standard", "edition": "2015", "clause": "Paragraph 9" }
+  },
+  {
+    "code_id": "UK-RD-006",
+    "jurisdiction": { "country": "GB" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum kitchen area",
+      "requirement": "Kitchen shall have a minimum floor area of 5.5 sq.m for a separate kitchen",
+      "min_value": 5.5,
+      "unit": "sqm",
+      "applies_to": ["kitchen"]
+    },
+    "source": { "document": "Nationally Described Space Standard", "edition": "2015", "clause": "Table 1" }
+  },
+  {
+    "code_id": "UK-RD-007",
+    "jurisdiction": { "country": "GB" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum bathroom area",
+      "requirement": "Bathroom shall have a minimum floor area of 2.5 sq.m",
+      "min_value": 2.5,
+      "unit": "sqm",
+      "applies_to": ["bathroom"]
+    },
+    "source": { "document": "Approved Document M", "edition": "2015", "clause": "Section 3.12" }
+  },
+  {
+    "code_id": "UK-RD-008",
+    "jurisdiction": { "country": "GB" },
+    "category": "room_dimensions",
+    "rule": {
+      "description": "Minimum corridor width",
+      "requirement": "Corridors shall have a minimum width of 900 mm (Approved Document M)",
+      "min_value": 900,
+      "unit": "mm",
+      "applies_to": ["corridor"]
+    },
+    "source": { "document": "Approved Document M", "edition": "2015", "clause": "Section 3.6" }
+  },
+  {
+    "code_id": "UK-VT-001",
+    "jurisdiction": { "country": "GB" },
+    "category": "ventilation",
+    "rule": {
+      "description": "Habitable room ventilation",
+      "requirement": "Habitable rooms shall have background ventilation of 8000 sq.mm equivalent area and purge ventilation opening of 1/20th floor area",
+      "min_value": 0.05,
+      "unit": "ratio_of_floor_area",
+      "applies_to": ["living_room", "bedroom", "dining", "study"]
+    },
+    "source": { "document": "Approved Document F", "edition": "2021", "clause": "Table 1.1" }
+  },
+  {
+    "code_id": "UK-VT-002",
+    "jurisdiction": { "country": "GB" },
+    "category": "ventilation",
+    "rule": {
+      "description": "Bathroom extract ventilation",
+      "requirement": "Bathrooms shall have intermittent extract of 15 l/s or continuous extract of 8 l/s",
+      "min_value": 15,
+      "unit": "ach",
+      "applies_to": ["bathroom"]
+    },
+    "source": { "document": "Approved Document F", "edition": "2021", "clause": "Table 1.3" }
+  },
+  {
+    "code_id": "UK-FS-001",
+    "jurisdiction": { "country": "GB" },
+    "category": "fire_safety",
+    "rule": {
+      "description": "Smoke alarm requirement",
+      "requirement": "At least one smoke alarm per storey, and heat alarm in kitchen (Approved Document B)",
+      "min_value": 1,
+      "unit": "per_room",
+      "applies_to": ["living_room", "bedroom", "corridor"]
+    },
+    "source": { "document": "Approved Document B Vol 1", "edition": "2019", "clause": "Section 1.1" }
+  },
+  {
+    "code_id": "UK-EL-001",
+    "jurisdiction": { "country": "GB" },
+    "category": "electrical",
+    "rule": {
+      "description": "Minimum socket outlets per habitable room",
+      "requirement": "Habitable rooms should have a minimum of 4 socket outlets",
+      "min_value": 4,
+      "unit": "outlets",
+      "applies_to": ["living_room", "bedroom", "dining", "study"]
+    },
+    "source": { "document": "Approved Document P", "edition": "2013", "clause": "Section 2, BS 7671" }
+  },
+  {
+    "code_id": "UK-EL-002",
+    "jurisdiction": { "country": "GB" },
+    "category": "electrical",
+    "rule": {
+      "description": "Kitchen electrical requirement",
+      "requirement": "Kitchen shall have a dedicated 32A circuit for cooker and minimum 6 socket outlets",
+      "min_value": 32,
+      "unit": "amps",
+      "applies_to": ["kitchen"]
+    },
+    "source": { "document": "BS 7671:2018", "edition": "2018", "clause": "Regulation 314.1" }
+  },
+  {
+    "code_id": "UK-PL-001",
+    "jurisdiction": { "country": "GB" },
+    "category": "plumbing",
+    "rule": {
+      "description": "Maximum water consumption",
+      "requirement": "New dwellings should achieve water consumption of no more than 125 litres per person per day",
+      "min_value": 125,
+      "unit": "lpcd",
+      "applies_to": ["bathroom", "kitchen"]
+    },
+    "source": { "document": "Approved Document G", "edition": "2015", "clause": "Section G2, Requirement G2(2)" }
+  },
+  {
+    "code_id": "UK-AC-001",
+    "jurisdiction": { "country": "GB" },
+    "category": "accessibility",
+    "rule": {
+      "description": "Minimum door width for accessibility",
+      "requirement": "All doors on accessible routes shall have minimum clear opening of 775 mm",
+      "min_value": 775,
+      "unit": "mm",
+      "applies_to": ["living_room", "bedroom", "bathroom", "kitchen", "dining", "corridor"]
+    },
+    "source": { "document": "Approved Document M", "edition": "2015", "clause": "Section 3.10" }
+  }
+]

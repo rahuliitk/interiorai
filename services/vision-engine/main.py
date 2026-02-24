@@ -19,6 +19,7 @@ from openlintel_shared.middleware import configure_logging, setup_middleware
 from openlintel_shared.redis_client import close_redis
 
 from src.routers import vision
+from src.routers import reconstruction
 
 logger = structlog.get_logger(__name__)
 
@@ -55,3 +56,4 @@ async def health_check() -> HealthResponse:
 
 
 app.include_router(vision.router)
+app.include_router(reconstruction.router)
