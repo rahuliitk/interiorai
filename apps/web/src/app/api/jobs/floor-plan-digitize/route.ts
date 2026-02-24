@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      job_id: job.id,
+      job_id: job!.id,
       user_id: session.user.id,
       project_id: projectId,
       image_url: fullImageUrl,

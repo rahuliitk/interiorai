@@ -4,9 +4,17 @@ import { db, payments, eq } from '@openlintel/db';
 import Stripe from 'stripe';
 import { createHmac } from 'crypto';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-12-18.acacia' as Stripe.LatestApiVersion,
-});
+export const dynamic = 'force-dynamic';
+
+let _stripe: Stripe | null = null;
+function getStripe(): Stripe {
+  if (!_stripe) {
+    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_not_configured', {
+      apiVersion: '2024-12-18.acacia' as Stripe.LatestApiVersion,
+    });
+  }
+  return _stripe;
+}
 
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
 const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || '';
@@ -37,7 +45,7 @@ async function handleStripeWebhook(rawBody: string, signature: string) {
   // Verify webhook signature
   if (STRIPE_WEBHOOK_SECRET) {
     try {
-      event = stripe.webhooks.constructEvent(rawBody, signature, STRIPE_WEBHOOK_SECRET);
+      event = getStripe().webhooks.constructEvent(rawBody, signature, STRIPE_WEBHOOK_SECRET);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Invalid signature';
       return NextResponse.json({ error: `Webhook signature verification failed: ${message}` }, { status: 400 });

@@ -585,3 +585,439 @@ export const yjsDocuments = pgTable('yjs_documents', {
   state: text('state'), // base64-encoded Y.js binary state
   updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
 });
+
+// ===========================================================================
+// PHASE 4: INTELLIGENCE
+// ===========================================================================
+
+// ---------------------------------------------------------------------------
+// Cost Predictions — AI-generated cost forecasts
+// ---------------------------------------------------------------------------
+export const costPredictions = pgTable('cost_predictions', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
+  predictedCost: real('predicted_cost').notNull(),
+  confidenceLow: real('confidence_low').notNull(),
+  confidenceHigh: real('confidence_high').notNull(),
+  riskFactors: jsonb('risk_factors'), // { name, impact, probability }[]
+  breakdown: jsonb('breakdown'), // { category, amount }[]
+  modelProvider: text('model_provider').notNull(),
+  inputSnapshot: jsonb('input_snapshot'), // snapshot of project data used
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Timeline Predictions — AI-generated timeline forecasts
+// ---------------------------------------------------------------------------
+export const timelinePredictions = pgTable('timeline_predictions', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
+  predictedDays: integer('predicted_days').notNull(),
+  confidenceLow: integer('confidence_low').notNull(),
+  confidenceHigh: integer('confidence_high').notNull(),
+  criticalRisks: jsonb('critical_risks'), // { name, delayDays, mitigation }[]
+  phaseBreakdown: jsonb('phase_breakdown'), // { phase, days, dependencies }[]
+  modelProvider: text('model_provider').notNull(),
+  inputSnapshot: jsonb('input_snapshot'),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Budget Scenarios — AI-optimized budget alternatives
+// ---------------------------------------------------------------------------
+export const budgetScenarios = pgTable('budget_scenarios', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  originalTotalCost: real('original_total_cost').notNull(),
+  optimizedTotalCost: real('optimized_total_cost').notNull(),
+  savingsAmount: real('savings_amount').notNull(),
+  savingsPercent: real('savings_percent').notNull(),
+  substitutions: jsonb('substitutions'), // { original, replacement, savings, reason }[]
+  constraints: jsonb('constraints'), // string[] of user constraints
+  status: text('status').notNull().default('draft'), // draft, accepted, rejected
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Sustainability Reports — carbon & green scoring
+// ---------------------------------------------------------------------------
+export const sustainabilityReports = pgTable('sustainability_reports', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
+  totalCarbonKg: real('total_carbon_kg').notNull(),
+  materialCarbonKg: real('material_carbon_kg').notNull(),
+  transportCarbonKg: real('transport_carbon_kg').notNull(),
+  sustainabilityScore: integer('sustainability_score').notNull(), // 0-100
+  leedPoints: integer('leed_points'),
+  greenAlternatives: jsonb('green_alternatives'), // { material, alternative, carbonSaved, costDelta }[]
+  modelProvider: text('model_provider'),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Portfolios — multi-project grouping
+// ---------------------------------------------------------------------------
+export const portfolios = pgTable('portfolios', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  description: text('description'),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Portfolio–Project associations
+// ---------------------------------------------------------------------------
+export const portfolioProjects = pgTable('portfolio_projects', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  portfolioId: text('portfolio_id')
+    .notNull()
+    .references(() => portfolios.id, { onDelete: 'cascade' }),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
+  sortOrder: integer('sort_order').default(0),
+});
+
+// ===========================================================================
+// PHASE 5: ECOSYSTEM
+// ===========================================================================
+
+// ---------------------------------------------------------------------------
+// Digital Twins
+// ---------------------------------------------------------------------------
+export const digitalTwins = pgTable('digital_twins', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
+  modelStorageKey: text('model_storage_key'),
+  modelVersion: integer('model_version').default(1),
+  status: text('status').notNull().default('draft'), // draft, active, archived
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// IoT Devices
+// ---------------------------------------------------------------------------
+export const iotDevices = pgTable('iot_devices', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  digitalTwinId: text('digital_twin_id')
+    .notNull()
+    .references(() => digitalTwins.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  deviceType: text('device_type').notNull(), // temperature, humidity, motion, energy, water
+  positionJson: jsonb('position_json'), // { x, y, z }
+  roomId: text('room_id').references(() => rooms.id, { onDelete: 'set null' }),
+  status: text('status').notNull().default('active'), // active, offline, maintenance
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// IoT Data Points
+// ---------------------------------------------------------------------------
+export const iotDataPoints = pgTable('iot_data_points', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  deviceId: text('device_id')
+    .notNull()
+    .references(() => iotDevices.id, { onDelete: 'cascade' }),
+  value: real('value').notNull(),
+  unit: text('unit').notNull(),
+  timestamp: timestamp('timestamp', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Emergency References — shutoff/breaker locations
+// ---------------------------------------------------------------------------
+export const emergencyReferences = pgTable('emergency_references', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
+  type: text('type').notNull(), // water_shutoff, gas_shutoff, electrical_breaker, fire_extinguisher
+  label: text('label').notNull(),
+  description: text('description'),
+  locationDescription: text('location_description'),
+  positionJson: jsonb('position_json'), // { x, y, z }
+  roomId: text('room_id').references(() => rooms.id, { onDelete: 'set null' }),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Maintenance Schedules
+// ---------------------------------------------------------------------------
+export const maintenanceSchedules = pgTable('maintenance_schedules', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
+  itemName: text('item_name').notNull(),
+  category: text('category').notNull(), // hvac, plumbing, electrical, structural, appliance, exterior
+  frequencyDays: integer('frequency_days').notNull(),
+  nextDueAt: timestamp('next_due_at', { mode: 'date' }).notNull(),
+  provider: text('provider'),
+  estimatedCost: real('estimated_cost'),
+  status: text('status').notNull().default('active'), // active, paused, completed
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Maintenance Logs
+// ---------------------------------------------------------------------------
+export const maintenanceLogs = pgTable('maintenance_logs', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  scheduleId: text('schedule_id')
+    .notNull()
+    .references(() => maintenanceSchedules.id, { onDelete: 'cascade' }),
+  performedAt: timestamp('performed_at', { mode: 'date' }).defaultNow().notNull(),
+  performedBy: text('performed_by'),
+  cost: real('cost'),
+  notes: text('notes'),
+  photoKeys: jsonb('photo_keys'), // string[]
+});
+
+// ---------------------------------------------------------------------------
+// Warranties
+// ---------------------------------------------------------------------------
+export const warranties = pgTable('warranties', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
+  itemName: text('item_name').notNull(),
+  category: text('category').notNull(), // appliance, fixture, material, system
+  brand: text('brand'),
+  serialNumber: text('serial_number'),
+  warrantyStartDate: timestamp('warranty_start_date', { mode: 'date' }).notNull(),
+  warrantyEndDate: timestamp('warranty_end_date', { mode: 'date' }).notNull(),
+  warrantyType: text('warranty_type').notNull().default('manufacturer'), // manufacturer, extended, contractor
+  status: text('status').notNull().default('active'), // active, expired, claimed
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Warranty Claims
+// ---------------------------------------------------------------------------
+export const warrantyClaims = pgTable('warranty_claims', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  warrantyId: text('warranty_id')
+    .notNull()
+    .references(() => warranties.id, { onDelete: 'cascade' }),
+  issueDescription: text('issue_description').notNull(),
+  photoKeys: jsonb('photo_keys'), // string[]
+  status: text('status').notNull().default('filed'), // filed, in_review, approved, denied, resolved
+  claimDate: timestamp('claim_date', { mode: 'date' }).defaultNow().notNull(),
+  resolutionDate: timestamp('resolution_date', { mode: 'date' }),
+});
+
+// ---------------------------------------------------------------------------
+// Offcut Listings — leftover material marketplace
+// ---------------------------------------------------------------------------
+export const offcutListings = pgTable('offcut_listings', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  materialType: text('material_type').notNull(), // wood, tile, stone, metal, fabric, other
+  quantity: real('quantity').notNull(),
+  unit: text('unit').notNull(), // pieces, sqft, sqm, linear_ft, linear_m, kg
+  dimensions: jsonb('dimensions'), // { length, width, thickness, unit }
+  condition: text('condition').notNull().default('new'), // new, like_new, good, fair
+  askingPrice: real('asking_price'),
+  currency: text('currency').default('USD'),
+  imageKeys: jsonb('image_keys'), // string[]
+  location: text('location'),
+  status: text('status').notNull().default('active'), // active, sold, expired, removed
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Offcut Inquiries
+// ---------------------------------------------------------------------------
+export const offcutInquiries = pgTable('offcut_inquiries', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  listingId: text('listing_id')
+    .notNull()
+    .references(() => offcutListings.id, { onDelete: 'cascade' }),
+  buyerUserId: text('buyer_user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  message: text('message').notNull(),
+  status: text('status').notNull().default('pending'), // pending, replied, accepted, declined
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Project Gallery Entries — community showcase
+// ---------------------------------------------------------------------------
+export const projectGalleryEntries = pgTable('project_gallery_entries', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  description: text('description'),
+  tags: jsonb('tags'), // string[]
+  imageKeys: jsonb('image_keys'), // string[]
+  style: text('style'),
+  isPublic: boolean('is_public').default(true),
+  likes: integer('likes').default(0),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Contractor Referrals
+// ---------------------------------------------------------------------------
+export const contractorReferrals = pgTable('contractor_referrals', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  referrerUserId: text('referrer_user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  contractorId: text('contractor_id')
+    .notNull()
+    .references(() => contractors.id, { onDelete: 'cascade' }),
+  refereeEmail: text('referee_email').notNull(),
+  message: text('message'),
+  status: text('status').notNull().default('sent'), // sent, viewed, hired
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Developer Apps — OAuth client registration
+// ---------------------------------------------------------------------------
+export const developerApps = pgTable('developer_apps', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+  clientId: text('client_id').notNull().unique(),
+  clientSecretHash: text('client_secret_hash').notNull(),
+  redirectUris: jsonb('redirect_uris'), // string[]
+  scopes: jsonb('scopes'), // string[]
+  status: text('status').notNull().default('active'), // active, suspended, revoked
+  rateLimitTier: text('rate_limit_tier').default('standard'), // standard, premium, enterprise
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// API Access Tokens
+// ---------------------------------------------------------------------------
+export const apiAccessTokens = pgTable('api_access_tokens', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  appId: text('app_id')
+    .notNull()
+    .references(() => developerApps.id, { onDelete: 'cascade' }),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  tokenHash: text('token_hash').notNull(),
+  scopes: jsonb('scopes'), // string[]
+  expiresAt: timestamp('expires_at', { mode: 'date' }).notNull(),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// API Request Logs
+// ---------------------------------------------------------------------------
+export const apiRequestLogs = pgTable('api_request_logs', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  appId: text('app_id')
+    .notNull()
+    .references(() => developerApps.id, { onDelete: 'cascade' }),
+  endpoint: text('endpoint').notNull(),
+  method: text('method').notNull(),
+  statusCode: integer('status_code').notNull(),
+  responseTimeMs: integer('response_time_ms'),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Webhook Subscriptions
+// ---------------------------------------------------------------------------
+export const webhookSubscriptions = pgTable('webhook_subscriptions', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  appId: text('app_id')
+    .notNull()
+    .references(() => developerApps.id, { onDelete: 'cascade' }),
+  eventType: text('event_type').notNull(), // project.created, bom.generated, payment.completed, etc.
+  targetUrl: text('target_url').notNull(),
+  secret: text('secret').notNull(),
+  status: text('status').notNull().default('active'), // active, paused, failed
+  failureCount: integer('failure_count').default(0),
+  createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
+});
+
+// ---------------------------------------------------------------------------
+// Exchange Rates — cached currency conversion rates
+// ---------------------------------------------------------------------------
+export const exchangeRates = pgTable('exchange_rates', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  fromCurrency: text('from_currency').notNull(),
+  toCurrency: text('to_currency').notNull(),
+  rate: real('rate').notNull(),
+  source: text('source').default('manual'), // manual, api
+  fetchedAt: timestamp('fetched_at', { mode: 'date' }).defaultNow().notNull(),
+});

@@ -18,6 +18,18 @@ import { catalogueRouter } from './catalogue';
 import { procurementRouter } from './procurement';
 import { floorPlanRouter } from './floorPlan';
 import { complianceRouter } from './compliance';
+// Phase 4
+import { predictionRouter } from './prediction';
+import { budgetOptimizationRouter } from './budgetOptimization';
+import { sustainabilityRouter } from './sustainability';
+import { portfolioRouter } from './portfolio';
+// Phase 5
+import { digitalTwinRouter } from './digitalTwin';
+import { maintenanceRouter } from './maintenance';
+import { warrantyRouter } from './warranty';
+import { communityRouter } from './community';
+import { developerPortalRouter } from './developerPortal';
+import { localizationRouter } from './localization';
 
 export const appRouter = router({
   project: projectRouter,
@@ -39,6 +51,18 @@ export const appRouter = router({
   procurement: procurementRouter,
   floorPlan: floorPlanRouter,
   compliance: complianceRouter,
+  // Phase 4
+  prediction: predictionRouter,
+  budgetOptimization: budgetOptimizationRouter,
+  sustainability: sustainabilityRouter,
+  portfolio: portfolioRouter,
+  // Phase 5
+  digitalTwin: digitalTwinRouter,
+  maintenance: maintenanceRouter,
+  warranty: warrantyRouter,
+  community: communityRouter,
+  developerPortal: developerPortalRouter,
+  localization: localizationRouter,
 });
 
 export type AppRouter = typeof appRouter;
