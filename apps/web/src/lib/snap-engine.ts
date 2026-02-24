@@ -57,7 +57,8 @@ export function snapToWall(
   const halfL = roomLengthM / 2;
   const halfW = roomWidthM / 2;
 
-  let { x, y, z } = position;
+  const { y } = position;
+  let { x, z } = position;
 
   // Snap to X walls
   if (Math.abs(x - halfL) < threshold) x = halfL;

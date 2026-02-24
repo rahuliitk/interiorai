@@ -241,7 +241,7 @@ export default function RoomDetailPage({
           </TabsTrigger>
           <TabsTrigger value="designs">
             <Palette className="mr-1.5 h-3.5 w-3.5" />
-            Designs ({room.designVariants.length})
+            Designs ({((room as any).designVariants ?? []).length})
           </TabsTrigger>
         </TabsList>
 
@@ -256,7 +256,7 @@ export default function RoomDetailPage({
           />
           {roomUploads.length > 0 && (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-              {roomUploads.map((upload) => (
+              {roomUploads.map((upload: any) => (
                 <div key={upload.id} className="group relative rounded-lg border overflow-hidden">
                   {upload.mimeType.startsWith('image/') ? (
                     <img
@@ -366,7 +366,7 @@ export default function RoomDetailPage({
             </Dialog>
           </div>
 
-          {room.designVariants.length === 0 ? (
+          {((room as any).designVariants ?? []).length === 0 ? (
             <Card className="flex flex-col items-center justify-center p-8 text-center">
               <Palette className="mb-2 h-8 w-8 text-muted-foreground" />
               <p className="text-sm text-muted-foreground mb-3">
@@ -378,7 +378,7 @@ export default function RoomDetailPage({
             </Card>
           ) : (
             <div className="space-y-3">
-              {room.designVariants.map((variant) => (
+              {((room as any).designVariants ?? []).map((variant: any) => (
                 <div
                   key={variant.id}
                   className="flex items-center justify-between rounded-lg border p-4"

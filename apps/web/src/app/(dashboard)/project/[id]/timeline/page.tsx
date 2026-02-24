@@ -59,7 +59,7 @@ export default function TimelinePage({ params }: { params: Promise<{ id: string 
     },
   });
 
-  const currentSchedule = schedules[0];
+  const currentSchedule: any = schedules[0];
 
   // Build Gantt tasks from trade sequence as preview data
   const previewTasks = useMemo(() => {
@@ -75,8 +75,8 @@ export default function TimelinePage({ params }: { params: Promise<{ id: string 
         id: `preview-${idx}`,
         name: trade.name,
         trade: trade.key,
-        startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0],
+        startDate: startDate.toISOString().split('T')[0]!,
+        endDate: endDate.toISOString().split('T')[0]!,
         progress: 0,
         isCritical: trade.isCritical,
         isMilestone: false,
@@ -87,29 +87,30 @@ export default function TimelinePage({ params }: { params: Promise<{ id: string 
 
   // Build Gantt tasks from actual schedule milestones
   const scheduleTasks = useMemo(() => {
-    if (!currentSchedule?.milestones?.length) return [];
-    return currentSchedule.milestones.map((ms: Record<string, unknown>, idx: number) => ({
+    const ms_list = (currentSchedule as any)?.milestones as Record<string, unknown>[] | undefined;
+    if (!ms_list?.length) return [];
+    return ms_list.map((ms, idx) => ({
       id: ms.id as string,
       name: (ms.name as string) || `Milestone ${idx + 1}`,
       trade: (ms.trade as string) || 'general',
-      startDate: ms.startDate ? new Date(ms.startDate as string).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-      endDate: ms.dueDate ? new Date(ms.dueDate as string).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      startDate: ms.startDate ? new Date(ms.startDate as string).toISOString().split('T')[0]! : new Date().toISOString().split('T')[0]!,
+      endDate: ms.dueDate ? new Date(ms.dueDate as string).toISOString().split('T')[0]! : new Date().toISOString().split('T')[0]!,
       progress: (ms.status as string) === 'completed' ? 100 : (ms.status as string) === 'in_progress' ? 50 : 0,
       isCritical: (ms.isCritical as boolean) ?? false,
       isMilestone: (ms.isMilestone as boolean) ?? false,
-      dependencies: idx > 0 ? [currentSchedule.milestones[idx - 1].id as string] : [],
+      dependencies: idx > 0 ? [ms_list[idx - 1]!.id as string] : [],
     }));
   }, [currentSchedule]);
 
   const ganttTasks = scheduleTasks.length > 0 ? scheduleTasks : previewTasks;
 
-  const projectStart = ganttTasks.length > 0 ? ganttTasks[0].startDate : new Date().toISOString().split('T')[0];
-  const projectEnd = ganttTasks.length > 0 ? ganttTasks[ganttTasks.length - 1].endDate : new Date().toISOString().split('T')[0];
+  const projectStart = ganttTasks.length > 0 ? ganttTasks[0]!.startDate : new Date().toISOString().split('T')[0]!;
+  const projectEnd = ganttTasks.length > 0 ? ganttTasks[ganttTasks.length - 1]!.endDate : new Date().toISOString().split('T')[0]!;
 
   // Build milestones for the tracker view
   const trackerMilestones = useMemo(() => {
-    if (currentSchedule?.milestones?.length) {
-      return currentSchedule.milestones.map((ms: Record<string, unknown>) => ({
+    if ((currentSchedule as any)?.milestones?.length) {
+      return ((currentSchedule as any).milestones as Record<string, unknown>[]).map((ms) => ({
         id: ms.id as string,
         name: (ms.name as string) || 'Unnamed Milestone',
         status: (ms.status as string) || 'pending',

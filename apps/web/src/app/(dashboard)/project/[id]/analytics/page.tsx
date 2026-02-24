@@ -15,7 +15,6 @@ import {
 } from '@openlintel/ui';
 import {
   ArrowLeft,
-  BarChart3,
   IndianRupee,
   Layers,
   Palette,
@@ -54,7 +53,7 @@ export default function ProjectAnalyticsPage({
   }
 
   const totalCost = overview?.totalCost ?? 0;
-  const costCategories: CostCategory[] = (overview?.costBreakdown ?? []).map((c) => ({
+  const costCategories: CostCategory[] = (overview?.costBreakdown ?? []).map((c: any) => ({
     ...c,
     color: c.color ?? '#94a3b8',
   }));

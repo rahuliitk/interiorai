@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { eq, and, sql, like, or, desc, count } from 'drizzle-orm';
-import { users, projects, jobs } from '@openlintel/db';
+import { users, projects, jobs, eq, and, sql, like, or, desc, count } from '@openlintel/db';
 import { router, adminProcedure } from '../init';
 
 const SERVICE_URLS: Record<string, string> = {
@@ -293,7 +292,7 @@ export const adminRouter = router({
           : [];
 
       const countsMap = new Map(
-        projectCounts.map((pc) => [pc.userId, pc.count]),
+        projectCounts.map((pc) => [pc.userId, Number(pc.count)]),
       );
 
       return {

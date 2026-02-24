@@ -1,6 +1,6 @@
 'use client';
 
-import { use, useState, useCallback, useRef, useEffect, Suspense, lazy } from 'react';
+import { use, useState, useCallback, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { trpc } from '@/lib/trpc/client';
 import {
@@ -26,14 +26,11 @@ import {
   ArrowLeft,
   Box,
   ChevronRight,
-  GripVertical,
   Trash2,
   Copy,
   Eye,
   EyeOff,
-  RotateCcw,
 } from 'lucide-react';
-import { cn } from '@openlintel/ui';
 
 import { Scene } from '@/components/editor-3d/scene';
 import { RoomGeometry } from '@/components/editor-3d/room-geometry';
@@ -44,9 +41,9 @@ import { MaterialPanel, type MaterialPreset } from '@/components/editor-3d/mater
 import { LightingPanel, getDefaultLightingConfig, type LightingConfig } from '@/components/editor-3d/lighting-panel';
 import { SnapGrid, SnapGridControls } from '@/components/editor-3d/snap-grid';
 import { CollabPresence } from '@/components/editor-3d/collab-presence';
+import { CollabCursors, useCollabSelectionEmitter } from '@/components/editor-3d/collab-cursors';
 import { createCollabSession, type CollabSession } from '@/lib/collaboration';
 import {
-  FURNITURE_CATALOGUE,
   getCatalogueByCategory,
   createPlacedFurniture,
   type PlacedFurniture,
@@ -94,6 +91,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
 
   // Collaboration session
   const [collab, setCollab] = useState<CollabSession | null>(null);
+  const emitSelectionChange = useCollabSelectionEmitter(collab?.socket ?? null);
 
   useEffect(() => {
     if (!project) return;
@@ -104,7 +102,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
     // Observe remote furniture changes from Y.js
     const observer = () => {
       const remoteFurniture: PlacedFurniture[] = [];
-      session.furnitureMap.forEach((value, key) => {
+      session.furnitureMap.forEach((value, _key) => {
         if (value && typeof value === 'object') {
           remoteFurniture.push(value as PlacedFurniture);
         }
@@ -148,13 +146,13 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
 
   // Set first room when project loads
   useEffect(() => {
-    if (project?.rooms?.length && !selectedRoomId) {
-      setSelectedRoomId(project.rooms[0].id);
+    if ((project as any)?.rooms?.length && !selectedRoomId) {
+      setSelectedRoomId((project as any).rooms[0].id);
     }
   }, [project, selectedRoomId]);
 
   // Get selected room
-  const selectedRoom = project?.rooms?.find((r) => r.id === selectedRoomId);
+  const selectedRoom = (project as any)?.rooms?.find((r: any) => r.id === selectedRoomId);
   const roomDimensions = selectedRoom
     ? {
         lengthMm: selectedRoom.lengthMm ?? DEFAULT_ROOM.lengthMm,
@@ -182,7 +180,8 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
     if (historyIndex > 0) {
       const newIndex = historyIndex - 1;
       setHistoryIndex(newIndex);
-      setFurniture(JSON.parse(JSON.stringify(history[newIndex].furniture)));
+      const entry = history[newIndex];
+      if (entry) setFurniture(JSON.parse(JSON.stringify(entry.furniture)));
     }
   }, [history, historyIndex]);
 
@@ -190,9 +189,19 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
     if (historyIndex < history.length - 1) {
       const newIndex = historyIndex + 1;
       setHistoryIndex(newIndex);
-      setFurniture(JSON.parse(JSON.stringify(history[newIndex].furniture)));
+      const entry = history[newIndex];
+      if (entry) setFurniture(JSON.parse(JSON.stringify(entry.furniture)));
     }
   }, [history, historyIndex]);
+
+  // Broadcast selection changes to collaborators
+  const handleSelectObject = useCallback(
+    (objectId: string | null) => {
+      setSelectedObjectId(objectId);
+      emitSelectionChange(objectId);
+    },
+    [emitSelectionChange],
+  );
 
   // Add furniture to scene
   const handleAddFurniture = useCallback(
@@ -201,10 +210,10 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
       const newFurniture = [...furniture, placed];
       setFurniture(newFurniture);
       pushHistory(newFurniture);
-      setSelectedObjectId(placed.id);
+      handleSelectObject(placed.id);
       setActiveTool('move');
     },
-    [furniture, pushHistory],
+    [furniture, pushHistory, handleSelectObject],
   );
 
   // Move furniture
@@ -215,15 +224,6 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
       );
     },
     [],
-  );
-
-  // On drop (end of transform) record history
-  const handleMoveEnd = useCallback(
-    (objectId: string, position: [number, number, number]) => {
-      const updated = furniture.map((f) => (f.id === objectId ? { ...f, position } : f));
-      pushHistory(updated);
-    },
-    [furniture, pushHistory],
   );
 
   // Rotate furniture
@@ -252,8 +252,8 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
     const newFurniture = furniture.filter((f) => f.id !== selectedObjectId);
     setFurniture(newFurniture);
     pushHistory(newFurniture);
-    setSelectedObjectId(null);
-  }, [selectedObjectId, furniture, pushHistory]);
+    handleSelectObject(null);
+  }, [selectedObjectId, furniture, pushHistory, handleSelectObject]);
 
   // Duplicate selected
   const handleDuplicateSelected = useCallback(() => {
@@ -275,8 +275,8 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
     const newFurniture = [...furniture, duplicate];
     setFurniture(newFurniture);
     pushHistory(newFurniture);
-    setSelectedObjectId(duplicate.id);
-  }, [selectedObjectId, furniture, pushHistory]);
+    handleSelectObject(duplicate.id);
+  }, [selectedObjectId, furniture, pushHistory, handleSelectObject]);
 
   // Apply material to selected
   const handleApplyMaterial = useCallback(
@@ -347,12 +347,12 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
         e.preventDefault();
         handleDuplicateSelected();
       } else if (e.key === 'Escape') {
-        setSelectedObjectId(null);
+        handleSelectObject(null);
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [handleDeleteSelected, handleUndo, handleRedo, handleDuplicateSelected]);
+  }, [handleDeleteSelected, handleUndo, handleRedo, handleDuplicateSelected, handleSelectObject]);
 
   // Get selected furniture object
   const selectedFurniture = furniture.find((f) => f.id === selectedObjectId) ?? null;
@@ -391,13 +391,13 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
         </div>
         <div className="flex items-center gap-2">
           {/* Room selector */}
-          {project.rooms.length > 0 && (
+          {((project as any).rooms ?? []).length > 0 && (
             <Select value={selectedRoomId} onValueChange={setSelectedRoomId}>
               <SelectTrigger className="w-[180px] h-8 text-xs">
                 <SelectValue placeholder="Select room" />
               </SelectTrigger>
               <SelectContent>
-                {project.rooms.map((room) => (
+                {((project as any).rooms ?? []).map((room: any) => (
                   <SelectItem key={room.id} value={room.id}>
                     {room.name}
                   </SelectItem>
@@ -497,7 +497,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
 
         {/* 3D Viewport */}
         <div className="flex-1 overflow-hidden rounded-lg border">
-          {project.rooms.length === 0 ? (
+          {((project as any).rooms ?? []).length === 0 ? (
             <div className="flex h-full items-center justify-center">
               <div className="text-center">
                 <Box className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
@@ -555,18 +555,24 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                   snapEnabled={snapEnabled}
                   roomLengthM={roomLengthM}
                   roomWidthM={roomWidthM}
-                  onSelect={setSelectedObjectId}
+                  onSelect={handleSelectObject}
                   onMove={handleMoveFurniture}
                   onRotate={handleRotateFurniture}
                   onScale={handleScaleFurniture}
                 />
               ))}
 
+              {/* Collaborative cursors from other users */}
+              <CollabCursors
+                socket={collab?.socket ?? null}
+                currentUserId="user"
+              />
+
               {/* Deselect when clicking on empty space */}
               <mesh
                 position={[0, -0.01, 0]}
                 rotation={[-Math.PI / 2, 0, 0]}
-                onClick={() => setSelectedObjectId(null)}
+                onClick={() => handleSelectObject(null)}
                 visible={false}
               >
                 <planeGeometry args={[100, 100]} />
@@ -601,7 +607,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                         <div key={axis} className="text-center">
                           <p className="text-[10px] text-muted-foreground">{axis}</p>
                           <p className="text-xs font-mono">
-                            {selectedFurniture.position[i].toFixed(2)}
+                            {(selectedFurniture.position[i] ?? 0).toFixed(2)}
                           </p>
                         </div>
                       ))}
@@ -616,7 +622,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                         <div key={axis} className="text-center">
                           <p className="text-[10px] text-muted-foreground">{axis}</p>
                           <p className="text-xs font-mono">
-                            {(selectedFurniture.size[i] * selectedFurniture.scale[i]).toFixed(2)}
+                            {((selectedFurniture.size[i] ?? 0) * (selectedFurniture.scale[i] ?? 1)).toFixed(2)}
                           </p>
                         </div>
                       ))}
@@ -631,7 +637,7 @@ export default function EditorPage({ params }: { params: Promise<{ id: string }>
                         <div key={axis} className="text-center">
                           <p className="text-[10px] text-muted-foreground">{axis}</p>
                           <p className="text-xs font-mono">
-                            {((selectedFurniture.rotation[i] * 180) / Math.PI).toFixed(0)}
+                            {(((selectedFurniture.rotation[i] ?? 0) * 180) / Math.PI).toFixed(0)}
                           </p>
                         </div>
                       ))}

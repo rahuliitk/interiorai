@@ -11,7 +11,6 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-  Badge,
   Skeleton,
   Tabs,
   TabsList,
@@ -26,7 +25,6 @@ import {
   QrCode,
   Monitor,
   Info,
-  Wifi,
   CheckCircle2,
   XCircle,
 } from 'lucide-react';
@@ -46,14 +44,14 @@ export default function ARPage({ params }: { params: Promise<{ id: string }> }) 
   const [currentRoomId, setCurrentRoomId] = useState<string>('');
 
   // Set initial room
-  const rooms = project?.rooms ?? [];
+  const rooms = (project as any)?.rooms ?? [];
   if (rooms.length > 0 && !currentRoomId && rooms[0]) {
     setCurrentRoomId(rooms[0].id);
   }
 
   // Generate waypoints from rooms
   const waypoints: VRWaypoint[] = useMemo(() => {
-    return rooms.flatMap((room) => [
+    return rooms.flatMap((room: any) => [
       {
         id: `wp_${room.id}_center`,
         name: `${room.name} - Center`,
@@ -308,7 +306,7 @@ export default function ARPage({ params }: { params: Promise<{ id: string }> }) 
                 </CardHeader>
                 <CardContent>
                   <VRWalkthrough
-                    rooms={rooms.map((r) => ({
+                    rooms={rooms.map((r: any) => ({
                       id: r.id,
                       name: r.name,
                       type: r.type,

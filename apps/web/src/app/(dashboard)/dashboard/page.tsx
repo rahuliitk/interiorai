@@ -171,7 +171,7 @@ export default function DashboardPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
-                    {project.rooms.length} room{project.rooms.length !== 1 ? 's' : ''}
+                    {((project as any).rooms?.length ?? 0)} room{((project as any).rooms?.length ?? 0) !== 1 ? 's' : ''}
                   </p>
                 </CardContent>
                 <CardFooter className="text-xs text-muted-foreground">

@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { eq, and } from 'drizzle-orm';
-import { bomResults, designVariants, rooms, projects, jobs } from '@openlintel/db';
+import { bomResults, designVariants, projects, jobs, eq, and } from '@openlintel/db';
 import { router, protectedProcedure } from '../init';
 
 const BOM_SERVICE_URL = process.env.BOM_SERVICE_URL || 'http://localhost:8002';

@@ -17,6 +17,7 @@ import { analyticsRouter } from './analytics';
 import { catalogueRouter } from './catalogue';
 import { procurementRouter } from './procurement';
 import { floorPlanRouter } from './floorPlan';
+import { complianceRouter } from './compliance';
 
 export const appRouter = router({
   project: projectRouter,
@@ -37,6 +38,7 @@ export const appRouter = router({
   catalogue: catalogueRouter,
   procurement: procurementRouter,
   floorPlan: floorPlanRouter,
+  compliance: complianceRouter,
 });
 
 export type AppRouter = typeof appRouter;

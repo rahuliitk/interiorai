@@ -9,7 +9,6 @@ import {
   CardContent,
   Badge,
   Skeleton,
-  Separator,
   Tabs,
   TabsList,
   TabsTrigger,

@@ -208,7 +208,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
         </Dialog>
       </div>
 
-      {project.rooms.length === 0 ? (
+      {((project as any).rooms ?? []).length === 0 ? (
         <Card className="flex flex-col items-center justify-center p-8 text-center">
           <CardDescription className="mb-4">
             No rooms yet. Add rooms to start designing.
@@ -220,7 +220,7 @@ export default function ProjectPage({ params }: { params: Promise<{ id: string }
         </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {project.rooms.map((room) => (
+          {((project as any).rooms ?? []).map((room: any) => (
             <Link key={room.id} href={`/project/${id}/rooms/${room.id}`}>
               <Card className="transition-shadow hover:shadow-md cursor-pointer">
                 <CardHeader>

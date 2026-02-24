@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { eq, and } from 'drizzle-orm';
-import { cutlistResults, designVariants, rooms, projects, jobs } from '@openlintel/db';
+import { cutlistResults, designVariants, projects, jobs, eq, and } from '@openlintel/db';
 import { router, protectedProcedure } from '../init';
 
 const CUTLIST_SERVICE_URL = process.env.CUTLIST_SERVICE_URL || 'http://localhost:8004';

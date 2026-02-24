@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { trpc } from '@/lib/trpc/client';
 import {
   Button,
-  Badge,
   Separator,
 } from '@openlintel/ui';
 import { Bell, Check, ExternalLink } from 'lucide-react';

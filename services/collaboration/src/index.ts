@@ -68,9 +68,36 @@ app.use('/api/v1/notifications', notificationsRouter);
 // WebSocket setup
 setupWebSocket(io);
 
+// Subscribe to Redis notification channels and push to websocket clients
+async function setupNotificationRelay(subscriber: ReturnType<typeof createClient>) {
+  await subscriber.pSubscribe('notification:*', (message, channel) => {
+    // channel format: notification:{userId}
+    const userId = channel.split(':')[1];
+    if (!userId) return;
+    try {
+      const notification = JSON.parse(message);
+      // Find connected sockets for this user and emit
+      const sockets = io.sockets.sockets;
+      for (const [, socket] of sockets) {
+        if ((socket as any).userId === userId) {
+          socket.emit('notification:new', notification);
+        }
+      }
+    } catch {
+      // Invalid JSON, ignore
+    }
+  });
+  console.log('Notification relay subscribed to Redis pub/sub');
+}
+
 async function start() {
   await redis.connect();
   console.log('Redis connected');
+
+  // Create a separate Redis client for pub/sub subscription
+  const subscriber = redis.duplicate();
+  await subscriber.connect();
+  await setupNotificationRelay(subscriber);
 
   await pool.query('SELECT 1');
   console.log('PostgreSQL connected');

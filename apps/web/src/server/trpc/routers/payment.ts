@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { eq, and } from 'drizzle-orm';
-import { payments, invoices, purchaseOrders, projects, vendors } from '@openlintel/db';
+import { payments, invoices, purchaseOrders, projects, eq, and } from '@openlintel/db';
 import { router, protectedProcedure } from '../init';
 import Stripe from 'stripe';
 

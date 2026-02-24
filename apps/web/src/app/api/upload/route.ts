@@ -1,9 +1,8 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { createHash } from 'crypto';
 import { auth } from '@/lib/auth';
-import { db } from '@openlintel/db';
-import { uploads, projects, rooms } from '@openlintel/db';
-import { eq, and } from 'drizzle-orm';
+import { db, uploads, projects, rooms, eq, and } from '@openlintel/db';
 import { saveFile, generateStorageKey } from '@/lib/storage';
 
 const MAX_SIZE = 10 * 1024 * 1024; // 10MB
@@ -14,6 +13,29 @@ const ALLOWED_TYPES = [
   'image/gif',
   'application/pdf',
 ];
+
+const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+function computeImageHash(buffer: Buffer): string {
+  return createHash('sha256').update(buffer).digest('hex').slice(0, 32);
+}
+
+async function generateThumbnail(
+  buffer: Buffer,
+  mimeType: string,
+): Promise<Buffer | null> {
+  if (!IMAGE_TYPES.includes(mimeType)) return null;
+  try {
+    // Dynamic import to avoid issues if sharp is not installed
+    const sharp = (await import('sharp')).default;
+    return await sharp(buffer)
+      .resize(256, 256, { fit: 'inside', withoutEnlargement: true })
+      .jpeg({ quality: 80 })
+      .toBuffer();
+  } catch {
+    return null;
+  }
+}
 
 export async function POST(request: NextRequest) {
   const session = await auth();
@@ -63,6 +85,17 @@ export async function POST(request: NextRequest) {
   const storageKey = generateStorageKey(file.name);
   await saveFile(buffer, storageKey, file.type);
 
+  // Generate thumbnail for images
+  let thumbnailKey: string | null = null;
+  const thumbnail = await generateThumbnail(buffer, file.type);
+  if (thumbnail) {
+    thumbnailKey = storageKey.replace(/\.[^.]+$/, '_thumb.jpg');
+    await saveFile(thumbnail, thumbnailKey, 'image/jpeg');
+  }
+
+  // Compute image hash for deduplication
+  const imageHash = IMAGE_TYPES.includes(file.type) ? computeImageHash(buffer) : null;
+
   const [upload] = await db
     .insert(uploads)
     .values({
@@ -74,6 +107,8 @@ export async function POST(request: NextRequest) {
       sizeBytes: file.size,
       storageKey,
       category,
+      thumbnailKey,
+      imageHash,
     })
     .returning();
 

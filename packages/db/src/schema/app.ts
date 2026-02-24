@@ -520,15 +520,22 @@ export const contractors = pgTable('contractors', {
   userId: text('user_id').references(() => users.id, { onDelete: 'set null' }), // optional linked user account
   name: text('name').notNull(),
   companyName: text('company_name'),
+  bio: text('bio'), // short description / about
+  website: text('website'),
+  profileImageUrl: text('profile_image_url'),
   specializations: jsonb('specializations'), // string[] - e.g. ['carpentry', 'electrical']
   phone: text('phone'),
   email: text('email'),
   address: text('address'),
   city: text('city'),
+  state: text('state'),
   rating: real('rating').default(0),
   totalReviews: integer('total_reviews').default(0),
   verified: boolean('verified').default(false),
+  yearsExperience: integer('years_experience'),
   portfolioKeys: jsonb('portfolio_keys'), // string[] of image storage keys
+  portfolioUrls: jsonb('portfolio_urls'), // string[] of external portfolio URLs
+  certifications: jsonb('certifications'), // string[] of licenses/certifications
   metadata: jsonb('metadata'),
   createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { mode: 'date' }).defaultNow().notNull(),

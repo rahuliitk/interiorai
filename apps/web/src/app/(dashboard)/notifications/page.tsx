@@ -74,7 +74,6 @@ export default function NotificationsPage() {
     },
   });
 
-  const notifications = filter === 'unread' ? unreadNotifications : allNotifications;
   const unreadCount = unreadNotifications.length;
 
   const handleNotificationClick = (notification: typeof allNotifications[number]) => {
@@ -82,8 +81,8 @@ export default function NotificationsPage() {
       markRead.mutate({ id: notification.id });
     }
     // Navigate to linked resource if available
-    if (notification.linkUrl) {
-      router.push(notification.linkUrl as string);
+    if (notification.link) {
+      router.push(notification.link);
     }
   };
 
@@ -203,13 +202,13 @@ export default function NotificationsPage() {
                       </span>
                     </div>
                   </div>
-                  {notification.body && (
+                  {notification.message && (
                     <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
-                      {notification.body}
+                      {notification.message}
                     </p>
                   )}
                   <div className="mt-2 flex items-center gap-2">
-                    {notification.linkUrl && (
+                    {notification.link && (
                       <span className="inline-flex items-center gap-0.5 text-[10px] text-primary">
                         <ExternalLink className="h-2.5 w-2.5" />
                         View details

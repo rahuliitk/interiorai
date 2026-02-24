@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { trpc } from '@/lib/trpc/client';
 import {
   Button,
@@ -26,7 +26,6 @@ import {
   ListTodo,
   Search,
   RefreshCw,
-  Play,
   Square,
   RotateCcw,
   Clock,

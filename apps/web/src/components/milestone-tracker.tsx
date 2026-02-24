@@ -79,7 +79,7 @@ export function MilestoneTracker({ milestones, onMilestoneClick }: MilestoneTrac
       <div className="absolute left-[15px] top-0 h-full w-0.5 bg-gray-200" />
 
       <div className="space-y-6">
-        {milestones.map((milestone, idx) => {
+        {milestones.map((milestone, _idx) => {
           const config = STATUS_CONFIG[milestone.status] || STATUS_CONFIG.pending;
           const StatusIcon = config.icon;
 

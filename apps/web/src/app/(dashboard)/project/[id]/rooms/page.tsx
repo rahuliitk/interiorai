@@ -41,7 +41,7 @@ export default function RoomsPage({ params }: { params: Promise<{ id: string }> 
       </Link>
       <h1 className="mb-6 text-2xl font-bold tracking-tight">Rooms — {project.name}</h1>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {project.rooms.map((room) => (
+        {((project as any).rooms ?? []).map((room: any) => (
           <Link key={room.id} href={`/project/${id}/rooms/${room.id}`}>
             <Card className="transition-shadow hover:shadow-md cursor-pointer">
               <CardHeader>

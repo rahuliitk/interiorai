@@ -80,7 +80,7 @@ export default function DrawingsPage({ params }: { params: Promise<{ id: string 
 
   const generateDrawings = trpc.drawing.generate.useMutation({
     onSuccess: (job) => {
-      setActiveJobId(job.id);
+      setActiveJobId(job!.id);
       setGenerateOpen(false);
       toast({ title: 'Drawing generation started' });
     },
@@ -146,7 +146,7 @@ export default function DrawingsPage({ params }: { params: Promise<{ id: string 
   }
 
   const previewDrawingData = previewDrawing
-    ? drawings.find((d) => d.id === previewDrawing)
+    ? drawings.find((d: any) => d.id === previewDrawing)
     : null;
 
   return (
@@ -188,7 +188,7 @@ export default function DrawingsPage({ params }: { params: Promise<{ id: string 
                     <SelectValue placeholder="Select design variant" />
                   </SelectTrigger>
                   <SelectContent>
-                    {variants.map((variant) => (
+                    {variants.map((variant: any) => (
                       <SelectItem key={variant.id} value={variant.id}>
                         {variant.name} ({variant.roomName})
                       </SelectItem>
@@ -263,7 +263,7 @@ export default function DrawingsPage({ params }: { params: Promise<{ id: string 
             <DialogTitle>
               {previewDrawingData?.drawingType
                 .replace(/_/g, ' ')
-                .replace(/\b\w/g, (c) => c.toUpperCase()) || 'Drawing Preview'}
+                .replace(/\b\w/g, (c: string) => c.toUpperCase()) || 'Drawing Preview'}
             </DialogTitle>
             <DialogDescription>
               {'variantName' in (previewDrawingData || {})
@@ -277,7 +277,7 @@ export default function DrawingsPage({ params }: { params: Promise<{ id: string 
               drawingType={previewDrawingData.drawingType}
               title={previewDrawingData.drawingType
                 .replace(/_/g, ' ')
-                .replace(/\b\w/g, (c) => c.toUpperCase())}
+                .replace(/\b\w/g, (c: string) => c.toUpperCase())}
               roomName={'roomName' in previewDrawingData ? (previewDrawingData as { roomName: string }).roomName : undefined}
               variantName={'variantName' in previewDrawingData ? (previewDrawingData as { variantName: string }).variantName : undefined}
               date={previewDrawingData.createdAt as unknown as string}
@@ -289,7 +289,7 @@ export default function DrawingsPage({ params }: { params: Promise<{ id: string 
       {/* Drawing cards */}
       {drawings.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {drawings.map((drawing) => {
+          {drawings.map((drawing: any) => {
             const svgUrl = getDownloadUrl(drawing.svgStorageKey);
             const dxfUrl = getDownloadUrl(drawing.dxfStorageKey);
             const pdfUrl = getDownloadUrl(drawing.pdfStorageKey);
@@ -317,7 +317,7 @@ export default function DrawingsPage({ params }: { params: Promise<{ id: string 
                       <CardTitle className="text-sm">
                         {drawing.drawingType
                           .replace(/_/g, ' ')
-                          .replace(/\b\w/g, (c) => c.toUpperCase())}
+                          .replace(/\b\w/g, (c: string) => c.toUpperCase())}
                       </CardTitle>
                       <CardDescription className="text-xs">
                         {'roomName' in drawing ? (drawing as { roomName: string }).roomName : ''}{' '}
@@ -415,7 +415,7 @@ export default function DrawingsPage({ params }: { params: Promise<{ id: string 
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {variants.map((variant) => (
+                  {variants.map((variant: any) => (
                     <div
                       key={variant.id}
                       className="flex items-center justify-between rounded-lg border p-3"

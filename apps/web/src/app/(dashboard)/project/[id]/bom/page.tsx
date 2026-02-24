@@ -31,13 +31,14 @@ import {
 } from '@openlintel/ui';
 import {
   ShoppingCart,
-  Download,
   FileSpreadsheet,
   FileText,
   FileDown,
   RefreshCw,
   Loader2,
+  Truck,
 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function BOMPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: projectId } = use(params);
@@ -54,7 +55,7 @@ export default function BOMPage({ params }: { params: Promise<{ id: string }> })
 
   const generateBom = trpc.bom.generate.useMutation({
     onSuccess: (job) => {
-      setActiveJobId(job.id);
+      setActiveJobId(job!.id);
       setGenerateOpen(false);
       toast({ title: 'BOM generation started' });
     },
@@ -170,6 +171,12 @@ export default function BOMPage({ params }: { params: Promise<{ id: string }> })
           {/* Export buttons */}
           {bomItems.length > 0 && (
             <>
+              <Link href={`/project/${projectId}/procurement`}>
+                <Button variant="outline" size="sm">
+                  <Truck className="mr-1 h-4 w-4" />
+                  Procurement
+                </Button>
+              </Link>
               <Button variant="outline" size="sm" onClick={() => handleExport('csv')}>
                 <FileDown className="mr-1 h-4 w-4" />
                 CSV
@@ -212,7 +219,7 @@ export default function BOMPage({ params }: { params: Promise<{ id: string }> })
                       <SelectValue placeholder="Select design variant" />
                     </SelectTrigger>
                     <SelectContent>
-                      {variants.map((variant) => (
+                      {variants.map((variant: any) => (
                         <SelectItem key={variant.id} value={variant.id}>
                           {variant.name} ({variant.roomName})
                         </SelectItem>
@@ -314,7 +321,7 @@ export default function BOMPage({ params }: { params: Promise<{ id: string }> })
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {variants.map((variant) => (
+                  {variants.map((variant: any) => (
                     <div
                       key={variant.id}
                       className="flex items-center justify-between rounded-lg border p-3"

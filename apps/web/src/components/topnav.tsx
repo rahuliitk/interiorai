@@ -7,7 +7,6 @@ import {
   Avatar,
   AvatarImage,
   AvatarFallback,
-  Button,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,

@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { eq, and } from 'drizzle-orm';
-import { userApiKeys } from '@openlintel/db';
+import { userApiKeys, eq, and } from '@openlintel/db';
 import { router, protectedProcedure } from '../init';
 import { encryptApiKey } from '@/lib/crypto';
 

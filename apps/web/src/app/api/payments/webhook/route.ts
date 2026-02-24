@@ -1,8 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { db } from '@openlintel/db';
-import { payments } from '@openlintel/db';
-import { eq } from 'drizzle-orm';
+import { db, payments, eq } from '@openlintel/db';
 import Stripe from 'stripe';
 import { createHmac } from 'crypto';
 

@@ -30,7 +30,6 @@ import {
   UserCog,
   Ban,
   CheckCircle2,
-  MoreHorizontal,
 } from 'lucide-react';
 
 const PAGE_SIZE = 20;
@@ -209,15 +208,7 @@ export default function AdminUsersPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {users.map((user: {
-                      id: string;
-                      name: string | null;
-                      email: string;
-                      createdAt: string;
-                      projectsCount: number;
-                      role: string;
-                      enabled: boolean;
-                    }) => (
+                    {users.map((user) => (
                       <tr key={user.id} className="border-b last:border-0 hover:bg-muted/50">
                         <td className="px-3 py-3 font-medium">
                           {user.name ?? 'Unnamed'}

@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { eq, and } from 'drizzle-orm';
-import { designVariants, rooms, projects, jobs } from '@openlintel/db';
+import { designVariants, rooms, projects, jobs, eq, and } from '@openlintel/db';
 import { router, protectedProcedure } from '../init';
 
 const DESIGN_SERVICE_URL = process.env.DESIGN_SERVICE_URL || 'http://localhost:8001';

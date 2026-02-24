@@ -6,7 +6,6 @@ import { cn } from '@openlintel/ui';
 import {
   Plus,
   Minus,
-  RotateCcw,
   Move,
   Check,
   X,

@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { eq, and } from 'drizzle-orm';
-import { uploads, projects, rooms } from '@openlintel/db';
+import { uploads, projects, rooms, eq, and } from '@openlintel/db';
 import { router, protectedProcedure } from '../init';
 import { deleteFile } from '@/lib/storage';
 

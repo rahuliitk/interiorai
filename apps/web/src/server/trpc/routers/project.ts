@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { eq, and } from 'drizzle-orm';
-import { projects } from '@openlintel/db';
+import { projects, eq, and } from '@openlintel/db';
 import { router, protectedProcedure } from '../init';
 
 export const projectRouter = router({

@@ -20,20 +20,12 @@ import {
   CardContent,
   Badge,
   Skeleton,
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
   Progress,
-  Separator,
   Tabs,
   TabsList,
   TabsTrigger,
@@ -46,7 +38,6 @@ import {
   Wind,
   RefreshCw,
   Loader2,
-  BookOpen,
   Thermometer,
   Gauge,
 } from 'lucide-react';
@@ -102,7 +93,7 @@ export default function MEPPage({ params }: { params: Promise<{ id: string }> })
 
   const calculateMep = trpc.mep.calculate.useMutation({
     onSuccess: (job) => {
-      setActiveJobId(job.id);
+      setActiveJobId(job!.id);
       toast({ title: `${activeCalcType} calculation started` });
     },
     onError: (err) => {
@@ -145,9 +136,9 @@ export default function MEPPage({ params }: { params: Promise<{ id: string }> })
   };
 
   // Parse results by type
-  const electricalResults = mepResults.filter((r) => r.calcType === 'electrical');
-  const plumbingResults = mepResults.filter((r) => r.calcType === 'plumbing');
-  const hvacResults = mepResults.filter((r) => r.calcType === 'hvac');
+  const electricalResults = mepResults.filter((r: any) => r.calcType === 'electrical');
+  const plumbingResults = mepResults.filter((r: any) => r.calcType === 'plumbing');
+  const hvacResults = mepResults.filter((r: any) => r.calcType === 'hvac');
 
   const latestElectrical = electricalResults.length > 0
     ? (electricalResults[0].result as ElectricalResult)
@@ -186,7 +177,7 @@ export default function MEPPage({ params }: { params: Promise<{ id: string }> })
                 <SelectValue placeholder="Select variant" />
               </SelectTrigger>
               <SelectContent>
-                {variants.map((variant) => (
+                {variants.map((variant: any) => (
                   <SelectItem key={variant.id} value={variant.id}>
                     {variant.name} ({variant.roomName})
                   </SelectItem>

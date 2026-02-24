@@ -3,14 +3,14 @@
 import { useState, useEffect } from 'react';
 import { trpc } from '@/lib/trpc/client';
 import {
-  Card, CardHeader, CardTitle, CardDescription, CardContent,
-  Badge, Skeleton, Button,
+  Card, CardHeader, CardTitle, CardContent,
+  Badge, Skeleton,
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
-  Separator, toast,
+  Separator,
 } from '@openlintel/ui';
 import {
-  Search, Package, Grid3x3, List, ChevronRight, ChevronDown,
-  ShoppingBag, Tag, Building2, IndianRupee, Filter,
+  Search, Package, Grid3x3, ChevronRight, ChevronDown,
+  ShoppingBag, IndianRupee,
 } from 'lucide-react';
 
 interface Product {

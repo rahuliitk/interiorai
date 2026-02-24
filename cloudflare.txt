@@ -1,0 +1,54 @@
+ DNS Configuration for openlintel.com
+
+  Here's what you need to set up at your domain registrar (GoDaddy, Namecheap, Cloudflare, etc.):
+
+  Apex domain (openlintel.com)
+
+  Add 4 A records pointing to GitHub Pages IPs:
+
+  ┌──────┬──────┬─────────────────┐
+  │ Type │ Host │      Value      │
+  ├──────┼──────┼─────────────────┤
+  │ A    │ @    │ 185.199.108.153 │
+  ├──────┼──────┼─────────────────┤
+  │ A    │ @    │ 185.199.109.153 │
+  ├──────┼──────┼─────────────────┤
+  │ A    │ @    │ 185.199.110.153 │
+  ├──────┼──────┼─────────────────┤
+  │ A    │ @    │ 185.199.111.153 │
+  └──────┴──────┴─────────────────┘
+
+  www subdomain (www.openlintel.com)
+
+  Add 1 CNAME record:
+
+  ┌───────┬──────┬─────────────────────┐
+  │ Type  │ Host │        Value        │
+  ├───────┼──────┼─────────────────────┤
+  │ CNAME │ www  │ rahuliitk.github.io │
+  └───────┴──────┴─────────────────────┘
+
+  After DNS propagation (5-30 minutes)
+
+  1. Go to https://github.com/rahuliitk/openlintel/settings/pages
+  2. Under "Custom domain", verify openlintel.com shows a green checkmark
+  3. Check "Enforce HTTPS" — GitHub will auto-provision a Let's Encrypt certificate
+  4. Your site will be live at https://openlintel.com
+
+  Verify DNS is working
+
+  You can test propagation with:
+  dig openlintel.com +short
+  # Should return the four 185.199.x.153 IPs
+
+  dig www.openlintel.com +short
+  # Should return rahuliitk.github.io
+
+  ---
+  Summary of what was done:
+  - Fixed 5 files with incorrect repo URLs (openlintel/openlintel → rahuliitk/openlintel)
+  - Updated docs/index.html URLs (from previous session)
+  - Created docs/CNAME with openlintel.com
+  - Committed and pushed to main
+  - Enabled GitHub Pages (docs/ folder, main branch)
+  - CNAME registered with GitHub — awaiting your DNS configuration

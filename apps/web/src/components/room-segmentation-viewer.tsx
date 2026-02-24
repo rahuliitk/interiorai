@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-  Badge,
   Button,
 } from '@openlintel/ui';
 import { Eye, EyeOff, Layers } from 'lucide-react';

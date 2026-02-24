@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { eq, and, ilike, sql } from 'drizzle-orm';
 import {
   contractors, contractorReviews, contractorAssignments, projects,
+  eq, and, ilike, sql,
 } from '@openlintel/db';
 import { router, protectedProcedure } from '../init';
 
@@ -13,6 +13,7 @@ export const contractorRouter = router({
         search: z.string().optional(),
         city: z.string().optional(),
         specialization: z.string().optional(),
+        verifiedOnly: z.boolean().default(false),
         limit: z.number().int().min(1).max(100).default(20),
         offset: z.number().int().min(0).default(0),
       }),
@@ -31,6 +32,9 @@ export const contractorRouter = router({
       if (input.city) {
         query = query.where(eq(contractors.city, input.city));
       }
+      if (input.verifiedOnly) {
+        query = query.where(eq(contractors.verified, true));
+      }
 
       return query;
     }),
@@ -44,6 +48,68 @@ export const contractorRouter = router({
       });
       if (!contractor) throw new Error('Contractor not found');
       return contractor;
+    }),
+
+  // ── Recommendation / Matching ──────────────────────────────
+  recommend: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.string(),
+        requiredSpecializations: z.array(z.string()).optional(),
+        city: z.string().optional(),
+        limit: z.number().int().min(1).max(50).default(10),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const project = await ctx.db.query.projects.findFirst({
+        where: and(eq(projects.id, input.projectId), eq(projects.userId, ctx.userId)),
+      });
+      if (!project) throw new Error('Project not found');
+
+      // Fetch all active contractors
+      const allContractors = await ctx.db
+        .select()
+        .from(contractors)
+        .limit(200)
+        .orderBy(sql`${contractors.rating} DESC NULLS LAST`);
+
+      // Score each contractor
+      const scored = allContractors.map((c) => {
+        let score = 0;
+        const specs = (c.specializations as string[]) || [];
+
+        // Specialization overlap (0-50 points)
+        if (input.requiredSpecializations?.length) {
+          const overlap = input.requiredSpecializations.filter((s) =>
+            specs.some((cs) => cs.toLowerCase() === s.toLowerCase()),
+          ).length;
+          score += (overlap / input.requiredSpecializations.length) * 50;
+        } else {
+          score += 25; // No preference = neutral
+        }
+
+        // Rating score (0-30 points)
+        score += ((c.rating || 0) / 5) * 30;
+
+        // Location match (0-10 points)
+        if (input.city && c.city?.toLowerCase() === input.city.toLowerCase()) {
+          score += 10;
+        }
+
+        // Verified bonus (0-5 points)
+        if (c.verified) score += 5;
+
+        // Experience bonus (0-5 points)
+        if (c.yearsExperience) {
+          score += Math.min(c.yearsExperience / 10, 1) * 5;
+        }
+
+        return { ...c, matchScore: Math.round(score * 10) / 10 };
+      });
+
+      // Sort by score and return top N
+      scored.sort((a, b) => b.matchScore - a.matchScore);
+      return scored.slice(0, input.limit);
     }),
 
   // ── Reviews ────────────────────────────────────────────────

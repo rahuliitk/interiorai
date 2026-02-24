@@ -2,7 +2,7 @@
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Badge } from '@openlintel/ui';
 import { cn } from '@openlintel/ui';
-import { Calendar, Clock, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { Clock, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 export interface Milestone {
   id: string;
